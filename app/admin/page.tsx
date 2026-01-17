@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
+import { toast } from "sonner"
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import { SiteHeader } from "@/components/dashboard/site-header"
 import {
@@ -15,6 +16,7 @@ import { Bird, Package, AlertTriangle, TrendingUp, Users, Calendar, ArrowRight, 
 import Link from "next/link"
 import Image from "next/image"
 import { getRoosterStats, type Rooster } from "./data/roosters"
+import { exportDashboardToExcel } from "./utils/export-dashboard"
 import { DateRangeSelector } from "./analytics/components/date-range-selector"
 import type { DateRange } from "./analytics/data/mock-data"
 import dynamic from "next/dynamic"
@@ -97,6 +99,16 @@ export default function Page() {
     .filter(r => r.status === 'Available')
     .slice(0, 3)
 
+  const handleExportReport = async () => {
+    try {
+      await exportDashboardToExcel(stats, roosters, activities, selectedDateRange)
+      toast.success("Dashboard report exported successfully!")
+    } catch (error) {
+      console.error("Error exporting dashboard:", error)
+      toast.error("Failed to export report. Please try again.")
+    }
+  }
+
   const slides = useMemo(
     () =>
       featuredRoosters.map((rooster) => ({
@@ -143,7 +155,11 @@ export default function Page() {
                         initialDateRange={selectedDateRange}
                         onDateRangeChange={setSelectedDateRange}
                       />
-                      <Button size="sm" className="bg-[#3d6c58] hover:bg-[#4e816b] w-full sm:w-auto">
+                      <Button 
+                        size="sm" 
+                        className="bg-[#3d6c58] hover:bg-[#4e816b] w-full sm:w-auto"
+                        onClick={handleExportReport}
+                      >
                         Export Report
                       </Button>
                     </>

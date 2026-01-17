@@ -16,6 +16,7 @@ import { Star, TrendingUp, TrendingDown, RefreshCw } from "lucide-react"
 
 import { type CustomerReview } from "./data/reviews"
 import { filterReviews, getStatusColor, renderStars } from "./utils/feedback-utils"
+import { exportFeedbackToExcel } from "./utils/export-to-excel"
 import { FeedbackPageHeader } from "./components/feedback-page-header"
 import { FeedbackSearchFilter } from "./components/feedback-search-filter"
 import { FeedbackStatsCards } from "./components/feedback-stats-cards"
@@ -193,7 +194,13 @@ export default function FeedbackPage() {
   }
 
   const handleExportReport = () => {
-    toast.success("Feedback report exported successfully")
+    try {
+      exportFeedbackToExcel(reviews)
+      toast.success("Feedback report exported successfully")
+    } catch (error) {
+      console.error("Error exporting feedback:", error)
+      toast.error("Failed to export report. Please try again.")
+    }
   }
 
   

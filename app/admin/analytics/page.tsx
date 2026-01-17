@@ -112,14 +112,14 @@ export function AnalyticsPage() {
     setSelectedDateRange(dateRange)
   }
 
-  const handleExportReport = () => {
+  const handleExportReport = async () => {
     if (!analyticsData) {
       toast.error("No data available to export")
       return
     }
 
     try {
-      exportAnalyticsToExcel(analyticsData, selectedDateRange)
+      await exportAnalyticsToExcel(analyticsData, selectedDateRange)
       toast.success("Report exported successfully!")
     } catch (error) {
       console.error("Error exporting report:", error)

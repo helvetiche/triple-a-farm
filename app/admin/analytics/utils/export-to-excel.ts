@@ -1,4 +1,3 @@
-import * as XLSX from "xlsx"
 import type {
   AnalyticsStats,
   MonthlyData,
@@ -15,10 +14,16 @@ interface AnalyticsData {
   customerRatings: CustomerRating[]
 }
 
-export const exportAnalyticsToExcel = (
+export const exportAnalyticsToExcel = async (
   data: AnalyticsData,
   dateRange?: { startDate: Date; endDate: Date }
 ) => {
+  // Dynamic import to ensure this only runs on client
+  if (typeof window === 'undefined') {
+    throw new Error('Export can only be performed in the browser')
+  }
+
+  const XLSX = await import('xlsx')
   const workbook = XLSX.utils.book_new()
 
   // Sheet 1: Summary Statistics
