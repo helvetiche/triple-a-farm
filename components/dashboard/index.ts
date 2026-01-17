@@ -1,0 +1,10 @@
+// Re-export all dashboard components for cleaner imports
+export { AppSidebar } from "./app-sidebar"
+export { DynamicBreadcrumb } from "./dynamic-breadcrumb"
+export { NavMain } from "./nav-main"
+export { NavUser } from "./nav-user"
+export { NotificationPanel } from "./notification-panel"
+export { PageHeader, PageHeaderAction, PageHeaderAddButton, PageHeaderLinkButton } from "./page-header"
+export { SearchForm } from "./search-form"
+export { SiteHeader } from "./site-header"
+export { StatCard, StatCards } from "./stat-cards"
