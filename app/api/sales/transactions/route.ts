@@ -65,15 +65,9 @@ export async function POST(request: NextRequest) {
       customerContact: body.customerContact,
       amount: body.amount,
       paymentMethod: body.paymentMethod,
-      status: body.status || "pending",
-      paymentStatus: body.paymentStatus || "unpaid",
       notes: body.notes,
       commission: body.commission,
       agentName: body.agentName,
-      amountPaid: body.amountPaid || 0,
-      lastPaymentDate: body.lastPaymentDate,
-      lastPaymentAmount: body.lastPaymentAmount,
-      paymentNotes: body.paymentNotes,
     };
 
     const created = await createSalesTransaction(sessionUser, input);

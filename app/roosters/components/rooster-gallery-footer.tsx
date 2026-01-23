@@ -45,25 +45,27 @@ export function RoosterGalleryFooter() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-white/80">+63 XXX XXX XXXX</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-white/80">info@tripleagamefarm.com</span>
+                <span className="text-white/80">0950 972 7214</span>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-white/80">Philippines</span>
+                <span className="text-white/80">
+                  119 Purok 1 Rose, Paltok<br />
+                  Angat, Bulacan
+                </span>
               </li>
             </ul>
             
             {/* Social Media */}
-            <div className="flex gap-4 mt-4">
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
+            <div className="mt-4">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61578922746473" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+              >
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
+                <span>Triple A Game Farm</span>
               </a>
             </div>
           </div>

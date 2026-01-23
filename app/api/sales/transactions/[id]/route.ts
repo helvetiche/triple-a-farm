@@ -60,12 +60,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = (await request.json()) as Partial<UpdateSalesTransactionInput>;
 
     const input: UpdateSalesTransactionInput = {
-      status: body.status,
-      paymentStatus: body.paymentStatus,
-      amountPaid: body.amountPaid,
-      lastPaymentDate: body.lastPaymentDate,
-      lastPaymentAmount: body.lastPaymentAmount,
-      paymentNotes: body.paymentNotes,
       notes: body.notes,
     };
 

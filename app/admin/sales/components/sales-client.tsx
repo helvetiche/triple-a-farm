@@ -28,9 +28,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { 
   SalesViewDialog,
-  SendConfirmationDialog,
   RecordSaleDialog,
-  UpdatePaymentDialog,
   RevenueTrendChart,
   SalesTable,
   LoadingSpinner,
@@ -56,7 +54,6 @@ export function SalesClient() {
   const [stats, setStats] = useState<SalesStats>({
     totalRevenue: 0,
     totalTransactions: 0,
-    pendingTransactions: 0,
     averageSaleAmount: 0,
     monthlyGrowth: 0,
     topBreed: ""
@@ -67,8 +64,6 @@ export function SalesClient() {
   const [showRecordSaleDialog, setShowRecordSaleDialog] = useState(false)
   const [selectedSale, setSelectedSale] = useState<SalesTransaction | null>(null)
   const [showViewDialog, setShowViewDialog] = useState(false)
-  const [showUpdatePaymentDialog, setShowUpdatePaymentDialog] = useState(false)
-  const [showSendConfirmationDialog, setShowSendConfirmationDialog] = useState(false)
   const [isSendingConfirmation, setIsSendingConfirmation] = useState(false)
   const [prefilledRoosterData, setPrefilledRoosterData] = useState<any>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -101,7 +96,6 @@ export function SalesClient() {
         setStats(analyticsResult.data.stats || {
           totalRevenue: 0,
           totalTransactions: 0,
-          pendingTransactions: 0,
           averageSaleAmount: 0,
           monthlyGrowth: 0,
           topBreed: ""
@@ -155,42 +149,11 @@ export function SalesClient() {
     }
   }
 
-  const handleUpdatePayment = async (updatedTransaction: SalesTransaction) => {
-    try {
-      // Payment is already saved to Firebase by update-payment-dialog
-      // Update local state immediately
-      setSales(sales.map(sale => 
-        sale.id === updatedTransaction.id ? updatedTransaction : sale
-      ))
-      setShowUpdatePaymentDialog(false)
-      
-      // Refresh from Firebase after a short delay
-      setTimeout(async () => {
-        await fetchSalesData()
-      }, 500)
-    } catch (error) {
-      console.error("Error updating payment:", error)
-      toastCRUD.updateError("Failed to update payment. Please try again.")
-    }
-  }
-
-  const handleSendConfirmation = async (saleId: string) => {
-    setIsSendingConfirmation(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsSendingConfirmation(false)
-    setShowSendConfirmationDialog(false)
-    if (selectedSale) {
-      toastCRUD.confirmationSent(selectedSale.customerName)
-    }
-  }
-
   const filteredSales = sales.filter(sale => {
     const matchesSearch = sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          sale.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          sale.id.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = selectedStatus === "all" || sale.paymentStatus === selectedStatus
-    return matchesSearch && matchesStatus
+    return matchesSearch
   })
 
   // Pagination logic
@@ -270,42 +233,30 @@ export function SalesClient() {
                   {
                     title: "Total Revenue",
                     value: `₱${stats.totalRevenue.toLocaleString()}`,
-                    description: "+12.5%",
+                    description: `${stats.monthlyGrowth >= 0 ? '+' : ''}${stats.monthlyGrowth.toFixed(1)}%`,
                     icon: TrendingUp,
                     trend: {
-                      value: "+12.5%",
-                      type: "increase"
+                      value: `${stats.monthlyGrowth >= 0 ? '+' : ''}${stats.monthlyGrowth.toFixed(1)}%`,
+                      type: stats.monthlyGrowth >= 0 ? "increase" : "decrease"
                     }
                   },
                   {
                     title: "Total Sales",
                     value: stats.totalTransactions.toString(),
-                    description: "+8.2%",
+                    description: "All completed sales",
                     icon: CreditCard,
-                    trend: {
-                      value: "+8.2%",
-                      type: "increase"
-                    }
-                  },
-                  {
-                    title: "Pending Payments",
-                    value: stats.pendingTransactions.toString(),
-                    description: "-2.4%",
-                    icon: Clock,
-                    trend: {
-                      value: "-2.4%",
-                      type: "decrease"
-                    }
                   },
                   {
                     title: "Average Sale",
                     value: `₱${stats.averageSaleAmount.toLocaleString()}`,
-                    description: "+5.1%",
+                    description: "Per transaction",
                     icon: PhilippinePeso,
-                    trend: {
-                      value: "+5.1%",
-                      type: "increase"
-                    }
+                  },
+                  {
+                    title: "Top Breed",
+                    value: stats.topBreed || "N/A",
+                    description: "Best selling",
+                    icon: Wallet,
                   }
                 ]}
               />
@@ -348,21 +299,6 @@ export function SalesClient() {
                       setSelectedSale(sale)
                       setShowViewDialog(true)
                     }}
-                    onUpdateTransaction={(sale: SalesTransaction) => {
-                      setSelectedSale(sale)
-                      setShowUpdatePaymentDialog(true)
-                    }}
-                    onUpdatePayment={(sale: SalesTransaction) => {
-                      setSelectedSale(sale)
-                      setShowUpdatePaymentDialog(true)
-                    }}
-                    onCancelTransaction={(sale: SalesTransaction) => {
-                      // Handle cancel if needed
-                    }}
-                    onSendConfirmation={(sale: SalesTransaction) => {
-                      setSelectedSale(sale)
-                      setShowSendConfirmationDialog(true)
-                    }}
                   />
                   {totalPages > 1 && (
                     <div className="pt-6">
@@ -404,23 +340,6 @@ export function SalesClient() {
           transaction={selectedSale}
           open={showViewDialog}
           onOpenChange={setShowViewDialog}
-          onSendConfirmation={(transaction: SalesTransaction) => {
-            setSelectedSale(transaction)
-            setShowSendConfirmationDialog(true)
-          }}
-        />
-
-        <UpdatePaymentDialog
-          transaction={selectedSale}
-          open={showUpdatePaymentDialog}
-          onOpenChange={setShowUpdatePaymentDialog}
-          onPaymentUpdated={handleUpdatePayment}
-        />
-
-        <SendConfirmationDialog
-          transaction={selectedSale}
-          open={showSendConfirmationDialog}
-          onOpenChange={setShowSendConfirmationDialog}
         />
 
       </SidebarProvider>

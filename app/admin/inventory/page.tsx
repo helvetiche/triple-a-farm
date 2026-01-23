@@ -65,10 +65,14 @@ import {
   RestockDialog,
   ConsumeDialog,
   ActivityLogDialog,
+  SupplierAddDialog,
+  SupplierViewDialog,
+  SupplierEditDialog,
 } from "./components";
 
 import { filterInventoryItems, getStatusColor } from "./data/mock-data";
 import type { InventoryItem, InventoryStats, InventoryActivity } from "@/lib/inventory-types";
+import type { Supplier } from "@/lib/supplier-types";
 
 // Import toast utilities
 import { toastCRUD } from "./utils/toast";
@@ -100,6 +104,13 @@ export default function InventoryPage() {
   const [isRestockDialogOpen, setIsRestockDialogOpen] = useState(false);
   const [isConsumeDialogOpen, setIsConsumeDialogOpen] = useState(false);
   const [isActivityLogDialogOpen, setIsActivityLogDialogOpen] = useState(false);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [isLoadingSuppliers, setIsLoadingSuppliers] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [isSupplierViewDialogOpen, setIsSupplierViewDialogOpen] = useState(false);
+  const [isSupplierAddDialogOpen, setIsSupplierAddDialogOpen] = useState(false);
+  const [isSupplierEditDialogOpen, setIsSupplierEditDialogOpen] = useState(false);
+  const [supplierSearchValue, setSupplierSearchValue] = useState("");
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     title: string;
@@ -199,6 +210,30 @@ export default function InventoryPage() {
       toastCRUD.networkError();
     } finally {
       setIsLoadingActivities(false);
+    }
+  };
+
+  const loadSuppliers = async () => {
+    setIsLoadingSuppliers(true);
+    try {
+      const response = await fetch("/api/suppliers");
+      const json = await response.json();
+
+      if (!response.ok || !json?.success) {
+        if (response.status === 401 || response.status === 403) {
+          toastCRUD.permissionError();
+        } else {
+          toastCRUD.loadError("suppliers");
+        }
+        return;
+      }
+
+      setSuppliers(json.data as Supplier[]);
+    } catch (error) {
+      console.error("Failed to load suppliers:", error);
+      toastCRUD.networkError();
+    } finally {
+      setIsLoadingSuppliers(false);
     }
   };
 
@@ -390,6 +425,73 @@ export default function InventoryPage() {
     }
   };
 
+  // Supplier handlers
+  const handleViewSupplier = (id: string) => {
+    const supplier = suppliers.find((s) => s.id === id);
+    if (supplier) {
+      setSelectedSupplier(supplier);
+      setIsSupplierViewDialogOpen(true);
+    }
+  };
+
+  const handleEditSupplier = (id: string) => {
+    const supplier = suppliers.find((s) => s.id === id);
+    if (supplier) {
+      setSelectedSupplier(supplier);
+      setIsSupplierEditDialogOpen(true);
+    }
+  };
+
+  const handleDeleteSupplier = (id: string) => {
+    const supplier = suppliers.find((s) => s.id === id);
+    if (supplier) {
+      setConfirmDialog({
+        open: true,
+        title: "Delete Supplier",
+        description: `Are you sure you want to delete ${supplier.name}? This action cannot be undone.`,
+        onConfirm: async () => {
+          try {
+            const response = await fetch(`/api/suppliers/${id}`, {
+              method: "DELETE",
+            });
+
+            const json = await response.json();
+
+            if (!response.ok || !json?.success) {
+              if (response.status === 401 || response.status === 403) {
+                toastCRUD.permissionError();
+              } else if (response.status === 404) {
+                toastCRUD.deleteError("Supplier", "Supplier not found.");
+              } else {
+                toastCRUD.deleteError("Supplier", json?.error?.message);
+              }
+              return;
+            }
+
+            setSuppliers((prev) => prev.filter((s) => s.id !== id));
+            toastCRUD.deleteSuccess("Supplier", supplier.name);
+          } catch (error) {
+            console.error("Failed to delete supplier:", error);
+            toastCRUD.deleteError(
+              "Supplier",
+              "Failed to delete supplier. Please try again."
+            );
+          }
+        },
+      });
+    }
+  };
+
+  const handleSupplierAdded = (newSupplier: Supplier) => {
+    setSuppliers((prev) => [...prev, newSupplier]);
+  };
+
+  const handleSupplierUpdated = (updatedSupplier: Supplier) => {
+    setSuppliers((prev) =>
+      prev.map((s) => (s.id === updatedSupplier.id ? updatedSupplier : s))
+    );
+  };
+
   // Show loading state while data is being loaded
   if (isDataLoading) {
     return (
@@ -490,6 +592,9 @@ export default function InventoryPage() {
               <Tabs defaultValue="inventory" className="space-y-4" onValueChange={(value) => {
                 if (value === "activity" && allActivities.length === 0) {
                   loadAllActivities();
+                }
+                if (value === "suppliers" && suppliers.length === 0) {
+                  loadSuppliers();
                 }
               }}>
                 <TabsList className="grid w-full grid-cols-4">
@@ -904,85 +1009,129 @@ export default function InventoryPage() {
                 </TabsContent>
 
                 <TabsContent value="suppliers" className="space-y-4">
+                  {/* Search and Add Button */}
+                  <Card className="border-[#3d6c58]/20">
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            placeholder="Search suppliers by name, contact, or phone..."
+                            value={supplierSearchValue}
+                            onChange={(e) => setSupplierSearchValue(e.target.value)}
+                            className="w-full px-4 py-2 border border-[#3d6c58]/20 focus:outline-none focus:ring-2 focus:ring-[#3d6c58] rounded-none"
+                          />
+                        </div>
+                        <Button
+                          className="bg-[#3d6c58] hover:bg-[#4e816b]"
+                          onClick={() => setIsSupplierAddDialogOpen(true)}
+                        >
+                          Add Supplier
+                        </Button>
+                        {supplierSearchValue && (
+                          <Button
+                            variant="outline"
+                            onClick={() => setSupplierSearchValue("")}
+                            className="border-[#3d6c58]/20"
+                          >
+                            Clear
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   <Card className="border-[#3d6c58]/20">
                     <CardHeader>
                       <CardTitle className="text-[#1f3f2c]">
                         Active Suppliers
                       </CardTitle>
                       <CardDescription>
-                        Manage your supplier relationships
+                        {suppliers.length === 0
+                          ? "No suppliers found"
+                          : `Manage your ${suppliers.length} supplier${suppliers.length !== 1 ? "s" : ""}`}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {[
-                          {
-                            name: "AgriFeeds Corp",
-                            contact: "+63 2 1234 5678",
-                            items: 12,
-                            orders: 5,
-                          },
-                          {
-                            name: "VetMed Supply",
-                            contact: "+63 2 2345 6789",
-                            items: 8,
-                            orders: 3,
-                          },
-                          {
-                            name: "Farm Supply Co",
-                            contact: "+63 2 3456 7890",
-                            items: 15,
-                            orders: 7,
-                          },
-                          {
-                            name: "CleanPro Solutions",
-                            contact: "+63 2 4567 8901",
-                            items: 6,
-                            orders: 2,
-                          },
-                        ].map((supplier, index) => (
-                          <Card key={index} className="border-[#3d6c58]/20">
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base text-[#1f3f2c]">
-                                {supplier.name}
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                              <div className="flex items-center space-x-2">
-                                <Phone className="h-4 w-4 text-[#4a6741]" />
-                                <p className="text-sm text-[#4a6741]">
-                                  {supplier.contact}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Book className="h-4 w-4 text-[#4a6741]" />
-                                <span className="text-sm text-[#4a6741]">
-                                  Items:
-                                </span>
-                                <span className="font-medium">
-                                  {supplier.items}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Package className="h-4 w-4 text-[#4a6741]" />
-                                <span className="text-sm text-[#4a6741]">
-                                  Orders:
-                                </span>
-                                <span className="font-medium">
-                                  {supplier.orders}
-                                </span>
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full border-[#3d6c58]/20"
-                              >
-                                View Details
-                              </Button>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                      {isLoadingSuppliers ? (
+                        <TableSkeleton />
+                      ) : suppliers.length === 0 && !supplierSearchValue ? (
+                        <NoSuppliersState />
+                      ) : suppliers.filter((supplier) => {
+                        if (!supplierSearchValue) return true;
+                        const searchLower = supplierSearchValue.toLowerCase();
+                        return (
+                          supplier.name.toLowerCase().includes(searchLower) ||
+                          supplier.phone.toLowerCase().includes(searchLower) ||
+                          supplier.contactPerson?.toLowerCase().includes(searchLower) ||
+                          supplier.email?.toLowerCase().includes(searchLower)
+                        );
+                      }).length === 0 ? (
+                        <div className="text-center py-12">
+                          <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                          <p className="text-gray-600">No suppliers found</p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Try adjusting your search terms
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                          {suppliers
+                            .filter((supplier) => {
+                              if (!supplierSearchValue) return true;
+                              const searchLower = supplierSearchValue.toLowerCase();
+                              return (
+                                supplier.name.toLowerCase().includes(searchLower) ||
+                                supplier.phone.toLowerCase().includes(searchLower) ||
+                                supplier.contactPerson?.toLowerCase().includes(searchLower) ||
+                                supplier.email?.toLowerCase().includes(searchLower)
+                              );
+                            })
+                            .map((supplier) => (
+                              <Card key={supplier.id} className="border-[#3d6c58]/20">
+                                <CardHeader className="pb-3">
+                                  <CardTitle className="text-base text-[#1f3f2c]">
+                                    {supplier.name}
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Phone className="h-4 w-4 text-[#4a6741]" />
+                                    <p className="text-sm text-[#4a6741]">
+                                      {supplier.phone}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Book className="h-4 w-4 text-[#4a6741]" />
+                                    <span className="text-sm text-[#4a6741]">
+                                      Items:
+                                    </span>
+                                    <span className="font-medium">
+                                      {supplier.itemsSupplied}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Package className="h-4 w-4 text-[#4a6741]" />
+                                    <span className="text-sm text-[#4a6741]">
+                                      Orders:
+                                    </span>
+                                    <span className="font-medium">
+                                      {supplier.totalOrders}
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full border-[#3d6c58]/20"
+                                    onClick={() => handleViewSupplier(supplier.id)}
+                                  >
+                                    View Details
+                                  </Button>
+                                </CardContent>
+                              </Card>
+                            ))}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -1050,6 +1199,28 @@ export default function InventoryPage() {
                 cancelText="Cancel"
                 variant="destructive"
                 onConfirm={confirmDialog.onConfirm}
+              />
+
+              {/* Supplier Dialogs */}
+              <SupplierViewDialog
+                supplier={selectedSupplier}
+                open={isSupplierViewDialogOpen}
+                onOpenChange={setIsSupplierViewDialogOpen}
+                onEdit={handleEditSupplier}
+                onDelete={handleDeleteSupplier}
+              />
+
+              <SupplierAddDialog
+                open={isSupplierAddDialogOpen}
+                onOpenChange={setIsSupplierAddDialogOpen}
+                onSupplierAdded={handleSupplierAdded}
+              />
+
+              <SupplierEditDialog
+                supplier={selectedSupplier}
+                open={isSupplierEditDialogOpen}
+                onOpenChange={setIsSupplierEditDialogOpen}
+                onSupplierUpdated={handleSupplierUpdated}
               />
             </div>
           </SidebarInset>

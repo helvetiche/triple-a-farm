@@ -143,8 +143,7 @@ export function RecordSaleDialog({
     setIsSaving(true)
 
     try {
-      // Update rooster status to "Reserved" when sale is recorded
-      // (Will be updated to "Sold" when payment is completed)
+      // Update rooster status to "Sold" when sale is recorded
       try {
         const roosterUpdateResponse = await fetch(`/api/roosters/${formData.roosterId}`, {
           method: "PATCH",
@@ -152,7 +151,7 @@ export function RecordSaleDialog({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            status: "Reserved"
+            status: "Sold"
           }),
         })
 
@@ -180,12 +179,9 @@ export function RecordSaleDialog({
           customerContact: formData.customerContact,
           amount: amount,
           paymentMethod: formData.paymentMethod,
-          status: "pending",
-          paymentStatus: "unpaid",
           notes: formData.notes,
           commission: amount * 0.1,
           agentName: "Current Agent",
-          amountPaid: 0,
         }),
       })
 
@@ -212,7 +208,7 @@ export function RecordSaleDialog({
       await new Promise(resolve => setTimeout(resolve, 200))
 
       onSaleRecorded(result.data)
-      toastCRUD.createSuccess("Sale recorded successfully")
+      toastCRUD.createSuccess("Sale recorded successfully - Rooster marked as Sold")
       
       // Reset form
       setFormData({
@@ -255,10 +251,10 @@ export function RecordSaleDialog({
           <div className="flex items-center gap-3">
             <div>
               <DialogTitle className="text-xl text-[#1f3f2c]">
-                Record New Sale
+                Mark as Sold
               </DialogTitle>
               <DialogDescription className="text-[#4a6741]">
-                Enter the details for this sales transaction
+                Record buyer information for this sale
               </DialogDescription>
             </div>
           </div>
@@ -397,7 +393,7 @@ export function RecordSaleDialog({
 
           {/* Sale Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#1f3f2c]">Sale Details</h3>
+            <h3 className="text-lg font-semibold text-[#1f3f2c]">Buyer Information</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="amount" className="flex items-center gap-1">
@@ -466,7 +462,7 @@ export function RecordSaleDialog({
             ) : (
               <>
                 <CheckCircle className="w-4 h-4" />
-                Record Sale
+                Mark as Sold
               </>
             )}
           </Button>

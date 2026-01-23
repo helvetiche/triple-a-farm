@@ -51,7 +51,7 @@ Date: ${transaction.date}
 Rooster Breed: ${transaction.breed}
 Amount: ₱${transaction.amount.toLocaleString()}
 Payment Method: ${transaction.paymentMethod.replace('_', ' ').toUpperCase()}
-Status: ${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+Status: Sold
 
 Your rooster is ready for pickup/delivery. Please bring this confirmation and a valid ID.
 

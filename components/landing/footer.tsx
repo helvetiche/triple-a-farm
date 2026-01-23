@@ -81,7 +81,7 @@ export function Footer() {
             </motion.div>
           </div>
 
-          {/* Social Icons */}
+          {/* Contact Information */}
           <div className="space-y-4">
             <motion.h4 
               className="text-lg font-semibold text-white"
@@ -90,37 +90,40 @@ export function Footer() {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              Connect With Us
+              Contact Us
             </motion.h4>
             <motion.div 
-              className="flex space-x-3"
+              className="space-y-3 text-sm"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              <Link 
-                href="#"
-                className="w-10 h-10 bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
-              >
-                <Facebook className="w-5 h-5" />
-              </Link>
-              <Link 
-                href="#"
-                className="w-10 h-10 bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
-              >
-                <Twitter className="w-5 h-5" />
-              </Link>
-              <Link 
-                href="#"
-                className="w-10 h-10 bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
-              >
-                <Instagram className="w-5 h-5" />
-              </Link>
+              <p className="text-white/80">
+                <strong className="text-white">Address:</strong><br />
+                119 Purok 1 Rose, Paltok<br />
+                Angat, Bulacan
+              </p>
+              <p className="text-white/80">
+                <strong className="text-white">Phone:</strong><br />
+                0950 972 7214
+              </p>
+              <div className="pt-2">
+                <p className="text-white/80 mb-2">
+                  <strong className="text-white">Follow us:</strong>
+                </p>
+                <Link 
+                  href="https://www.facebook.com/profile.php?id=61578922746473"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+                  title="Triple A Game Farm"
+                >
+                  <Facebook className="w-5 h-5" />
+                  <span>Triple A Game Farm</span>
+                </Link>
+              </div>
             </motion.div>
-            <p className="text-white/60 text-sm mt-4">
-              Follow us for updates and tips
-            </p>
           </div>
         </div>
 

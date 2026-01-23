@@ -71,9 +71,7 @@ export const getAnalyticsStats = async (
     });
   }
 
-  const paidTransactions = filteredTransactions.filter(
-    (t) => t.paymentStatus === "paid"
-  );
+  const paidTransactions = filteredTransactions;
   const totalRevenue = paidTransactions.reduce((sum, t) => sum + t.amount, 0);
 
   const totalSales = filteredTransactions.length;
@@ -92,13 +90,9 @@ export const getAnalyticsStats = async (
     return saleDate.getFullYear() === now.getFullYear() - 1;
   });
 
-  const currentYearRevenue = currentYear
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const currentYearRevenue = currentYear.reduce((sum, t) => sum + t.amount, 0);
 
-  const lastYearRevenue = lastYear
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const lastYearRevenue = lastYear.reduce((sum, t) => sum + t.amount, 0);
 
   const yearlyGrowth =
     lastYearRevenue > 0
@@ -123,13 +117,9 @@ export const getAnalyticsStats = async (
     );
   });
 
-  const currentMonthRevenue = currentMonth
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const currentMonthRevenue = currentMonth.reduce((sum, t) => sum + t.amount, 0);
 
-  const lastMonthRevenue = lastMonth
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const lastMonthRevenue = lastMonth.reduce((sum, t) => sum + t.amount, 0);
 
   const monthlyGrowth =
     lastMonthRevenue > 0
@@ -207,9 +197,7 @@ export const getMonthlyTrends = async (
       const date = new Date(monthKey + "-01");
       const monthName = date.toLocaleDateString("en-US", { month: "short" });
 
-      const revenue = monthTransactions
-        .filter((t) => t.paymentStatus === "paid")
-        .reduce((sum, t) => sum + t.amount, 0);
+      const revenue = monthTransactions.reduce((sum, t) => sum + t.amount, 0);
 
       const sales = monthTransactions.length;
 
@@ -265,16 +253,12 @@ export const getBreedPerformance = async (
   });
 
   // Calculate totals
-  const totalRevenue = filteredTransactions
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalRevenue = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
 
   const breedData: BreedData[] = Array.from(breedMap.entries()).map(
     ([breed, breedTransactions]) => {
       const sales = breedTransactions.length;
-      const revenue = breedTransactions
-        .filter((t) => t.paymentStatus === "paid")
-        .reduce((sum, t) => sum + t.amount, 0);
+      const revenue = breedTransactions.reduce((sum, t) => sum + t.amount, 0);
       const percentage = totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
 
       return {

@@ -48,24 +48,12 @@ export interface CreateSalesTransactionInput {
   customerContact: string;
   amount: number;
   paymentMethod: "cash" | "gcash" | "bank_transfer" | "paypal";
-  status: "completed" | "pending" | "cancelled";
-  paymentStatus: "paid" | "partial" | "unpaid";
   notes?: string;
   commission?: number;
   agentName?: string;
-  amountPaid?: number;
-  lastPaymentDate?: string;
-  lastPaymentAmount?: number;
-  paymentNotes?: string;
 }
 
 export interface UpdateSalesTransactionInput {
-  status?: "completed" | "pending" | "cancelled";
-  paymentStatus?: "paid" | "partial" | "unpaid";
-  amountPaid?: number;
-  lastPaymentDate?: string;
-  lastPaymentAmount?: number;
-  paymentNotes?: string;
   notes?: string;
 }
 
@@ -151,15 +139,9 @@ export const createSalesTransaction = async (
     customerContact: input.customerContact,
     amount: input.amount,
     paymentMethod: input.paymentMethod,
-    status: input.status || "pending",
-    paymentStatus: input.paymentStatus || "unpaid",
     notes: input.notes,
     commission: input.commission || input.amount * 0.1,
     agentName: input.agentName,
-    amountPaid: input.amountPaid || 0,
-    lastPaymentDate: input.lastPaymentDate,
-    lastPaymentAmount: input.lastPaymentAmount,
-    paymentNotes: input.paymentNotes,
   };
 
   // Remove undefined values before saving to Firestore
@@ -254,15 +236,9 @@ export const getSalesStats = async (
 
   const transactions = await getSalesTransactions(user);
 
-  const totalRevenue = transactions
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalRevenue = transactions.reduce((sum, t) => sum + t.amount, 0);
 
   const totalTransactions = transactions.length;
-
-  const pendingTransactions = transactions.filter(
-    (t) => t.paymentStatus === "unpaid" || t.paymentStatus === "partial"
-  ).length;
 
   const averageSaleAmount =
     totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
@@ -286,13 +262,9 @@ export const getSalesStats = async (
     );
   });
 
-  const currentMonthRevenue = currentMonth
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const currentMonthRevenue = currentMonth.reduce((sum, t) => sum + t.amount, 0);
 
-  const lastMonthRevenue = lastMonth
-    .filter((t) => t.paymentStatus === "paid")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const lastMonthRevenue = lastMonth.reduce((sum, t) => sum + t.amount, 0);
 
   const monthlyGrowth =
     lastMonthRevenue > 0
@@ -311,7 +283,6 @@ export const getSalesStats = async (
   return {
     totalRevenue,
     totalTransactions,
-    pendingTransactions,
     averageSaleAmount,
     monthlyGrowth,
     topBreed,
@@ -334,9 +305,7 @@ export const getRevenueTrend = async (
     const dateStr = date.toISOString().split("T")[0];
 
     const dayTransactions = transactions.filter((t) => t.date === dateStr);
-    const revenue = dayTransactions
-      .filter((t) => t.paymentStatus === "paid")
-      .reduce((sum, t) => sum + t.amount, 0);
+    const revenue = dayTransactions.reduce((sum, t) => sum + t.amount, 0);
 
     trends.push({
       date: dateStr,

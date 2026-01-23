@@ -17,10 +17,7 @@ import {
   Phone, 
   CreditCard, 
   CheckCircle,
-  Clock,
-  XCircle,
   FileText,
-  Send,
   PhilippinePeso
 } from "lucide-react"
 import { SalesTransaction } from "../types"
@@ -30,41 +27,18 @@ interface SalesViewDialogProps {
   transaction: SalesTransaction | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSendConfirmation?: (transaction: SalesTransaction) => void
 }
 
 export function SalesViewDialog({
   transaction,
   open,
   onOpenChange,
-  onSendConfirmation,
 }: SalesViewDialogProps) {
   if (!transaction) return null
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
-
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "partial":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "unpaid":
-        return "bg-red-100 text-red-800 border-red-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
+    // All sales are sold/completed
+    return "bg-green-100 text-green-800 border-green-200"
   }
 
   const getPaymentMethodIcon = (method: string) => {
@@ -79,13 +53,6 @@ export function SalesViewDialog({
         return <CreditCard className="w-4 h-4" />
       default:
         return <CreditCard className="w-4 h-4" />
-    }
-  }
-
-  const handleSendConfirmation = () => {
-    if (onSendConfirmation) {
-      onSendConfirmation(transaction)
-      toastCRUD.confirmationSent(transaction.customerName)
     }
   }
 
@@ -105,14 +72,9 @@ export function SalesViewDialog({
               </div>
             </div>
             <div className="flex gap-2">
-              <Badge className={getStatusColor(transaction.status)}>
-                {transaction.status === "completed" && <CheckCircle className="w-3 h-3 mr-1" />}
-                {transaction.status === "pending" && <Clock className="w-3 h-3 mr-1" />}
-                {transaction.status === "cancelled" && <XCircle className="w-3 h-3 mr-1" />}
-                {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
-              </Badge>
-              <Badge className={getPaymentStatusColor(transaction.paymentStatus)}>
-                {transaction.paymentStatus.charAt(0).toUpperCase() + transaction.paymentStatus.slice(1)}
+              <Badge className={getStatusColor("sold")}>
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Sold
               </Badge>
             </div>
           </div>
@@ -208,16 +170,6 @@ export function SalesViewDialog({
         </ScrollArea>
         
         <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          {transaction.status === "completed" && (
-            <Button 
-              variant="outline" 
-              onClick={handleSendConfirmation}
-              className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10"
-            >
-              <Send className="w-4 h-4 " />
-              Send Confirmation
-            </Button>
-          )}
           <Button 
             variant="outline" 
             onClick={() => onOpenChange(false)}
