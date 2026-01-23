@@ -111,7 +111,7 @@ export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyR
                 </div>
                 <div>
                   <div className="text-[#4a6741]">Price</div>
-                  <div className="text-[#1f3f2c] font-semibold truncate">{rooster.price}</div>
+                  <div className="text-[#1f3f2c] font-semibold truncate">₱ {rooster.price}</div>
                 </div>
               </div>
 
@@ -150,10 +150,10 @@ export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyR
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead>Breed</TableHead>
                 <TableHead className="hidden sm:table-cell">Age</TableHead>
                 <TableHead className="hidden md:table-cell">Weight</TableHead>
-                <TableHead className="hidden lg:table-cell">Arrival Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden sm:table-cell">Price</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -163,16 +163,16 @@ export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyR
               {roosters.map((rooster) => (
                 <TableRow key={rooster.id}>
                   <TableCell className="font-medium">{rooster.id}</TableCell>
+                  <TableCell>{rooster.name || "--"}</TableCell>
                   <TableCell>{rooster.breed}</TableCell>
                   <TableCell className="hidden sm:table-cell">{rooster.age}</TableCell>
                   <TableCell className="hidden md:table-cell">{rooster.weight}</TableCell>
-                  <TableCell className="hidden lg:table-cell">{rooster.arrivalDate}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(rooster.status)}>
                       {rooster.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell font-semibold">{rooster.price}</TableCell>
+                  <TableCell className="hidden sm:table-cell font-semibold">₱ {rooster.price}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

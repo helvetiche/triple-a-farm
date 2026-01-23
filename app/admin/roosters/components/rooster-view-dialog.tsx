@@ -173,13 +173,6 @@ export function RoosterViewDialog({
                     <span className="text-sm font-medium text-[#1f3f2c]">{rooster.weight}</span>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-[#3d6c58]/10">
-                  <span className="text-sm text-[#4a6741]">Arrival Date</span>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-[#3d6c58]" />
-                    <span className="text-sm font-medium text-[#1f3f2c]">{rooster.arrivalDate}</span>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -221,6 +214,26 @@ export function RoosterViewDialog({
                 </div>
               </div>
             </div>
+
+            {/* Vaccination Records */}
+            {rooster.vaccinations && rooster.vaccinations.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-[#1f3f2c] mb-3">
+                  Vaccination Records
+                </h4>
+                <div className="space-y-2">
+                  {rooster.vaccinations.map((vaccination: { name: string; date: string }, index: number) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center py-2 px-3 bg-[#3d6c58]/5 rounded border border-[#3d6c58]/10"
+                    >
+                      <span className="text-sm font-medium text-[#1f3f2c]">{vaccination.name}</span>
+                      <span className="text-xs text-[#4a6741]">{vaccination.date}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-2 pt-4">

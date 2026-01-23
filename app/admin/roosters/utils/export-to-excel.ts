@@ -42,11 +42,8 @@ export const exportRoostersToExcel = (
       "Status",
       "Health",
       "Location",
-      "Arrival Date",
       "Date Added",
       "Owner",
-      "Bloodline",
-      "Fight Record (W-L-D)",
       "Description",
     ],
     ...roosters.map((r) => [
@@ -59,13 +56,8 @@ export const exportRoostersToExcel = (
       r.status,
       r.health.charAt(0).toUpperCase() + r.health.slice(1),
       r.location,
-      r.arrivalDate,
       r.dateAdded,
       r.owner || "",
-      r.bloodline || "",
-      r.fightRecord
-        ? `${r.fightRecord.wins}-${r.fightRecord.losses}-${r.fightRecord.draws}`
-        : "",
       r.description || "",
     ]),
   ]

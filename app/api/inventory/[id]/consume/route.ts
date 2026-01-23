@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
-import { restockInventoryItem } from "@/lib/inventory";
+import { consumeInventoryItem } from "@/lib/inventory";
 
 interface RouteParams {
   params: Promise<{
@@ -28,12 +28,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const updated = await restockInventoryItem(
-      sessionUser,
-      id,
-      amount,
-      reason
-    );
+    const updated = await consumeInventoryItem(sessionUser, id, amount, reason);
 
     return jsonSuccess(updated, { status: 200 });
   } catch (error: any) {
@@ -45,7 +40,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       if (error.message === "FORBIDDEN") {
         return jsonError(
           "FORBIDDEN",
-          "You do not have permission to restock inventory items.",
+          "You do not have permission to consume inventory items.",
           403
         );
       }
@@ -54,7 +49,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return jsonError("NOT_FOUND", "Inventory item not found.", 404);
       }
 
-      if (error.message === "INVALID_RESTOCK_AMOUNT") {
+      if (error.message === "INVALID_CONSUME_AMOUNT") {
         return jsonError(
           "INVALID_REQUEST",
           "Amount must be a positive number.",
@@ -67,10 +62,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    console.error("POST /api/inventory/[id]/restock error:", error);
+    console.error("POST /api/inventory/[id]/consume error:", error);
     return jsonError(
-      "INVENTORY_RESTOCK_FAILED",
-      "Failed to restock inventory item.",
+      "INVENTORY_CONSUME_FAILED",
+      "Failed to consume inventory item.",
       500
     );
   }

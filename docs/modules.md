@@ -10,7 +10,7 @@ Features:
 Purpose: Manages the lifecycle and data of individual roosters from arrival to sale, replacing paper-based records.
 
 Features:
-    - Rooster Profiling: Create/Edit profiles with fields for Breed, Age, Weight, and Arrival Date.
+    - Rooster Profiling: Create/Edit profiles with fields for Breed, Age, and Weight.
     - Digital Catalog: Upload images for the sales display.
     - Status Tracking: Tag roosters as "Available," "Sold," "Quarantine," or "Deceased".
     - Search & Filter: Locate roosters by ID or breed.

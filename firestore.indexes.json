@@ -45,6 +45,30 @@
       ]
     },
     {
+      "collectionGroup": "inventoryActivity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "performedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "inventoryActivity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "itemId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "performedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "analytics",
       "queryScope": "COLLECTION",
       "fields": [

@@ -35,7 +35,6 @@ interface Rooster {
   breed: string                 // Rooster breed
   age: string                   // Age in months
   weight: string                // Weight in kg
-  arrivalDate: string           // Arrival date
   status: "Available" | "Sold" | "Quarantine" | "Deceased"
   price: string                 // Selling price
   image?: string                // Optional image URL

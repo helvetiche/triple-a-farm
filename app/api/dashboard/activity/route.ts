@@ -55,17 +55,17 @@ export async function GET(request: NextRequest) {
 
       const recentRoosters = roosters
         .filter((rooster) => {
-          const dateAdded = new Date(rooster.dateAdded || rooster.arrivalDate);
+          const dateAdded = new Date(rooster.dateAdded);
           return dateAdded >= thirtyDaysAgo;
         })
         .sort((a, b) => {
-          const dateA = new Date(a.dateAdded || a.arrivalDate).getTime();
-          const dateB = new Date(b.dateAdded || b.arrivalDate).getTime();
+          const dateA = new Date(a.dateAdded).getTime();
+          const dateB = new Date(b.dateAdded).getTime();
           return dateB - dateA;
         })
         .slice(0, 3)
         .map((rooster) => {
-          const dateAdded = new Date(rooster.dateAdded || rooster.arrivalDate);
+          const dateAdded = new Date(rooster.dateAdded);
           return {
             action: "New rooster added",
             detail: `${rooster.breed} breed - ${rooster.id}`,

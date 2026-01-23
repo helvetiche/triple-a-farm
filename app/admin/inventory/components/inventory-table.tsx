@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Eye, Edit, Plus } from "lucide-react"
+import { MoreHorizontal, Eye, Edit, Plus, Minus, History } from "lucide-react"
 import { InventoryItem } from "../data/mock-data"
 import { formatInventoryDisplayId } from "@/lib/inventory-types"
 
@@ -27,6 +27,8 @@ interface InventoryTableProps {
   onViewDetails: (id: string) => void
   onEdit: (id: string) => void
   onRestock: (id: string) => void
+  onConsume: (id: string) => void
+  onViewActivity: (id: string) => void
 }
 
 export function InventoryTable({
@@ -34,6 +36,8 @@ export function InventoryTable({
   onViewDetails,
   onEdit,
   onRestock,
+  onConsume,
+  onViewActivity,
 }: InventoryTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -108,6 +112,15 @@ export function InventoryTable({
                       <Plus className=" h-4 w-4" />
                       Restock
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onConsume(item.id)}>
+                      <Minus className=" h-4 w-4" />
+                      Consume
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => onViewActivity(item.id)}>
+                      <History className=" h-4 w-4" />
+                      View Activity Log
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -149,9 +162,19 @@ export function InventoryTable({
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
                 </Button>
-                <Button variant="outline" onClick={() => onRestock(item.id)} className="w-full border-[#3d6c58]/20">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Restock
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" onClick={() => onRestock(item.id)} className="w-full border-[#3d6c58]/20">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Restock
+                  </Button>
+                  <Button variant="outline" onClick={() => onConsume(item.id)} className="w-full border-[#3d6c58]/20">
+                    <Minus className="w-4 h-4 mr-2" />
+                    Consume
+                  </Button>
+                </div>
+                <Button variant="outline" onClick={() => onViewActivity(item.id)} className="w-full border-[#3d6c58]/20">
+                  <History className="w-4 h-4 mr-2" />
+                  Activity Log
                 </Button>
               </div>
             </div>
@@ -215,6 +238,15 @@ export function InventoryTable({
                         <DropdownMenuItem onClick={() => onRestock(item.id)}>
                           <Plus className=" h-4 w-4" />
                           Restock
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onConsume(item.id)}>
+                          <Minus className=" h-4 w-4" />
+                          Consume
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onViewActivity(item.id)}>
+                          <History className=" h-4 w-4" />
+                          View Activity Log
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -4,7 +4,7 @@ export interface RoosterSettings {
   viewMode: ViewMode
   itemsPerPage: number
   showImages: boolean
-  sortBy: "id" | "breed" | "age" | "price" | "arrivalDate"
+  sortBy: "id" | "breed" | "age" | "price"
   sortOrder: "asc" | "desc"
 }
 

@@ -56,6 +56,7 @@ export const getRoosters = async (
       id: doc.id,
       breedId: (data.breedId as string) || "",
       breed: (data.breed as string) || "",
+      name: (data.name as string) || "",
       age: (data.age as string) || "",
       weight: (data.weight as string) || "",
       price: (data.price as string) || "",
@@ -63,8 +64,11 @@ export const getRoosters = async (
       health: (data.health as Rooster["health"]) || "good",
       images: Array.isArray(data.images) ? (data.images as string[]) : [],
       dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+      description: (data.description as string) || "",
+      location: (data.location as string) || "",
       owner: data.owner as string | undefined,
       image: data.image as string | undefined,
+      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
     };
 
     return rooster;
@@ -90,6 +94,7 @@ export const getRoosterById = async (
     id: doc.id,
     breedId: (data.breedId as string) || "",
     breed: (data.breed as string) || "",
+    name: (data.name as string) || "",
     age: (data.age as string) || "",
     weight: (data.weight as string) || "",
     price: (data.price as string) || "",
@@ -97,8 +102,11 @@ export const getRoosterById = async (
     health: (data.health as Rooster["health"]) || "good",
     images: Array.isArray(data.images) ? (data.images as string[]) : [],
     dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+    description: (data.description as string) || "",
+    location: (data.location as string) || "",
     owner: data.owner as string | undefined,
     image: data.image as string | undefined,
+    vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
   };
 
   return rooster;
@@ -108,6 +116,7 @@ export interface CreateRoosterInput {
   id: string;
   breedId: string;
   breed: string;
+  name: string;
   age: string;
   weight: string;
   price: string;
@@ -115,14 +124,18 @@ export interface CreateRoosterInput {
   health: Rooster["health"];
   images: string[];
   dateAdded: string;
+  description: string;
+  location: string;
   owner?: string;
   image?: string;
+  vaccinations?: Array<{ name: string; date: string }>;
 }
 
 export interface UpdateRoosterInput {
   id?: string;
   breedId?: string;
   breed?: string;
+  name?: string;
   age?: string;
   weight?: string;
   price?: string;
@@ -130,8 +143,11 @@ export interface UpdateRoosterInput {
   health?: Rooster["health"];
   images?: string[];
   dateAdded?: string;
+  description?: string;
+  location?: string;
   owner?: string | null;
   image?: string | null;
+  vaccinations?: Array<{ name: string; date: string }> | null;
 }
 
 // Helper function to remove undefined values for Firestore
@@ -153,6 +169,7 @@ const buildRoosterDocFromCreate = (
   const docData: Record<string, unknown> = {
     breedId: input.breedId,
     breed: input.breed,
+    name: input.name,
     age: input.age,
     weight: input.weight,
     price: input.price,
@@ -160,6 +177,8 @@ const buildRoosterDocFromCreate = (
     health: input.health,
     images: input.images || [],
     dateAdded: input.dateAdded,
+    description: input.description,
+    location: input.location,
   };
 
   // Only add optional fields if they have values
@@ -169,6 +188,9 @@ const buildRoosterDocFromCreate = (
   const imageUrl = input.image || (input.images && input.images[0]);
   if (imageUrl) {
     docData.image = imageUrl;
+  }
+  if (input.vaccinations && input.vaccinations.length > 0) {
+    docData.vaccinations = input.vaccinations;
   }
 
   return docData as Omit<Rooster, "id">;
@@ -181,6 +203,7 @@ const applyUpdateToRooster = (
   const docData: Record<string, unknown> = {
     breedId: input.breedId !== undefined ? input.breedId : existing.breedId,
     breed: input.breed !== undefined ? input.breed : existing.breed,
+    name: input.name !== undefined ? input.name : existing.name,
     age: input.age !== undefined ? input.age : existing.age,
     weight: input.weight !== undefined ? input.weight : existing.weight,
     price: input.price !== undefined ? input.price : existing.price,
@@ -189,6 +212,8 @@ const applyUpdateToRooster = (
     images: input.images !== undefined ? input.images : existing.images,
     dateAdded:
       input.dateAdded !== undefined ? input.dateAdded : existing.dateAdded,
+    description: input.description !== undefined ? input.description : existing.description,
+    location: input.location !== undefined ? input.location : existing.location,
   };
 
   // Handle optional fields - only include if they have values
@@ -211,6 +236,16 @@ const applyUpdateToRooster = (
     docData.image = input.images[0];
   } else if (existing.image !== undefined && existing.image !== null) {
     docData.image = existing.image;
+  }
+
+  // Handle vaccinations
+  if (input.vaccinations !== undefined) {
+    if (input.vaccinations !== null && input.vaccinations.length > 0) {
+      docData.vaccinations = input.vaccinations;
+    }
+    // If null or empty array, don't include (will be removed from Firestore with merge)
+  } else if (existing.vaccinations !== undefined && existing.vaccinations !== null) {
+    docData.vaccinations = existing.vaccinations;
   }
 
   return docData as Omit<Rooster, "id">;

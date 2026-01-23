@@ -32,6 +32,41 @@ export interface InventoryStats {
   monthlySpend: number;
 }
 
+export type InventoryActivityType = "restock" | "consume";
+
+export interface InventoryActivity {
+  id: string;
+  itemId: string;
+  itemName: string;
+  type: InventoryActivityType;
+  amount: number;
+  unit: string;
+  reason: string;
+  previousStock: number;
+  newStock: number;
+  performedBy: string;
+  performedAt: string;
+}
+
+export const RESTOCK_REASONS = [
+  "Purchase Order",
+  "Supplier Delivery",
+  "Stock Transfer",
+  "Return from Use",
+  "Inventory Adjustment",
+  "Other",
+] as const;
+
+export const CONSUME_REASONS = [
+  "Broken",
+  "Lost",
+  "Sold",
+  "Used in Operations",
+  "Expired",
+  "Damaged",
+  "Other",
+] as const;
+
 export const calculateInventoryStatus = (
   currentStock: number,
   minStock: number

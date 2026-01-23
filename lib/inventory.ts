@@ -6,6 +6,8 @@ import {
   formatInventoryDisplayId,
   type InventoryItem,
   type InventoryStats,
+  type InventoryActivity,
+  type InventoryActivityType,
 } from "@/lib/inventory-types";
 
 type InventoryAction =
@@ -14,10 +16,13 @@ type InventoryAction =
   | "update"
   | "delete"
   | "restock"
-  | "readStats";
+  | "consume"
+  | "readStats"
+  | "readActivity";
 
 const INVENTORY_COLLECTION = "inventoryItems";
 const INVENTORY_META_COLLECTION = "inventoryMeta";
+const INVENTORY_ACTIVITY_COLLECTION = "inventoryActivity";
 const INVENTORY_STATS_DOC_ID = "stats";
 
 const assertInventoryPermission = (
@@ -33,10 +38,12 @@ const assertInventoryPermission = (
   const canRead = hasRequiredRole(roles, ["admin", "staff"]);
   const canWriteAdminOnly = hasRequiredRole(roles, "admin");
   const canRestock = hasRequiredRole(roles, ["admin", "staff"]);
+  const canConsume = hasRequiredRole(roles, ["admin", "staff"]);
 
   switch (action) {
     case "read":
     case "readStats":
+    case "readActivity":
       if (!canRead) {
         throw new Error("FORBIDDEN");
       }
@@ -53,6 +60,11 @@ const assertInventoryPermission = (
         throw new Error("FORBIDDEN");
       }
       return;
+    case "consume":
+      if (!canConsume) {
+        throw new Error("FORBIDDEN");
+      }
+      return;
     default:
       throw new Error("FORBIDDEN");
   }
@@ -62,6 +74,9 @@ const inventoryCollectionRef = () => adminDb.collection(INVENTORY_COLLECTION);
 
 const inventoryStatsDocRef = () =>
   adminDb.collection(INVENTORY_META_COLLECTION).doc(INVENTORY_STATS_DOC_ID);
+
+const inventoryActivityCollectionRef = () =>
+  adminDb.collection(INVENTORY_ACTIVITY_COLLECTION);
 
 export const getInventoryItems = async (
   user: SessionUser | null
@@ -167,29 +182,47 @@ const applyUpdateToInventoryItem = (
 
   const status = calculateInventoryStatus(updatedCurrentStock, updatedMinStock);
 
-  return {
-    createdAt: existing.createdAt,
-    displayId: existing.displayId,
+  const result: any = {
     name: input.name ?? existing.name,
     category: input.category ?? existing.category,
     currentStock: updatedCurrentStock,
     minStock: updatedMinStock,
     unit: input.unit ?? existing.unit,
     supplier: input.supplier ?? existing.supplier,
-    price: input.price === null ? undefined : input.price ?? existing.price,
-    location:
-      input.location === null ? undefined : input.location ?? existing.location,
-    description:
-      input.description === null
-        ? undefined
-        : input.description ?? existing.description,
     lastRestocked: input.lastRestocked ?? existing.lastRestocked,
-    expiryDate:
-      input.expiryDate === null
-        ? undefined
-        : input.expiryDate ?? existing.expiryDate,
     status,
   };
+
+  // Only include optional fields if they have values
+  if (existing.createdAt) {
+    result.createdAt = existing.createdAt;
+  }
+  
+  if (existing.displayId) {
+    result.displayId = existing.displayId;
+  }
+
+  const price = input.price === null ? undefined : input.price ?? existing.price;
+  if (price !== undefined) {
+    result.price = price;
+  }
+
+  const location = input.location === null ? undefined : input.location ?? existing.location;
+  if (location !== undefined) {
+    result.location = location;
+  }
+
+  const description = input.description === null ? undefined : input.description ?? existing.description;
+  if (description !== undefined) {
+    result.description = description;
+  }
+
+  const expiryDate = input.expiryDate === null ? undefined : input.expiryDate ?? existing.expiryDate;
+  if (expiryDate !== undefined) {
+    result.expiryDate = expiryDate;
+  }
+
+  return result as Omit<InventoryItem, "id">;
 };
 
 const recalculateInventoryStats = async (): Promise<InventoryStats> => {
@@ -329,12 +362,17 @@ export const deleteInventoryItem = async (
 export const restockInventoryItem = async (
   user: SessionUser | null,
   id: string,
-  amount: number
+  amount: number,
+  reason: string
 ): Promise<InventoryItem> => {
   assertInventoryPermission(user, "restock");
 
   if (!Number.isFinite(amount) || amount <= 0) {
     throw new Error("INVALID_RESTOCK_AMOUNT");
+  }
+
+  if (!reason || reason.trim() === "") {
+    throw new Error("REASON_REQUIRED");
   }
 
   const docRef = inventoryCollectionRef().doc(id);
@@ -362,6 +400,22 @@ export const restockInventoryItem = async (
     });
 
     tx.set(docRef, updatedDoc, { merge: true });
+
+    // Log activity
+    const activityRef = inventoryActivityCollectionRef().doc();
+    const activity: Omit<InventoryActivity, "id"> = {
+      itemId: id,
+      itemName: existing.name,
+      type: "restock",
+      amount,
+      unit: existing.unit,
+      reason: reason.trim(),
+      previousStock: existing.currentStock,
+      newStock: newCurrentStock,
+      performedBy: user?.email || "Unknown",
+      performedAt: new Date().toISOString(),
+    };
+    tx.set(activityRef, activity);
 
     const stats = await recalculateInventoryStats();
     tx.set(inventoryStatsDocRef(), stats, { merge: true });
@@ -391,4 +445,102 @@ export const getInventoryStats = async (
   await docRef.set(stats, { merge: true });
 
   return stats;
+};
+
+export const consumeInventoryItem = async (
+  user: SessionUser | null,
+  id: string,
+  amount: number,
+  reason: string
+): Promise<InventoryItem> => {
+  assertInventoryPermission(user, "consume");
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error("INVALID_CONSUME_AMOUNT");
+  }
+
+  if (!reason || reason.trim() === "") {
+    throw new Error("REASON_REQUIRED");
+  }
+
+  const docRef = inventoryCollectionRef().doc(id);
+
+  let updated: InventoryItem | null = null;
+
+  await adminDb.runTransaction(async (tx) => {
+    const snapshot = await tx.get(docRef);
+
+    if (!snapshot.exists) {
+      throw new Error("NOT_FOUND");
+    }
+
+    const existing = {
+      id: snapshot.id,
+      ...(snapshot.data() as Omit<InventoryItem, "id">),
+    } as InventoryItem;
+
+    const newCurrentStock = Math.max(0, existing.currentStock - amount);
+
+    const updatedDoc = applyUpdateToInventoryItem(existing, {
+      currentStock: newCurrentStock,
+    });
+
+    tx.set(docRef, updatedDoc, { merge: true });
+
+    // Log activity
+    const activityRef = inventoryActivityCollectionRef().doc();
+    const activity: Omit<InventoryActivity, "id"> = {
+      itemId: id,
+      itemName: existing.name,
+      type: "consume",
+      amount,
+      unit: existing.unit,
+      reason: reason.trim(),
+      previousStock: existing.currentStock,
+      newStock: newCurrentStock,
+      performedBy: user?.email || "Unknown",
+      performedAt: new Date().toISOString(),
+    };
+    tx.set(activityRef, activity);
+
+    const stats = await recalculateInventoryStats();
+    tx.set(inventoryStatsDocRef(), stats, { merge: true });
+
+    updated = {
+      id: snapshot.id,
+      ...updatedDoc,
+    };
+  });
+
+  if (!updated) {
+    throw new Error("UNKNOWN_ERROR");
+  }
+
+  return updated;
+};
+
+export const getInventoryActivity = async (
+  user: SessionUser | null,
+  itemId?: string,
+  limit: number = 50
+): Promise<InventoryActivity[]> => {
+  assertInventoryPermission(user, "readActivity");
+
+  let query = inventoryActivityCollectionRef()
+    .orderBy("performedAt", "desc")
+    .limit(limit);
+
+  if (itemId) {
+    query = query.where("itemId", "==", itemId) as any;
+  }
+
+  const snapshot = await query.get();
+
+  return snapshot.docs.map((doc) => {
+    const data = doc.data() as Omit<InventoryActivity, "id">;
+    return {
+      id: doc.id,
+      ...data,
+    };
+  });
 };

@@ -1,9 +1,15 @@
 // Rooster data types and utilities
 
+export interface Vaccination {
+  name: string
+  date: string
+}
+
 export interface Rooster {
   id: string
   breedId: string
   breed: string
+  name: string
   age: string
   weight: string
   price: string
@@ -11,8 +17,11 @@ export interface Rooster {
   health: 'excellent' | 'good' | 'fair' | 'poor'
   images: string[]
   dateAdded: string
+  description: string
+  location: string
   owner?: string
   image?: string // Added for backward compatibility
+  vaccinations?: Vaccination[]
 }
 
 // Available breeds for dropdown/select - now fetched dynamically from API

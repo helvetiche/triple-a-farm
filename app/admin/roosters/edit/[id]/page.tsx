@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { DatePicker } from "@/components/ui/date-picker";
 import { ArrowLeft, Upload, Bird, Save, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -57,20 +56,14 @@ export default function EditRoosterPage() {
     breed: "",
     age: "",
     weight: "",
-    arrivalDate: undefined as Date | undefined,
     status: "",
     health: "",
     price: "",
     description: "",
     location: "",
-    bloodline: "",
     owner: "",
-    fightRecord: {
-      wins: "",
-      losses: "",
-      draws: "",
-    },
   });
+  const [vaccinations, setVaccinations] = useState<Array<{ name: string; date: string }>>([]);
   const [images, setImages] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,28 +83,20 @@ export default function EditRoosterPage() {
         if (result.success && result.data) {
           const rooster = result.data as Rooster;
           setFormData({
-            id: rooster.id,
-            name: rooster.name,
-            breed: rooster.breed,
-            age: rooster.age,
-            weight: rooster.weight,
-            arrivalDate: rooster.arrivalDate
-              ? new Date(rooster.arrivalDate)
-              : undefined,
-            status: rooster.status,
-            health: rooster.health,
-            price: rooster.price,
-            description: rooster.description,
-            location: rooster.location,
-            bloodline: rooster.bloodline || "",
+            id: rooster.id || "",
+            name: rooster.name || "",
+            breed: rooster.breed || "",
+            age: rooster.age || "",
+            weight: rooster.weight || "",
+            status: rooster.status || "",
+            health: rooster.health || "",
+            price: rooster.price || "",
+            description: rooster.description || "",
+            location: rooster.location || "",
             owner: rooster.owner || "",
-            fightRecord: {
-              wins: rooster.fightRecord?.wins.toString() || "",
-              losses: rooster.fightRecord?.losses.toString() || "",
-              draws: rooster.fightRecord?.draws.toString() || "",
-            },
           });
           setImages(rooster.images || []);
+          setVaccinations(rooster.vaccinations || []);
         } else {
           toastCRUD.loadError("rooster");
           router.push("/admin/roosters");
@@ -146,13 +131,6 @@ export default function EditRoosterPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleFightRecordChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      fightRecord: { ...prev.fightRecord, [field]: value },
-    }));
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,19 +184,31 @@ export default function EditRoosterPage() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleAddVaccination = () => {
+    setVaccinations((prev) => [...prev, { name: "", date: "" }]);
+  };
+
+  const handleRemoveVaccination = (index: number) => {
+    setVaccinations((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVaccinationChange = (index: number, field: "name" | "date", value: string) => {
+    setVaccinations((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
   const handleSave = async () => {
     if (
       !formData.id ||
-      !formData.name ||
       !formData.breed ||
       !formData.age ||
       !formData.weight ||
       !formData.price ||
       !formData.status ||
-      !formData.health ||
-      !formData.description ||
-      !formData.arrivalDate ||
-      !formData.location
+      !formData.health
     ) {
       toastCRUD.validationError("required fields");
       return;
@@ -227,10 +217,11 @@ export default function EditRoosterPage() {
     setIsSaving(true);
 
     try {
-      const arrivalDateStr = formData.arrivalDate.toISOString().split("T")[0];
+      // Filter out empty vaccinations
+      const validVaccinations = vaccinations.filter(v => v.name.trim() && v.date.trim());
 
       const roosterData = {
-        name: formData.name,
+        name: formData.name || formData.breed,
         breed: formData.breed,
         age: formData.age,
         weight: formData.weight,
@@ -242,22 +233,11 @@ export default function EditRoosterPage() {
           | "Quarantine"
           | "Deceased",
         health: formData.health as "excellent" | "good" | "fair" | "poor",
-        description: formData.description,
+        description: formData.description || "",
         images: images,
-        arrivalDate: arrivalDateStr,
-        location: formData.location,
+        location: formData.location || "Main Farm",
         owner: formData.owner.trim() || undefined,
-        bloodline: formData.bloodline.trim() || undefined,
-        fightRecord:
-          formData.fightRecord.wins ||
-          formData.fightRecord.losses ||
-          formData.fightRecord.draws
-            ? {
-                wins: parseInt(formData.fightRecord.wins) || 0,
-                losses: parseInt(formData.fightRecord.losses) || 0,
-                draws: parseInt(formData.fightRecord.draws) || 0,
-              }
-            : undefined,
+        vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
         image: images[0] || undefined,
       };
 
@@ -441,22 +421,6 @@ export default function EditRoosterPage() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <DatePicker
-                                id="arrivalDate"
-                                label="Arrival Date"
-                                value={formData.arrivalDate}
-                                onChange={(date) =>
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    arrivalDate: date,
-                                  }))
-                                }
-                                placeholder="Select arrival date"
-                                required
-                                className="w-full"
-                              />
-                            </div>
-                            <div className="space-y-2">
                               <Label htmlFor="status">Status</Label>
                               <Select
                                 value={formData.status}
@@ -511,72 +475,6 @@ export default function EditRoosterPage() {
                                   handleInputChange("location", e.target.value)
                                 }
                                 placeholder="Main Farm"
-                                className="border-[#3d6c58]/20 text-black"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="bloodline">Bloodline</Label>
-                              <Input
-                                id="bloodline"
-                                value={formData.bloodline}
-                                onChange={(e) =>
-                                  handleInputChange("bloodline", e.target.value)
-                                }
-                                placeholder="Lemon Kelso"
-                                className="border-[#3d6c58]/20 text-black"
-                              />
-                            </div>
-                          </div>
-                          <div className="grid gap-4 md:grid-cols-3">
-                            <div className="space-y-2">
-                              <Label htmlFor="wins">Fight Record - Wins</Label>
-                              <Input
-                                id="wins"
-                                type="number"
-                                value={formData.fightRecord.wins}
-                                onChange={(e) =>
-                                  handleFightRecordChange(
-                                    "wins",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="0"
-                                className="border-[#3d6c58]/20 text-black"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="losses">
-                                Fight Record - Losses
-                              </Label>
-                              <Input
-                                id="losses"
-                                type="number"
-                                value={formData.fightRecord.losses}
-                                onChange={(e) =>
-                                  handleFightRecordChange(
-                                    "losses",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="0"
-                                className="border-[#3d6c58]/20 text-black"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="draws">
-                                Fight Record - Draws
-                              </Label>
-                              <Input
-                                id="draws"
-                                type="number"
-                                value={formData.fightRecord.draws}
-                                onChange={(e) =>
-                                  handleFightRecordChange(
-                                    "draws",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="0"
                                 className="border-[#3d6c58]/20 text-black"
                               />
                             </div>
@@ -637,6 +535,78 @@ export default function EditRoosterPage() {
                           rows={4}
                         />
                       </div>
+                    </div>
+
+                    {/* Vaccination Records */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                          Vaccination Records
+                        </h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddVaccination}
+                          className="border-[#3d6c58]/20"
+                        >
+                          Add Vaccination
+                        </Button>
+                      </div>
+                      {vaccinations.length === 0 ? (
+                        <p className="text-sm text-[#4a6741]">
+                          No vaccination records yet. Click "Add Vaccination" to add one.
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {vaccinations.map((vaccination, index) => (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-start p-3 border border-[#3d6c58]/20 rounded-md"
+                            >
+                              <div className="flex-1 grid gap-2 md:grid-cols-2">
+                                <div className="space-y-1">
+                                  <Label htmlFor={`vax-name-${index}`} className="text-xs">
+                                    Vaccine Name
+                                  </Label>
+                                  <Input
+                                    id={`vax-name-${index}`}
+                                    value={vaccination.name}
+                                    onChange={(e) =>
+                                      handleVaccinationChange(index, "name", e.target.value)
+                                    }
+                                    placeholder="e.g., Newcastle Disease"
+                                    className="border-[#3d6c58]/20 text-black"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label htmlFor={`vax-date-${index}`} className="text-xs">
+                                    Date Administered
+                                  </Label>
+                                  <Input
+                                    id={`vax-date-${index}`}
+                                    type="date"
+                                    value={vaccination.date}
+                                    onChange={(e) =>
+                                      handleVaccinationChange(index, "date", e.target.value)
+                                    }
+                                    className="border-[#3d6c58]/20 text-black"
+                                  />
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRemoveVaccination(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

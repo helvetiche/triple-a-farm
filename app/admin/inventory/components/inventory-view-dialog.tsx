@@ -19,7 +19,10 @@ import {
   Trash2,
   AlertTriangle,
   Building,
-  PhilippinePeso
+  PhilippinePeso,
+  Plus,
+  Minus,
+  History
 } from "lucide-react"
 import { InventoryItem } from "../data/mock-data"
 import { formatInventoryDisplayId } from "@/lib/inventory-types"
@@ -30,6 +33,9 @@ interface InventoryViewDialogProps {
   onOpenChange: (open: boolean) => void
   onEdit: (id: string) => void
   onDelete: (id: string) => void
+  onRestock?: (id: string) => void
+  onConsume?: (id: string) => void
+  onViewActivity?: (id: string) => void
 }
 
 export function InventoryViewDialog({
@@ -38,6 +44,9 @@ export function InventoryViewDialog({
   onOpenChange,
   onEdit,
   onDelete,
+  onRestock,
+  onConsume,
+  onViewActivity,
 }: InventoryViewDialogProps) {
   if (!item) return null
 
@@ -227,22 +236,56 @@ export function InventoryViewDialog({
           </div>
         </ScrollArea>
         
-        <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          <Button 
-            variant="outline"
-            onClick={() => onEdit(item.id)}
-          >
-            <Edit className="w-4 h-4" />
-            Edit Item
-          </Button>
-          <Button 
-            variant="default"
-            className="bg-red-600 text-white hover:bg-red-500"
-            onClick={() => onDelete(item.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete Item
-          </Button>
+        <DialogFooter className="flex justify-between gap-3 pt-4 border-t border-gray-200">
+          <div className="flex gap-2">
+            {onRestock && (
+              <Button 
+                variant="outline"
+                onClick={() => onRestock(item.id)}
+                className="border-green-500 text-green-700 hover:bg-green-50"
+              >
+                <Plus className="w-4 h-4" />
+                Restock
+              </Button>
+            )}
+            {onConsume && (
+              <Button 
+                variant="outline"
+                onClick={() => onConsume(item.id)}
+                className="border-orange-500 text-orange-700 hover:bg-orange-50"
+              >
+                <Minus className="w-4 h-4" />
+                Consume
+              </Button>
+            )}
+            {onViewActivity && (
+              <Button 
+                variant="outline"
+                onClick={() => onViewActivity(item.id)}
+                className="border-blue-500 text-blue-700 hover:bg-blue-50"
+              >
+                <History className="w-4 h-4" />
+                Activity Log
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => onEdit(item.id)}
+            >
+              <Edit className="w-4 h-4" />
+              Edit
+            </Button>
+            <Button 
+              variant="default"
+              className="bg-red-600 text-white hover:bg-red-500"
+              onClick={() => onDelete(item.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

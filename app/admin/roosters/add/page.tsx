@@ -41,6 +41,7 @@ export default function AddRoosterPage() {
     health: "",
     owner: "",
   })
+  const [vaccinations, setVaccinations] = useState<Array<{ name: string; date: string }>>([])
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [images, setImages] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
@@ -64,6 +65,22 @@ export default function AddRoosterPage() {
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
+
+  const handleAddVaccination = () => {
+    setVaccinations((prev) => [...prev, { name: "", date: "" }]);
+  };
+
+  const handleRemoveVaccination = (index: number) => {
+    setVaccinations((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVaccinationChange = (index: number, field: "name" | "date", value: string) => {
+    setVaccinations((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
 
   const handleSave = async () => {
     if (
@@ -111,10 +128,14 @@ export default function AddRoosterPage() {
 
       const dateAdded = new Date().toISOString().split("T")[0]
 
+      // Filter out empty vaccinations
+      const validVaccinations = vaccinations.filter(v => v.name.trim() && v.date.trim());
+
       const roosterData = {
         id: formData.id,
         breedId: formData.breedId,
         breed: formData.breed,
+        name: formData.breed, // Use breed as name for now
         age: formData.age,
         weight: formData.weight,
         price: formData.price,
@@ -122,7 +143,10 @@ export default function AddRoosterPage() {
         health: formData.health as "excellent" | "good" | "fair" | "poor",
         images: uploadedUrls,
         dateAdded: dateAdded,
+        description: "", // Empty for now
+        location: "Main Farm", // Default location
         owner: formData.owner || undefined,
+        vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
         image: uploadedUrls[0] || undefined,
       }
 
@@ -300,6 +324,78 @@ export default function AddRoosterPage() {
                           />
                         </div>
                       </div>
+                    </div>
+
+                    {/* Vaccination Records */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                          Vaccination Records
+                        </h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddVaccination}
+                          className="border-[#3d6c58]/20"
+                        >
+                          Add Vaccination
+                        </Button>
+                      </div>
+                      {vaccinations.length === 0 ? (
+                        <p className="text-sm text-[#4a6741]">
+                          No vaccination records yet. Click "Add Vaccination" to add one.
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {vaccinations.map((vaccination, index) => (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-start p-3 border border-[#3d6c58]/20 rounded-md"
+                            >
+                              <div className="flex-1 grid gap-2 md:grid-cols-2">
+                                <div className="space-y-1">
+                                  <Label htmlFor={`vax-name-${index}`} className="text-xs">
+                                    Vaccine Name
+                                  </Label>
+                                  <Input
+                                    id={`vax-name-${index}`}
+                                    value={vaccination.name}
+                                    onChange={(e) =>
+                                      handleVaccinationChange(index, "name", e.target.value)
+                                    }
+                                    placeholder="e.g., Newcastle Disease"
+                                    className="border-[#3d6c58]/20 text-black"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label htmlFor={`vax-date-${index}`} className="text-xs">
+                                    Date Administered
+                                  </Label>
+                                  <Input
+                                    id={`vax-date-${index}`}
+                                    type="date"
+                                    value={vaccination.date}
+                                    onChange={(e) =>
+                                      handleVaccinationChange(index, "date", e.target.value)
+                                    }
+                                    className="border-[#3d6c58]/20 text-black"
+                                  />
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRemoveVaccination(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                   </CardContent>

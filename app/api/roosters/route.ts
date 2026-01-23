@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
       id: body.id,
       breedId: body.breedId,
       breed: body.breed,
+      name: body.name || body.breed,
       age: body.age,
       weight: body.weight,
       price: body.price,
@@ -71,8 +72,11 @@ export async function POST(request: NextRequest) {
       health: body.health,
       images: body.images || [],
       dateAdded: body.dateAdded || new Date().toISOString().split("T")[0],
+      description: body.description || "",
+      location: body.location || "Main Farm",
       owner: body.owner,
       image: body.image,
+      vaccinations: body.vaccinations,
     };
 
     const created = await createRooster(sessionUser, input);

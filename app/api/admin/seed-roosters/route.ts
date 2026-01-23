@@ -40,15 +40,9 @@ const sampleRoosters = [
     health: "excellent",
     description: "A prime Lemon rooster with exceptional fighting lineage. Shows great potential in the pit.",
     images: [],
-    arrivalDate: "2024-01-15",
     dateAdded: "2024-01-15",
     location: "Main Farm",
     bloodline: "Lemon Hatch Cross",
-    fightRecord: {
-      wins: 3,
-      losses: 0,
-      draws: 0
-    }
   },
   {
     breed: "Lemon", 
@@ -59,15 +53,9 @@ const sampleRoosters = [
     health: "good",
     description: "Young Lemon rooster showing great speed and agility. Perfect for breeding.",
     images: [],
-    arrivalDate: "2024-02-20",
     dateAdded: "2024-02-20",
     location: "North Farm",
     bloodline: "Pure Lemon",
-    fightRecord: {
-      wins: 1,
-      losses: 0,
-      draws: 0
-    }
   },
 
   // Golden Boy Roosters
@@ -80,15 +68,9 @@ const sampleRoosters = [
     health: "excellent",
     description: "Champion Golden Boy with proven track record. Excellent fighter and breeder.",
     images: [],
-    arrivalDate: "2023-12-10",
     dateAdded: "2023-12-10",
     location: "Main Farm",
     bloodline: "Golden Boy Line",
-    fightRecord: {
-      wins: 5,
-      losses: 1,
-      draws: 0
-    }
   },
   {
     breed: "Golden Boy",
@@ -99,15 +81,9 @@ const sampleRoosters = [
     health: "excellent",
     description: "Powerful Golden Boy with exceptional strength and fighting instinct.",
     images: [],
-    arrivalDate: "2024-01-25",
     dateAdded: "2024-01-25",
     location: "South Farm",
     bloodline: "Golden Cross",
-    fightRecord: {
-      wins: 2,
-      losses: 0,
-      draws: 1
-    },
     owner: "John Doe"
   },
 
@@ -121,15 +97,9 @@ const sampleRoosters = [
     health: "excellent",
     description: "Premium Sweater rooster with championship bloodline. Top-tier fighter.",
     images: [],
-    arrivalDate: "2024-01-05",
     dateAdded: "2024-01-05",
     location: "Main Farm",
     bloodline: "Sweater Hatch Cross",
-    fightRecord: {
-      wins: 4,
-      losses: 0,
-      draws: 0
-    }
   }
 ];
 

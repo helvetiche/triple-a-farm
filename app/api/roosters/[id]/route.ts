@@ -63,6 +63,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       id: body.id,
       breedId: body.breedId,
       breed: body.breed,
+      name: body.name,
       age: body.age,
       weight: body.weight,
       price: body.price,
@@ -70,8 +71,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       health: body.health,
       images: body.images,
       dateAdded: body.dateAdded,
+      description: body.description,
+      location: body.location,
       owner: body.owner,
       image: body.image,
+      vaccinations: body.vaccinations,
     };
 
     const updated = await updateRooster(sessionUser, id, input);
