@@ -25,10 +25,14 @@ import { ReviewsTable } from "./components/reviews-table"
 import { ReviewsEmptyState } from "./components/reviews-empty-state"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const description = "Feedback & Ratings Management"
 
 export default function FeedbackPage() {
+  // Auth
+  const { userData } = useAuth()
+  
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [reviews, setReviews] = useState<CustomerReview[]>([])
@@ -195,7 +199,10 @@ export default function FeedbackPage() {
 
   const handleExportReport = () => {
     try {
-      exportFeedbackToExcel(reviews)
+      const exportedBy = userData 
+        ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+        : "Unknown"
+      exportFeedbackToExcel(reviews, exportedBy)
       toast.success("Feedback report exported successfully")
     } catch (error) {
       console.error("Error exporting feedback:", error)

@@ -10,7 +10,8 @@ interface RoosterStats {
 
 export const exportRoostersToExcel = (
   roosters: Rooster[],
-  stats?: RoosterStats
+  stats?: RoosterStats,
+  exportedBy?: string
 ) => {
   const workbook = XLSX.utils.book_new()
 
@@ -19,6 +20,7 @@ export const exportRoostersToExcel = (
     const summaryData = [
       ["Rooster Inventory Report Summary"],
       ["Generated:", new Date().toLocaleString()],
+      ["Exported by:", exportedBy || "Unknown"],
       [],
       ["Metric", "Value"],
       ["Total Roosters", stats.total],
@@ -30,7 +32,8 @@ export const exportRoostersToExcel = (
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
   }
 
-  // Sheet 2: All Roosters
+  // Sheet 2: All Roosters (sorted alphabetically by name)
+  const sortedRoosters = [...roosters].sort((a, b) => a.name.localeCompare(b.name))
   const roostersData = [
     [
       "ID",
@@ -46,7 +49,7 @@ export const exportRoostersToExcel = (
       "Owner",
       "Description",
     ],
-    ...roosters.map((r) => [
+    ...sortedRoosters.map((r) => [
       r.id,
       r.name,
       r.breed,
@@ -64,8 +67,9 @@ export const exportRoostersToExcel = (
   const roostersSheet = XLSX.utils.aoa_to_sheet(roostersData)
   XLSX.utils.book_append_sheet(workbook, roostersSheet, "All Roosters")
 
-  // Sheet 3: Available Roosters
+  // Sheet 3: Available Roosters (sorted alphabetically by name)
   const availableRoosters = roosters.filter((r) => r.status === "Available")
+    .sort((a, b) => a.name.localeCompare(b.name))
   if (availableRoosters.length > 0) {
     const availableData = [
       ["ID", "Name", "Breed", "Age", "Weight", "Price", "Health", "Location"],
@@ -84,10 +88,11 @@ export const exportRoostersToExcel = (
     XLSX.utils.book_append_sheet(workbook, availableSheet, "Available")
   }
 
-  // Sheet 4: By Status (excluding Available since we already have a dedicated sheet)
+  // Sheet 4: By Status (excluding Available since we already have a dedicated sheet, sorted alphabetically by name)
   const statusGroups = ["Sold", "Reserved", "Quarantine", "Deceased"]
   statusGroups.forEach((status) => {
     const statusRoosters = roosters.filter((r) => r.status === status)
+      .sort((a, b) => a.name.localeCompare(b.name))
     if (statusRoosters.length > 0) {
       const statusData = [
         ["ID", "Name", "Breed", "Age", "Weight", "Price", "Health"],

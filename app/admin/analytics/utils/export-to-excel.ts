@@ -16,7 +16,8 @@ interface AnalyticsData {
 
 export const exportAnalyticsToExcel = async (
   data: AnalyticsData,
-  dateRange?: { startDate: Date; endDate: Date }
+  dateRange?: { startDate: Date; endDate: Date },
+  exportedBy?: string
 ) => {
   // Dynamic import to ensure this only runs on client
   if (typeof window === 'undefined') {
@@ -30,6 +31,7 @@ export const exportAnalyticsToExcel = async (
   const summaryData = [
     ["Analytics Report Summary"],
     ["Generated:", new Date().toLocaleString()],
+    ["Exported by:", exportedBy || "Unknown"],
     [],
     ["Metric", "Value"],
     ["Total Revenue", `₱${data.stats.totalRevenue.toLocaleString()}`],

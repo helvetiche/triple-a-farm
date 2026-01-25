@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Key, Shield, AlertTriangle, Edit3, Save, X } from "lucide-react"
 import { toast } from "sonner"
@@ -153,9 +153,8 @@ export default function PasswordSettingsPage() {
                       <CardContent className="space-y-4" style={{ borderRadius: 0 }}>
                         <div className="space-y-2">
                           <Label htmlFor="currentPassword" className="text-[#3d6c58]">Current Password</Label>
-                          <Input
+                          <PasswordInput
                             id="currentPassword"
-                            type="password"
                             value={passwordData.currentPassword}
                             onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                             className="border-[#3d6c58]/20"
@@ -169,9 +168,8 @@ export default function PasswordSettingsPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="newPassword" className="text-[#3d6c58]">New Password</Label>
-                          <Input
+                          <PasswordInput
                             id="newPassword"
-                            type="password"
                             value={passwordData.newPassword}
                             onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                             className="border-[#3d6c58]/20"
@@ -185,9 +183,8 @@ export default function PasswordSettingsPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="confirmPassword" className="text-[#3d6c58]">Confirm New Password</Label>
-                          <Input
+                          <PasswordInput
                             id="confirmPassword"
-                            type="password"
                             value={passwordData.confirmPassword}
                             onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                             className="border-[#3d6c58]/20"

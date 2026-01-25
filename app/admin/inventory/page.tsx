@@ -78,10 +78,14 @@ import type { Supplier } from "@/lib/supplier-types";
 import { toastCRUD } from "./utils/toast";
 import { exportInventoryToExcel } from "./utils/export-to-excel";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const description = "Farm Supply & Inventory Management";
 
 export default function InventoryPage() {
+  // Auth
+  const { userData } = useAuth();
+  
   // State and settings
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
@@ -532,7 +536,10 @@ export default function InventoryPage() {
                     className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                     onClick={() => {
                       try {
-                        exportInventoryToExcel(items, stats || undefined);
+                        const exportedBy = userData 
+                          ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+                          : "Unknown";
+                        exportInventoryToExcel(items, stats || undefined, exportedBy);
                         toast.success(
                           "Inventory report exported successfully!"
                         );

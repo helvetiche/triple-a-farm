@@ -37,6 +37,7 @@ import {
 import { toastCRUD } from "./utils/toast";
 import { exportRoostersToExcel } from "./utils/export-to-excel";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Import unified rooster data
 import {
@@ -54,6 +55,9 @@ import { useRoosterSettings } from "./utils/use-rooster-settings";
 export const description = "Rooster Inventory Management";
 
 export default function RoostersPage() {
+  // Auth
+  const { userData } = useAuth();
+  
   // State and settings
   const [searchValue, setSearchValue] = useState("");
   const [roosters, setRoosters] = useState<Rooster[]>([]);
@@ -205,7 +209,10 @@ export default function RoostersPage() {
                       className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                       onClick={() => {
                         try {
-                          exportRoostersToExcel(roosters, stats);
+                          const exportedBy = userData 
+                            ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+                            : "Unknown";
+                          exportRoostersToExcel(roosters, stats, exportedBy);
                           toast.success(
                             "Rooster report exported successfully!"
                           );

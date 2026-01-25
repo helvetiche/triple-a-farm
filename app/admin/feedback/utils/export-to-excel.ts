@@ -1,6 +1,6 @@
 import type { CustomerReview } from "../data/reviews"
 
-export const exportFeedbackToExcel = (reviews: CustomerReview[]) => {
+export const exportFeedbackToExcel = (reviews: CustomerReview[], exportedBy?: string) => {
   // Dynamic import to ensure this only runs on client
   if (typeof window === 'undefined') {
     throw new Error('Export can only be performed in the browser')
@@ -22,6 +22,7 @@ export const exportFeedbackToExcel = (reviews: CustomerReview[]) => {
     const summaryData = [
       ["Feedback & Ratings Report"],
       ["Generated:", new Date().toLocaleString()],
+      ["Exported by:", exportedBy || "Unknown"],
       [],
       ["Metric", "Value"],
       ["Total Reviews", totalReviews],
@@ -36,10 +37,13 @@ export const exportFeedbackToExcel = (reviews: CustomerReview[]) => {
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
 
-    // Sheet 2: All Reviews
+    // Sheet 2: All Reviews (sorted alphabetically by customer name)
+    const sortedReviews = [...reviews].sort((a, b) => 
+      a.customer.localeCompare(b.customer)
+    )
     const reviewsData = [
       ["Review ID", "Date", "Customer", "Rooster", "Rating", "Comment", "Status"],
-      ...reviews.map(review => [
+      ...sortedReviews.map(review => [
         review.id,
         review.date,
         review.customer,
@@ -52,12 +56,13 @@ export const exportFeedbackToExcel = (reviews: CustomerReview[]) => {
     const reviewsSheet = XLSX.utils.aoa_to_sheet(reviewsData)
     XLSX.utils.book_append_sheet(workbook, reviewsSheet, "All Reviews")
 
-    // Sheet 3: Published Reviews Only
+    // Sheet 3: Published Reviews Only (sorted alphabetically by customer name)
+    const publishedReviews = reviews
+      .filter(r => r.status === 'published')
+      .sort((a, b) => a.customer.localeCompare(b.customer))
     const publishedData = [
       ["Review ID", "Date", "Customer", "Rooster", "Rating", "Comment"],
-      ...reviews
-        .filter(r => r.status === 'published')
-        .map(review => [
+      ...publishedReviews.map(review => [
           review.id,
           review.date,
           review.customer,

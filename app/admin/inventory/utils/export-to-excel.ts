@@ -4,7 +4,8 @@ import { formatInventoryDisplayId } from "@/lib/inventory-types"
 
 export const exportInventoryToExcel = (
   items: InventoryItem[],
-  stats?: InventoryStats
+  stats?: InventoryStats,
+  exportedBy?: string
 ) => {
   const workbook = XLSX.utils.book_new()
 
@@ -13,6 +14,7 @@ export const exportInventoryToExcel = (
     const summaryData = [
       ["Inventory Report Summary"],
       ["Generated:", new Date().toLocaleString()],
+      ["Exported by:", exportedBy || "Unknown"],
       [],
       ["Metric", "Value"],
       ["Total Items", stats.totalItems],
@@ -24,7 +26,8 @@ export const exportInventoryToExcel = (
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
   }
 
-  // Sheet 2: Inventory Items
+  // Sheet 2: Inventory Items (sorted alphabetically by name)
+  const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name))
   const inventoryData = [
     [
       "Item ID",
@@ -41,7 +44,7 @@ export const exportInventoryToExcel = (
       "Expiry Date",
       "Description",
     ],
-    ...items.map((item) => [
+    ...sortedItems.map((item) => [
       formatInventoryDisplayId(item),
       item.name,
       item.category,
@@ -60,8 +63,9 @@ export const exportInventoryToExcel = (
   const inventorySheet = XLSX.utils.aoa_to_sheet(inventoryData)
   XLSX.utils.book_append_sheet(workbook, inventorySheet, "Inventory Items")
 
-  // Sheet 3: Stock Alerts (if any)
+  // Sheet 3: Stock Alerts (if any, sorted alphabetically by name)
   const alertItems = items.filter((item) => item.status !== "adequate")
+    .sort((a, b) => a.name.localeCompare(b.name))
   if (alertItems.length > 0) {
     const alertsData = [
       ["Item ID", "Name", "Category", "Current Stock", "Min Stock", "Status"],

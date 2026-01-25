@@ -20,6 +20,7 @@ import { exportDashboardToExcel } from "./utils/export-dashboard"
 import { DateRangeSelector } from "./analytics/components/date-range-selector"
 import type { DateRange } from "./analytics/data/mock-data"
 import dynamic from "next/dynamic"
+import { useAuth } from "@/contexts/AuthContext"
 
 import Zoom from "yet-another-react-lightbox/plugins/zoom"
 import { useLightbox } from "@/hooks/use-lightbox"
@@ -45,6 +46,9 @@ const iconMap: Record<string, typeof Bird> = {
 }
 
 export default function Page() {
+  // Auth
+  const { userData } = useAuth()
+  
   const [isLoading, setIsLoading] = useState(true)
   const [roosters, setRoosters] = useState<Rooster[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
@@ -101,7 +105,10 @@ export default function Page() {
 
   const handleExportReport = async () => {
     try {
-      await exportDashboardToExcel(stats, roosters, activities, selectedDateRange)
+      const exportedBy = userData 
+        ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+        : "Unknown"
+      await exportDashboardToExcel(stats, roosters, activities, selectedDateRange, exportedBy)
       toast.success("Dashboard report exported successfully!")
     } catch (error) {
       console.error("Error exporting dashboard:", error)

@@ -45,10 +45,14 @@ import { PageHeader, StatCards } from "@/components/dashboard"
 import { getAvailableRoosters, roosterBreeds, type Rooster } from "../../data/roosters"
 import { exportSalesToExcel } from "../utils/export-to-excel"
 import { toast } from "sonner"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const description = "Sales & Transaction Tracking"
 
 export function SalesClient() {
+  // Auth
+  const { userData } = useAuth()
+  
   const [isLoading, setIsLoading] = useState(true)
   const [sales, setSales] = useState<SalesTransaction[]>([])
   const [stats, setStats] = useState<SalesStats>({
@@ -206,7 +210,10 @@ export function SalesClient() {
                     className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                     onClick={() => {
                       try {
-                        exportSalesToExcel(sales, stats)
+                        const exportedBy = userData 
+                          ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+                          : "Unknown"
+                        exportSalesToExcel(sales, stats, exportedBy)
                         toast.success("Sales report exported successfully!")
                       } catch (error) {
                         console.error("Error exporting sales:", error)

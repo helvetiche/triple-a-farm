@@ -23,7 +23,8 @@ export const exportDashboardToExcel = async (
   stats: DashboardStats,
   roosters: Rooster[],
   activities: Activity[],
-  dateRange?: { startDate: Date; endDate: Date }
+  dateRange?: { startDate: Date; endDate: Date },
+  exportedBy?: string
 ) => {
   // Dynamic import to ensure this only runs on client
   if (typeof window === 'undefined') {
@@ -37,6 +38,7 @@ export const exportDashboardToExcel = async (
   const summaryData = [
     ["Dashboard Report"],
     ["Generated:", new Date().toLocaleString()],
+    ["Exported by:", exportedBy || "Unknown"],
     [],
     ["Metric", "Value"],
     ["Total Roosters", stats.total],
@@ -51,7 +53,7 @@ export const exportDashboardToExcel = async (
   ]
 
   if (dateRange) {
-    summaryData.splice(3, 0, [
+    summaryData.splice(4, 0, [
       "Date Range",
       `${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`,
     ])

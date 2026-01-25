@@ -53,6 +53,7 @@ import {
   type CustomerRating
 } from "./data/mock-data"
 import { exportAnalyticsToExcel } from "./utils/export-to-excel"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const description = "Analytics & Reports"
 
@@ -65,6 +66,9 @@ interface AnalyticsData {
 }
 
 export function AnalyticsPage() {
+  // Auth
+  const { userData } = useAuth()
+  
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
@@ -119,7 +123,10 @@ export function AnalyticsPage() {
     }
 
     try {
-      await exportAnalyticsToExcel(analyticsData, selectedDateRange)
+      const exportedBy = userData 
+        ? `${userData.firstName} ${userData.lastName} (${userData.email})`
+        : "Unknown"
+      await exportAnalyticsToExcel(analyticsData, selectedDateRange, exportedBy)
       toast.success("Report exported successfully!")
     } catch (error) {
       console.error("Error exporting report:", error)

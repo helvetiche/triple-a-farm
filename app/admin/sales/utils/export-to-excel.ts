@@ -3,7 +3,8 @@ import type { SalesTransaction, SalesStats } from "../types"
 
 export const exportSalesToExcel = (
   transactions: SalesTransaction[],
-  stats?: SalesStats
+  stats?: SalesStats,
+  exportedBy?: string
 ) => {
   const workbook = XLSX.utils.book_new()
 
@@ -12,6 +13,7 @@ export const exportSalesToExcel = (
     const summaryData = [
       ["Sales & Transactions Report Summary"],
       ["Generated:", new Date().toLocaleString()],
+      ["Exported by:", exportedBy || "Unknown"],
       [],
       ["Metric", "Value"],
       ["Total Revenue", `₱${stats.totalRevenue.toLocaleString()}`],
@@ -25,7 +27,10 @@ export const exportSalesToExcel = (
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
   }
 
-  // Sheet 2: Transactions
+  // Sheet 2: Transactions (sorted alphabetically by customer name)
+  const sortedTransactions = [...transactions].sort((a, b) => 
+    a.customerName.localeCompare(b.customerName)
+  )
   const transactionsData = [
     [
       "Transaction ID",
@@ -42,7 +47,7 @@ export const exportSalesToExcel = (
       "Last Payment Date",
       "Notes",
     ],
-    ...transactions.map((t) => [
+    ...sortedTransactions.map((t) => [
       t.transactionId || t.id,
       t.date,
       t.customerName,
