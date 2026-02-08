@@ -18,7 +18,9 @@ export interface Rooster {
   images: string[]
   dateAdded: string
   description: string
-  location: string
+  locationId: string
+  location: string // Keep for backward compatibility and display
+  locationAddress?: string
   owner?: string
   image?: string // Added for backward compatibility
   vaccinations?: Vaccination[]
@@ -56,6 +58,58 @@ export const fallbackBreeds = [
 
 // Legacy export for backward compatibility - use getRoosterBreeds() instead
 export const roosterBreeds = fallbackBreeds;
+
+// Location interface for dropdown
+export interface LocationOption {
+  locationId: string;
+  name: string;
+  address?: string;
+}
+
+// Available locations for dropdown/select - now fetched dynamically from API
+export const getRoosterLocations = async (): Promise<string[]> => {
+  try {
+    const response = await fetch('/api/public/locations');
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      return result.data.map((location: any) => location.name);
+    }
+
+    // Fallback to default location if API fails
+    return fallbackLocations;
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return fallbackLocations;
+  }
+};
+
+// Get locations with IDs for forms
+export const getRoosterLocationsWithIds = async (): Promise<LocationOption[]> => {
+  try {
+    const response = await fetch('/api/public/locations');
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      return result.data.map((location: any) => ({
+        locationId: location.locationId || location.id,
+        name: location.name,
+        address: location.address,
+      }));
+    }
+
+    // Fallback to empty array if API fails
+    return [];
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return [];
+  }
+};
+
+// Fallback locations for when API is unavailable
+export const fallbackLocations = [
+  "Main Farm"
+];
 
 // Status options
 export const roosterStatuses = [
@@ -110,11 +164,12 @@ export const getRoosterStats = (roosters: Rooster[]) => {
 
 export const filterRoosters = (roosters: Rooster[], searchValue: string) => {
   if (!searchValue) return roosters
-  
+
   const search = searchValue.toLowerCase()
-  return roosters.filter(rooster => 
+  return roosters.filter(rooster =>
     rooster.id.toLowerCase().includes(search) ||
     rooster.breed.toLowerCase().includes(search) ||
+    rooster.location.toLowerCase().includes(search) ||
     rooster.status.toLowerCase().includes(search)
   )
 }

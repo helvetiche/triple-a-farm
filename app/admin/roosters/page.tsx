@@ -31,6 +31,7 @@ import {
   RoosterViewDialog,
   ConfirmDialog,
   BreedManagementDialog,
+  LocationManagementDialog,
 } from "./components";
 
 // Import toast utilities
@@ -65,6 +66,7 @@ export default function RoostersPage() {
   const [selectedRooster, setSelectedRooster] = useState<Rooster | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isBreedDialogOpen, setIsBreedDialogOpen] = useState(false);
+  const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -238,6 +240,13 @@ export default function RoostersPage() {
                       <Bird className="w-4 h-4" />
                       Manage Breeds
                     </Button>
+                    <Button
+                      onClick={() => setIsLocationDialogOpen(true)}
+                      className="bg-[#3d6c58] hover:bg-[#2d4f3a] text-white"
+                    >
+                      <Package className="w-4 h-4" />
+                      Manage Locations
+                    </Button>
                   </div>
                 </PageHeader>
               )}
@@ -402,6 +411,12 @@ export default function RoostersPage() {
               <BreedManagementDialog
                 open={isBreedDialogOpen}
                 onOpenChange={setIsBreedDialogOpen}
+              />
+
+              {/* Location Management Dialog */}
+              <LocationManagementDialog
+                open={isLocationDialogOpen}
+                onOpenChange={setIsLocationDialogOpen}
               />
             </div>
           </SidebarInset>

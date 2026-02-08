@@ -73,6 +73,8 @@ export function RoosterGrid({ roosters }: RoosterGridProps) {
                     <span className="text-xs">{rooster.age}</span>
                     <span className="text-gray-400 mx-1 sm:mx-2">•</span>
                     <span className="text-xs">{rooster.weight}</span>
+                    <span className="text-gray-400 mx-1 sm:mx-2">•</span>
+                    <span className="text-xs">{rooster.location}</span>
                   </div>
                   <div className="font-semibold text-gray-900 text-sm sm:text-base">
                     ₱{rooster.price}

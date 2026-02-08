@@ -18,6 +18,7 @@ export async function GET() {
         id: doc.id,
         breedId: (data.breedId as string) || "",
         breed: (data.breed as string) || "",
+        name: (data.name as string) || "",
         age: (data.age as string) || "",
         weight: (data.weight as string) || "",
         price: (data.price as string) || "",
@@ -25,8 +26,13 @@ export async function GET() {
         health: (data.health as Rooster["health"]) || "good",
         images: Array.isArray(data.images) ? (data.images as string[]) : [],
         dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+        description: (data.description as string) || "",
+        locationId: (data.locationId as string) || "",
+        location: (data.location as string) || "",
+        locationAddress: (data.locationAddress as string) || undefined,
         owner: data.owner as string | undefined,
         image: data.image as string | undefined,
+        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
       };
 
       return rooster;

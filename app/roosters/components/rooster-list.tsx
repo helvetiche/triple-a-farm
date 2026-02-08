@@ -80,6 +80,8 @@ export function RoosterList({ roosters }: RoosterListProps) {
                   <span>{rooster.age}</span>
                   <span className="text-gray-400">•</span>
                   <span>{rooster.weight}</span>
+                  <span className="text-gray-400">•</span>
+                  <span>{rooster.location}</span>
                 </div>
               </div>
             </div>
@@ -136,6 +138,10 @@ export function RoosterList({ roosters }: RoosterListProps) {
                     <div className="flex gap-4">
                       <span className="font-medium">Weight:</span>
                       <span>{rooster.weight}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span className="font-medium">Location:</span>
+                      <span>{rooster.location}</span>
                     </div>
                   </div>
                 </div>

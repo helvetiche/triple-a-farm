@@ -18,22 +18,27 @@ import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toastCRUD } from "../utils/toast"
-import { getRoosterBreeds, roosterStatuses, healthStatuses } from "../../data/roosters"
+import { getRoosterBreeds, getRoosterLocationsWithIds, roosterStatuses, healthStatuses, type LocationOption } from "../../data/roosters"
 import Image from "next/image"
 
 export const description = "Add New Rooster"
 
 export default function AddRoosterPage() {
   const router = useRouter()
-  // State for dynamic breeds
+  // State for dynamic breeds and locations
   const [breeds, setBreeds] = useState<string[]>([])
+  const [locations, setLocations] = useState<LocationOption[]>([])
   const [isLoadingBreeds, setIsLoadingBreeds] = useState(true)
+  const [isLoadingLocations, setIsLoadingLocations] = useState(true)
   
   // State for form fields
   const [formData, setFormData] = useState({
     id: "",
     breedId: "",
     breed: "",
+    locationId: "",
+    location: "",
+    locationAddress: "",
     age: "",
     weight: "",
     price: "",
@@ -46,7 +51,7 @@ export default function AddRoosterPage() {
   const [images, setImages] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
-  // Fetch breeds on component mount
+  // Fetch breeds and locations on component mount
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
@@ -58,8 +63,20 @@ export default function AddRoosterPage() {
         setIsLoadingBreeds(false)
       }
     }
-    
+
+    const fetchLocations = async () => {
+      try {
+        const locationsList = await getRoosterLocationsWithIds()
+        setLocations(locationsList)
+      } catch (error) {
+        console.error('Error fetching locations:', error)
+      } finally {
+        setIsLoadingLocations(false)
+      }
+    }
+
     fetchBreeds()
+    fetchLocations()
   }, [])
 
   const handleInputChange = (field: string, value: string) => {
@@ -87,6 +104,8 @@ export default function AddRoosterPage() {
       !formData.id ||
       !formData.breedId ||
       !formData.breed ||
+      !formData.locationId ||
+      !formData.location ||
       !formData.age ||
       !formData.weight ||
       !formData.price ||
@@ -144,7 +163,9 @@ export default function AddRoosterPage() {
         images: uploadedUrls,
         dateAdded: dateAdded,
         description: "", // Empty for now
-        location: "Main Farm", // Default location
+        locationId: formData.locationId,
+        location: formData.location,
+        locationAddress: formData.locationAddress || undefined,
         owner: formData.owner || undefined,
         vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
         image: uploadedUrls[0] || undefined,
@@ -238,6 +259,38 @@ export default function AddRoosterPage() {
                                 breeds.map((breed: string) => (
                                   <SelectItem key={breed} value={breed}>
                                     {breed}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="location">Location</Label>
+                          <Select value={formData.locationId} onValueChange={(value) => {
+                            const selectedLocation = locations.find(loc => loc.locationId === value);
+                            if (selectedLocation) {
+                              handleInputChange("locationId", selectedLocation.locationId);
+                              handleInputChange("location", selectedLocation.name);
+                              handleInputChange("locationAddress", selectedLocation.address || "");
+                            }
+                          }}>
+                            <SelectTrigger className="border-[#3d6c58]/20">
+                              <SelectValue placeholder="Select location" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {isLoadingLocations ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading locations...
+                                </SelectItem>
+                              ) : locations.length === 0 ? (
+                                <SelectItem value="none" disabled>
+                                  No locations available
+                                </SelectItem>
+                              ) : (
+                                locations.map((location) => (
+                                  <SelectItem key={location.locationId} value={location.locationId}>
+                                    {location.name}
                                   </SelectItem>
                                 ))
                               )}

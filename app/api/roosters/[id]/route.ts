@@ -72,6 +72,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       images: body.images,
       dateAdded: body.dateAdded,
       description: body.description,
+      locationId: body.locationId,
       location: body.location,
       owner: body.owner,
       image: body.image,

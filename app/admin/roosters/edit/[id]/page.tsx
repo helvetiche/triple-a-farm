@@ -32,9 +32,11 @@ import { ConfirmDialog } from "../../components";
 import { toastCRUD } from "../../utils/toast";
 import {
   getRoosterBreeds,
+  getRoosterLocationsWithIds,
   roosterStatuses,
   healthStatuses,
   type Rooster,
+  type LocationOption,
 } from "../../../data/roosters";
 
 export const description = "Edit Rooster";
@@ -45,22 +47,26 @@ export default function EditRoosterPage() {
   const roosterId = params.id as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // State for dynamic breeds
+  // State for dynamic breeds and locations
   const [breeds, setBreeds] = useState<string[]>([]);
+  const [locations, setLocations] = useState<LocationOption[]>([]);
   const [isLoadingBreeds, setIsLoadingBreeds] = useState(true);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(true);
 
   // State for form fields
   const [formData, setFormData] = useState({
     id: "",
     name: "",
     breed: "",
+    locationId: "",
+    location: "",
+    locationAddress: "",
     age: "",
     weight: "",
     status: "",
     health: "",
     price: "",
     description: "",
-    location: "",
     owner: "",
   });
   const [vaccinations, setVaccinations] = useState<Array<{ name: string; date: string }>>([]);
@@ -86,13 +92,15 @@ export default function EditRoosterPage() {
             id: rooster.id || "",
             name: rooster.name || "",
             breed: rooster.breed || "",
+            locationId: rooster.locationId || "",
+            location: rooster.location || "",
+            locationAddress: rooster.locationAddress || "",
             age: rooster.age || "",
             weight: rooster.weight || "",
             status: rooster.status || "",
             health: rooster.health || "",
             price: rooster.price || "",
             description: rooster.description || "",
-            location: rooster.location || "",
             owner: rooster.owner || "",
           });
           setImages(rooster.images || []);
@@ -125,8 +133,20 @@ export default function EditRoosterPage() {
         setIsLoadingBreeds(false)
       }
     }
-    
+
+    const fetchLocations = async () => {
+      try {
+        const locationsList = await getRoosterLocationsWithIds()
+        setLocations(locationsList)
+      } catch (error) {
+        console.error('Error fetching locations:', error)
+      } finally {
+        setIsLoadingLocations(false)
+      }
+    }
+
     fetchBreeds()
+    fetchLocations()
   }, []);
 
   const handleInputChange = (field: string, value: string) => {
@@ -235,7 +255,9 @@ export default function EditRoosterPage() {
         health: formData.health as "excellent" | "good" | "fair" | "poor",
         description: formData.description || "",
         images: images,
+        locationId: formData.locationId,
         location: formData.location || "Main Farm",
+        locationAddress: formData.locationAddress || undefined,
         owner: formData.owner.trim() || undefined,
         vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
         image: images[0] || undefined,
@@ -397,6 +419,41 @@ export default function EditRoosterPage() {
                               </Select>
                             </div>
                             <div className="space-y-2">
+                              <Label htmlFor="location">Location</Label>
+                              <Select
+                                value={formData.locationId}
+                                onValueChange={(value) => {
+                                  const selectedLocation = locations.find(loc => loc.locationId === value);
+                                  if (selectedLocation) {
+                                    handleInputChange("locationId", selectedLocation.locationId);
+                                    handleInputChange("location", selectedLocation.name);
+                                    handleInputChange("locationAddress", selectedLocation.address || "");
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="border-[#3d6c58]/20">
+                                  <SelectValue placeholder="Select location" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {isLoadingLocations ? (
+                                    <SelectItem value="loading" disabled>
+                                      Loading locations...
+                                    </SelectItem>
+                                  ) : locations.length === 0 ? (
+                                    <SelectItem value="none" disabled>
+                                      No locations available
+                                    </SelectItem>
+                                  ) : (
+                                    locations.map((location) => (
+                                      <SelectItem key={location.locationId} value={location.locationId}>
+                                        {location.name}
+                                      </SelectItem>
+                                    ))
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
                               <Label htmlFor="age">Age</Label>
                               <Input
                                 id="age"
@@ -465,18 +522,6 @@ export default function EditRoosterPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="location">Location</Label>
-                              <Input
-                                id="location"
-                                value={formData.location}
-                                onChange={(e) =>
-                                  handleInputChange("location", e.target.value)
-                                }
-                                placeholder="Main Farm"
-                                className="border-[#3d6c58]/20 text-black"
-                              />
                             </div>
                           </div>
                         </>

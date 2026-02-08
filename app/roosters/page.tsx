@@ -55,9 +55,10 @@ export default function RoosterGalleryPage() {
   const filteredAndSorted = useMemo(() => {
     let filtered = roosters.filter((r) => {
       // Search filter
-      const matchesQuery = !query.trim() || 
+      const matchesQuery = !query.trim() ||
         r.id.toLowerCase().includes(query.toLowerCase()) ||
-        r.breed.toLowerCase().includes(query.toLowerCase());
+        r.breed.toLowerCase().includes(query.toLowerCase()) ||
+        r.location.toLowerCase().includes(query.toLowerCase());
       
       // Status filter
       const matchesStatus = activeFilters.status === 'all' || r.status === activeFilters.status;

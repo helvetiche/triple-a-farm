@@ -57,12 +57,12 @@ export const exportFeedbackToExcel = (reviews: CustomerReview[], exportedBy?: st
     XLSX.utils.book_append_sheet(workbook, reviewsSheet, "All Reviews")
 
     // Sheet 3: Published Reviews Only (sorted alphabetically by customer name)
-    const publishedReviews = reviews
+    const publishedReviewsList = reviews
       .filter(r => r.status === 'published')
       .sort((a, b) => a.customer.localeCompare(b.customer))
     const publishedData = [
       ["Review ID", "Date", "Customer", "Rooster", "Rating", "Comment"],
-      ...publishedReviews.map(review => [
+      ...publishedReviewsList.map(review => [
           review.id,
           review.date,
           review.customer,

@@ -65,7 +65,9 @@ export const getRoosters = async (
       images: Array.isArray(data.images) ? (data.images as string[]) : [],
       dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
       description: (data.description as string) || "",
+      locationId: (data.locationId as string) || "",
       location: (data.location as string) || "",
+      locationAddress: (data.locationAddress as string) || undefined,
       owner: data.owner as string | undefined,
       image: data.image as string | undefined,
       vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
@@ -103,7 +105,9 @@ export const getRoosterById = async (
     images: Array.isArray(data.images) ? (data.images as string[]) : [],
     dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
     description: (data.description as string) || "",
+    locationId: (data.locationId as string) || "",
     location: (data.location as string) || "",
+    locationAddress: (data.locationAddress as string) || undefined,
     owner: data.owner as string | undefined,
     image: data.image as string | undefined,
     vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
@@ -125,7 +129,9 @@ export interface CreateRoosterInput {
   images: string[];
   dateAdded: string;
   description: string;
+  locationId: string;
   location: string;
+  locationAddress?: string;
   owner?: string;
   image?: string;
   vaccinations?: Array<{ name: string; date: string }>;
@@ -142,6 +148,9 @@ export interface UpdateRoosterInput {
   status?: Rooster["status"];
   health?: Rooster["health"];
   images?: string[];
+  locationId?: string;
+  location?: string;
+  locationAddress?: string;
   dateAdded?: string;
   description?: string;
   location?: string;
@@ -178,7 +187,9 @@ const buildRoosterDocFromCreate = (
     images: input.images || [],
     dateAdded: input.dateAdded,
     description: input.description,
+    locationId: input.locationId,
     location: input.location,
+    locationAddress: input.locationAddress,
   };
 
   // Only add optional fields if they have values

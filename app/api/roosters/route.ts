@@ -51,7 +51,9 @@ export async function POST(request: NextRequest) {
       !body.weight ||
       !body.price ||
       !body.status ||
-      !body.health
+      !body.health ||
+      !body.locationId ||
+      !body.location
     ) {
       return jsonError(
         "INVALID_REQUEST",
@@ -73,7 +75,8 @@ export async function POST(request: NextRequest) {
       images: body.images || [],
       dateAdded: body.dateAdded || new Date().toISOString().split("T")[0],
       description: body.description || "",
-      location: body.location || "Main Farm",
+      locationId: body.locationId,
+      location: body.location,
       owner: body.owner,
       image: body.image,
       vaccinations: body.vaccinations,

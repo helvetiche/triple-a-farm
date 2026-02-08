@@ -1,10 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronLeft, ChevronRight, Calendar, Weight, Heart, DollarSign, User } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Calendar, Weight, Heart, DollarSign, User, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Rooster } from '@/app/admin/data/roosters';
+
+interface Location {
+  locationId?: string;
+  id?: string;
+  name: string;
+  address?: string;
+}
 
 interface RoosterDetailModalProps {
   rooster: Rooster | null;
@@ -13,6 +20,47 @@ interface RoosterDetailModalProps {
 
 export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [locations, setLocations] = useState<Location[]>([]);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch("/api/public/locations");
+        const result = await response.json();
+        if (result.success && result.data) {
+          setLocations(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  const getLocationAddress = (rooster: Rooster | null): string | undefined => {
+    if (!rooster) return undefined;
+    // First check if rooster has locationAddress stored
+    if (rooster.locationAddress) {
+      return rooster.locationAddress;
+    }
+    // Look up from locations by name (most reliable match)
+    if (rooster.location) {
+      const location = locations.find(loc => 
+        loc.name === rooster.location || 
+        loc.name.toLowerCase() === rooster.location.toLowerCase()
+      );
+      if (location?.address) return location.address;
+    }
+    // Fallback: try to match by locationId
+    if (rooster.locationId) {
+      const location = locations.find(loc => 
+        (loc.locationId && loc.locationId === rooster.locationId) || 
+        (loc.id && loc.id === rooster.locationId)
+      );
+      if (location?.address) return location.address;
+    }
+    return undefined;
+  };
 
   if (!rooster) return null;
 
@@ -144,7 +192,7 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
             </div>
 
             {/* Details Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                   <Calendar className="w-4 h-4" />
@@ -177,6 +225,17 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
                 <p className="text-gray-900 font-medium">
                   {new Date(rooster.dateAdded).toLocaleDateString()}
                 </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-gray-500 text-sm">
+                  <MapPin className="w-4 h-4" />
+                  <span>Location</span>
+                </div>
+                <p className="text-gray-900 font-medium">{rooster.location}</p>
+                {getLocationAddress(rooster) && (
+                  <p className="text-gray-600 text-sm">{getLocationAddress(rooster)}</p>
+                )}
               </div>
             </div>
 

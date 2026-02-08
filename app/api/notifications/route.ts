@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       const recentSales = sales
         .filter((sale) => {
           const saleDate = new Date(sale.date);
-          return saleDate >= sevenDaysAgo && sale.status === "completed";
+          return saleDate >= sevenDaysAgo;
         })
         .slice(0, 5)
         .map((sale) => {

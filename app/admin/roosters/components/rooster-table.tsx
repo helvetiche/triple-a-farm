@@ -19,6 +19,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Eye, Edit, Trash2, ShoppingBag } from "lucide-react"
 import { Rooster, roosterStatuses, healthStatuses } from "../../data/roosters"
+import { useState, useEffect } from "react"
+
+interface Location {
+  locationId?: string
+  id?: string
+  name: string
+  address?: string
+}
 
 interface RoosterTableProps {
   roosters: Rooster[]
@@ -29,6 +37,46 @@ interface RoosterTableProps {
 }
 
 export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyRooster }: RoosterTableProps) {
+  const [locations, setLocations] = useState<Location[]>([])
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch("/api/public/locations")
+        const result = await response.json()
+        if (result.success && result.data) {
+          setLocations(result.data)
+        }
+      } catch (error) {
+        console.error("Error fetching locations:", error)
+      }
+    }
+    fetchLocations()
+  }, [])
+
+  const getLocationAddress = (rooster: Rooster): string | undefined => {
+    // First check if rooster has locationAddress stored
+    if (rooster.locationAddress) {
+      return rooster.locationAddress
+    }
+    // Look up from locations by name (most reliable match)
+    if (rooster.location) {
+      const location = locations.find(loc => 
+        loc.name === rooster.location || 
+        loc.name.toLowerCase() === rooster.location.toLowerCase()
+      )
+      if (location?.address) return location.address
+    }
+    // Fallback: try to match by locationId
+    if (rooster.locationId) {
+      const location = locations.find(loc => 
+        (loc.locationId && loc.locationId === rooster.locationId) || 
+        (loc.id && loc.id === rooster.locationId)
+      )
+      if (location?.address) return location.address
+    }
+    return undefined
+  }
   const getStatusColor = (status: string) => {
     const statusConfig = roosterStatuses.find(s => s.value === status)
     return statusConfig?.color || "bg-gray-100 text-gray-800"
@@ -156,6 +204,7 @@ export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyR
                 <TableHead className="hidden md:table-cell">Weight</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden sm:table-cell">Price</TableHead>
+                <TableHead className="hidden lg:table-cell">Location</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -173,6 +222,14 @@ export function RoosterTable({ roosters, onViewDetails, onEdit, onDelete, onBuyR
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell font-semibold">₱ {rooster.price}</TableCell>
+                  <TableCell className="hidden lg:table-cell">
+                    <div>
+                      <div className="font-medium">{rooster.location || "--"}</div>
+                      {getLocationAddress(rooster) && (
+                        <div className="text-sm text-gray-600">{getLocationAddress(rooster)}</div>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
