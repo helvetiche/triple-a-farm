@@ -2,6 +2,7 @@ import { adminDb } from "@/lib/firebase";
 import type { SessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
 import type { SalesTransaction, SalesStats, RevenueTrend } from "@/app/admin/sales/types";
+import { logAuditEvent } from "@/lib/audit";
 
 type SalesAction = "read" | "create" | "update" | "delete" | "readStats";
 
@@ -155,10 +156,28 @@ export const createSalesTransaction = async (
 
   await docRef.set(cleanedDoc);
 
-  return {
+  const createdTransaction: SalesTransaction = {
     id: docRef.id,
     ...docData,
   };
+
+  logAuditEvent(user, {
+    action: "create",
+    entity: "sales",
+    entityId: createdTransaction.id,
+    entityName: createdTransaction.transactionId,
+    description: `Created sales transaction: ${createdTransaction.transactionId} for ${createdTransaction.customerName}`,
+    details: {
+      metadata: {
+        breed: createdTransaction.breed,
+        amount: createdTransaction.amount,
+        paymentMethod: createdTransaction.paymentMethod,
+        customerName: createdTransaction.customerName,
+      },
+    },
+  });
+
+  return createdTransaction;
 };
 
 export const updateSalesTransaction = async (
@@ -210,7 +229,24 @@ export const updateSalesTransaction = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
-  return updated;
+  const updatedTransaction = updated as SalesTransaction;
+
+  logAuditEvent(user, {
+    action: "update",
+    entity: "sales",
+    entityId: updatedTransaction.id,
+    entityName: updatedTransaction.transactionId,
+    description: `Updated sales transaction: ${updatedTransaction.transactionId}`,
+    details: {
+      metadata: {
+        breed: updatedTransaction.breed,
+        amount: updatedTransaction.amount,
+        customerName: updatedTransaction.customerName,
+      },
+    },
+  });
+
+  return updatedTransaction;
 };
 
 export const deleteSalesTransaction = async (
@@ -226,7 +262,27 @@ export const deleteSalesTransaction = async (
     throw new Error("NOT_FOUND");
   }
 
+  const deletedTransaction = {
+    id: doc.id,
+    ...(doc.data() as Omit<SalesTransaction, "id">),
+  } as SalesTransaction;
+
   await docRef.delete();
+
+  logAuditEvent(user, {
+    action: "delete",
+    entity: "sales",
+    entityId: deletedTransaction.id,
+    entityName: deletedTransaction.transactionId,
+    description: `Deleted sales transaction: ${deletedTransaction.transactionId}`,
+    details: {
+      metadata: {
+        breed: deletedTransaction.breed,
+        amount: deletedTransaction.amount,
+        customerName: deletedTransaction.customerName,
+      },
+    },
+  });
 };
 
 export const getSalesStats = async (

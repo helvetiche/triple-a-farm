@@ -5,6 +5,7 @@ import {
   updateSupplier,
   deleteSupplier,
 } from "@/lib/suppliers";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function GET(
   request: NextRequest,
@@ -72,8 +73,23 @@ export async function PUT(
       notes: body.notes,
     });
 
+    logAuditEvent(sessionUser, {
+      action: "update",
+      entity: "supplier",
+      entityId: supplier.id,
+      entityName: supplier.name,
+      description: `Updated supplier: ${supplier.name}`,
+      details: {
+        metadata: {
+          phone: supplier.phone,
+          email: supplier.email,
+          address: supplier.address,
+        },
+      },
+    });
+
     return jsonSuccess(supplier, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -113,10 +129,28 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    
+    const supplier = await getSupplierById(id);
+    const supplierName = supplier?.name || id;
+
     await deleteSupplier(id);
 
+    logAuditEvent(sessionUser, {
+      action: "delete",
+      entity: "supplier",
+      entityId: id,
+      entityName: supplierName,
+      description: `Deleted supplier: ${supplierName}`,
+      details: {
+        metadata: {
+          phone: supplier?.phone,
+          email: supplier?.email,
+        },
+      },
+    });
+
     return jsonSuccess({ message: "Supplier deleted successfully" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

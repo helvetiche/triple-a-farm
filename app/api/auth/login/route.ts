@@ -8,6 +8,7 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { validateRequestBody, withTimeout } from "@/lib/utils";
+import { logAuditEvent } from "@/lib/audit";
 
 interface LoginRequestBody {
   email: string;
@@ -129,6 +130,21 @@ export async function POST(request: Request) {
     
     console.log("[LOGIN] Successfully created session for:", decodedClaims.email);
 
+    logAuditEvent(
+      {
+        uid: decodedClaims.uid,
+        email: decodedClaims.email ?? "",
+        roles: [],
+      },
+      {
+        action: "login",
+        entity: "user",
+        entityId: decodedClaims.uid,
+        entityName: decodedClaims.email ?? "Unknown",
+        description: `User logged in: ${decodedClaims.email}`,
+      }
+    );
+
     return jsonSuccess(
       {
         uid: decodedClaims.uid,
@@ -136,7 +152,7 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     // More specific error handling
     if (error.message === "Authentication request timed out") {
       console.error("[LOGIN] Authentication timeout:", error);

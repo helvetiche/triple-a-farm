@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase";
 import { hasRequiredRole } from "@/lib/roles";
+import { logAuditEvent } from "@/lib/audit";
 
 const BREEDS_COLLECTION = "rooster_breeds";
 
@@ -114,11 +115,24 @@ export async function POST(request: NextRequest) {
 
     const docRef = await breedsCollectionRef().add(newBreed);
 
-    return jsonSuccess(
-      { id: docRef.id, ...newBreed },
-      { status: 201 }
-    );
-  } catch (error: any) {
+    const createdBreed = { id: docRef.id, ...newBreed };
+
+    logAuditEvent(sessionUser, {
+      action: "create",
+      entity: "breed",
+      entityId: createdBreed.id,
+      entityName: createdBreed.name,
+      description: `Created rooster breed: ${createdBreed.name}`,
+      details: {
+        metadata: {
+          origin: createdBreed.origin,
+          description: createdBreed.description,
+        },
+      },
+    });
+
+    return jsonSuccess(createdBreed, { status: 201 });
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -178,11 +192,22 @@ export async function PUT(request: NextRequest) {
 
     await docRef.update(updatedBreed);
 
-    return jsonSuccess(
-      { id, ...updatedBreed },
-      { status: 200 }
-    );
-  } catch (error: any) {
+    logAuditEvent(sessionUser, {
+      action: "update",
+      entity: "breed",
+      entityId: id,
+      entityName: updatedBreed.name,
+      description: `Updated rooster breed: ${updatedBreed.name}`,
+      details: {
+        metadata: {
+          origin: updatedBreed.origin,
+          description: updatedBreed.description,
+        },
+      },
+    });
+
+    return jsonSuccess({ id, ...updatedBreed }, { status: 200 });
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -230,13 +255,26 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const breedData = doc.data()!;
+    const breedName = breedData.name;
+
     await docRef.delete();
 
-    return jsonSuccess(
-      { message: "Breed deleted successfully" },
-      { status: 200 }
-    );
-  } catch (error: any) {
+    logAuditEvent(sessionUser, {
+      action: "delete",
+      entity: "breed",
+      entityId: id,
+      entityName: breedName,
+      description: `Deleted rooster breed: ${breedName}`,
+      details: {
+        metadata: {
+          origin: breedData.origin,
+        },
+      },
+    });
+
+    return jsonSuccess({ message: "Breed deleted successfully" }, { status: 200 });
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

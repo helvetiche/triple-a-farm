@@ -45,7 +45,6 @@ import { PageHeader } from "@/components/dashboard";
 import {
   Activity,
   Search,
-  Filter,
   Eye,
   User,
   Clock,
@@ -338,93 +337,80 @@ export default function AuditTrailPage() {
           )}
 
           {/* Filters */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-muted-foreground" />
-                  <CardTitle className="text-base">Filters</CardTitle>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleResetFilters}>
-                  Reset
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-7">
-                <div className="md:col-span-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Search activities..."
-                      value={searchValue}
-                      onChange={(e) => {
-                        setSearchValue(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="pl-9"
-                    />
-                  </div>
-                </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search activities..."
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-9 h-9"
+              />
+            </div>
 
-                <Select
-                  value={actionFilter}
-                  onValueChange={(value) => {
-                    setActionFilter(value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Action" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Actions</SelectItem>
-                    {Object.entries(AUDIT_ACTION_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="flex flex-wrap items-center gap-2">
+              <Select
+                value={actionFilter}
+                onValueChange={(value) => {
+                  setActionFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="h-9 w-[130px]">
+                  <SelectValue placeholder="Action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Actions</SelectItem>
+                  {Object.entries(AUDIT_ACTION_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                <Select
-                  value={entityFilter}
-                  onValueChange={(value) => {
-                    setEntityFilter(value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Entity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Entities</SelectItem>
-                    {Object.entries(AUDIT_ENTITY_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <Select
+                value={entityFilter}
+                onValueChange={(value) => {
+                  setEntityFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="h-9 w-[130px]">
+                  <SelectValue placeholder="Entity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Entities</SelectItem>
+                  {Object.entries(AUDIT_ENTITY_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                <Select
-                  value={severityFilter}
-                  onValueChange={(value) => {
-                    setSeverityFilter(value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Severity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Severity</SelectItem>
-                    <SelectItem value="info">Info</SelectItem>
-                    <SelectItem value="warning">Warning</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
+              <Select
+                value={severityFilter}
+                onValueChange={(value) => {
+                  setSeverityFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="h-9 w-[120px]">
+                  <SelectValue placeholder="Severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severity</SelectItem>
+                  <SelectItem value="info">Info</SelectItem>
+                  <SelectItem value="warning">Warning</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
 
+              <div className="flex items-center gap-2">
                 <DatePicker
                   label=""
                   value={startDate}
@@ -432,9 +418,9 @@ export default function AuditTrailPage() {
                     setStartDate(date);
                     setCurrentPage(1);
                   }}
-                  placeholder="From date"
+                  placeholder="From"
                 />
-
+                <span className="text-muted-foreground text-sm">to</span>
                 <DatePicker
                   label=""
                   value={endDate}
@@ -442,11 +428,20 @@ export default function AuditTrailPage() {
                     setEndDate(date);
                     setCurrentPage(1);
                   }}
-                  placeholder="To date"
+                  placeholder="To"
                 />
               </div>
-            </CardContent>
-          </Card>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-9 px-3"
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
 
           {/* Audit Log Table */}
           <Card>

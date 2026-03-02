@@ -1,6 +1,7 @@
 import { adminDb } from "@/lib/firebase";
 import { getSessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
+import { logAuditEvent } from "@/lib/audit";
 
 export interface FarmLocation {
   locationId: string;
@@ -98,11 +99,24 @@ export const createLocation = async (locationData: Omit<FarmLocation, "locationI
 
   await locationsCollectionRef().doc(locationId).set(newLocation);
 
+  logAuditEvent(sessionUser, {
+    action: "create",
+    entity: "location",
+    entityId: newLocation.locationId,
+    entityName: newLocation.name,
+    description: `Created farm location: ${newLocation.name}`,
+    details: {
+      metadata: {
+        address: newLocation.address,
+      },
+    },
+  });
+
   return newLocation;
 };
 
 export const updateLocation = async (locationId: string, locationData: Partial<Omit<FarmLocation, "locationId" | "createdAt" | "updatedAt">>): Promise<FarmLocation> => {
-  await assertLocationPermission("update");
+  const sessionUser = await assertLocationPermission("update");
 
   const now = new Date().toISOString();
   const updateData = {
@@ -112,14 +126,13 @@ export const updateLocation = async (locationId: string, locationData: Partial<O
 
   await locationsCollectionRef().doc(locationId).update(updateData);
 
-  // Get updated location
   const doc = await locationsCollectionRef().doc(locationId).get();
   const data = doc.data();
   if (!data) {
     throw new Error("Location not found");
   }
 
-  return {
+  const updatedLocation: FarmLocation = {
     locationId: data.locationId || locationId,
     name: data.name || "",
     address: data.address || "",
@@ -127,10 +140,25 @@ export const updateLocation = async (locationId: string, locationData: Partial<O
     updatedAt: data.updatedAt,
     createdBy: data.createdBy,
   };
+
+  logAuditEvent(sessionUser, {
+    action: "update",
+    entity: "location",
+    entityId: updatedLocation.locationId,
+    entityName: updatedLocation.name,
+    description: `Updated farm location: ${updatedLocation.name}`,
+    details: {
+      metadata: {
+        address: updatedLocation.address,
+      },
+    },
+  });
+
+  return updatedLocation;
 };
 
 export const deleteLocation = async (locationId: string): Promise<void> => {
-  await assertLocationPermission("delete");
+  const sessionUser = await assertLocationPermission("delete");
 
   // Check if location is being used by any roosters
   const roostersSnapshot = await adminDb.collection("roosters").where("locationId", "==", locationId).get();
@@ -138,7 +166,24 @@ export const deleteLocation = async (locationId: string): Promise<void> => {
     throw new Error("Cannot delete location that is assigned to roosters");
   }
 
+  const doc = await locationsCollectionRef().doc(locationId).get();
+  const data = doc.data();
+  const locationName = data?.name || locationId;
+
   await locationsCollectionRef().doc(locationId).delete();
+
+  logAuditEvent(sessionUser, {
+    action: "delete",
+    entity: "location",
+    entityId: locationId,
+    entityName: locationName,
+    description: `Deleted farm location: ${locationName}`,
+    details: {
+      metadata: {
+        address: data?.address,
+      },
+    },
+  });
 };
 
 export const getLocationById = async (locationId: string): Promise<FarmLocation | null> => {

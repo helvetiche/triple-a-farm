@@ -2,6 +2,7 @@ import { adminDb } from "@/lib/firebase";
 import type { SessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
 import type { Rooster } from "@/app/admin/data/roosters";
+import { logAuditEvent } from "@/lib/audit";
 
 type RoosterAction = "read" | "create" | "update" | "delete" | "readStats";
 
@@ -153,7 +154,6 @@ export interface UpdateRoosterInput {
   locationAddress?: string;
   dateAdded?: string;
   description?: string;
-  location?: string;
   owner?: string | null;
   image?: string | null;
   vaccinations?: Array<{ name: string; date: string }> | null;
@@ -277,10 +277,28 @@ export const createRooster = async (
 
   await docRef.set(cleanedData);
 
-  return {
+  const createdRooster: Rooster = {
     id: docRef.id,
     ...docData,
   };
+
+  logAuditEvent(user, {
+    action: "create",
+    entity: "rooster",
+    entityId: createdRooster.id,
+    entityName: createdRooster.name,
+    description: `Created rooster: ${createdRooster.name} (${createdRooster.breed})`,
+    details: {
+      metadata: {
+        breed: createdRooster.breed,
+        status: createdRooster.status,
+        price: createdRooster.price,
+        location: createdRooster.location,
+      },
+    },
+  });
+
+  return createdRooster;
 };
 
 export const updateRooster = async (
@@ -323,7 +341,25 @@ export const updateRooster = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
-  return updated;
+  const updatedRooster = updated as Rooster;
+
+  logAuditEvent(user, {
+    action: "update",
+    entity: "rooster",
+    entityId: updatedRooster.id,
+    entityName: updatedRooster.name,
+    description: `Updated rooster: ${updatedRooster.name}`,
+    details: {
+      metadata: {
+        breed: updatedRooster.breed,
+        status: updatedRooster.status,
+        price: updatedRooster.price,
+        location: updatedRooster.location,
+      },
+    },
+  });
+
+  return updatedRooster;
 };
 
 export const deleteRooster = async (
@@ -333,6 +369,7 @@ export const deleteRooster = async (
   assertRoosterPermission(user, "delete");
 
   const docRef = roostersCollectionRef().doc(id);
+  let deletedRooster: Rooster | null = null;
 
   await adminDb.runTransaction(async (tx) => {
     const snapshot = await tx.get(docRef);
@@ -341,8 +378,31 @@ export const deleteRooster = async (
       throw new Error("NOT_FOUND");
     }
 
+    deletedRooster = {
+      id: snapshot.id,
+      ...(snapshot.data() as Omit<Rooster, "id">),
+    } as Rooster;
+
     tx.delete(docRef);
   });
+
+  if (deletedRooster) {
+    const rooster = deletedRooster as Rooster;
+    logAuditEvent(user, {
+      action: "delete",
+      entity: "rooster",
+      entityId: rooster.id,
+      entityName: rooster.name,
+      description: `Deleted rooster: ${rooster.name}`,
+      details: {
+        metadata: {
+          breed: rooster.breed,
+          status: rooster.status,
+          price: rooster.price,
+        },
+      },
+    });
+  }
 };
 
 export interface RoosterStats {

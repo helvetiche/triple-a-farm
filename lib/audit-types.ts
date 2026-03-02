@@ -19,6 +19,7 @@ export type AuditEntity =
   | "user"
   | "supplier"
   | "location"
+  | "breed"
   | "settings"
   | "system";
 
@@ -97,6 +98,7 @@ export const AUDIT_ENTITY_LABELS: Record<AuditEntity, string> = {
   user: "User",
   supplier: "Supplier",
   location: "Location",
+  breed: "Breed",
   settings: "Settings",
   system: "System",
 };

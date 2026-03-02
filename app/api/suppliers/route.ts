@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getAllSuppliers, createSupplier } from "@/lib/suppliers";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function GET() {
   try {
@@ -64,8 +65,23 @@ export async function POST(request: NextRequest) {
       notes: body.notes,
     });
 
+    logAuditEvent(sessionUser, {
+      action: "create",
+      entity: "supplier",
+      entityId: supplier.id,
+      entityName: supplier.name,
+      description: `Created supplier: ${supplier.name}`,
+      details: {
+        metadata: {
+          phone: supplier.phone,
+          email: supplier.email,
+          address: supplier.address,
+        },
+      },
+    });
+
     return jsonSuccess(supplier, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
