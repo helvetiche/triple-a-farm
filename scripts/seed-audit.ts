@@ -35,10 +35,7 @@ type AuditEntity =
 type AuditSeverity = "info" | "warning" | "critical";
 
 const users = [
-  { uid: "user1", email: "admin@tripleafarm.com", name: "Admin User", role: "admin" },
-  { uid: "user2", email: "staff1@tripleafarm.com", name: "Juan Staff", role: "staff" },
-  { uid: "user3", email: "staff2@tripleafarm.com", name: "Maria Staff", role: "staff" },
-  { uid: "user4", email: "manager@tripleafarm.com", name: "Pedro Manager", role: "admin" },
+  { uid: "tripleagamefarm5", email: "tripleagamefarm5@gmail.com", name: "Triple A Gamefarm", role: "admin" },
 ];
 
 const inventoryItems = [
@@ -297,6 +294,22 @@ async function seedAuditLogs() {
 
   try {
     const auditRef = adminDb.collection(AUDIT_COLLECTION);
+
+    // Clear existing audit logs
+    console.log("Clearing existing audit logs...");
+    const existingDocs = await auditRef.listDocuments();
+    if (existingDocs.length > 0) {
+      const batchSize = 500;
+      for (let i = 0; i < existingDocs.length; i += batchSize) {
+        const batch = adminDb.batch();
+        const chunk = existingDocs.slice(i, i + batchSize);
+        for (const doc of chunk) {
+          batch.delete(doc);
+        }
+        await batch.commit();
+      }
+      console.log(`Deleted ${existingDocs.length} existing audit logs.\n`);
+    }
 
     const entries = generateAuditEntries(100);
 

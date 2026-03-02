@@ -271,7 +271,7 @@ export default function AuditTrailPage() {
 
           {/* Stats Cards */}
           {stats ? (
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
@@ -320,29 +320,10 @@ export default function AuditTrailPage() {
                   </p>
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Most Active
-                  </CardTitle>
-                  <User className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-lg font-bold truncate">
-                    {stats.recentUsers?.[0]?.userName ||
-                      stats.recentUsers?.[0]?.userEmail ||
-                      "N/A"}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {stats.recentUsers?.[0]?.actionCount || 0} actions
-                  </p>
-                </CardContent>
-              </Card>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-4">
-              {[...Array(4)].map((_, i) => (
+            <div className="grid gap-4 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
                 <Card key={i}>
                   <CardHeader className="pb-2">
                     <Skeleton className="h-4 w-24" />
@@ -370,7 +351,7 @@ export default function AuditTrailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-6">
+              <div className="grid gap-4 md:grid-cols-7">
                 <div className="md:col-span-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -444,14 +425,25 @@ export default function AuditTrailPage() {
                   </SelectContent>
                 </Select>
 
-                <div className="flex gap-2">
-                  <DatePicker
-                    label=""
-                    value={startDate}
-                    onChange={setStartDate}
-                    placeholder="From"
-                  />
-                </div>
+                <DatePicker
+                  label=""
+                  value={startDate}
+                  onChange={(date) => {
+                    setStartDate(date);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="From date"
+                />
+
+                <DatePicker
+                  label=""
+                  value={endDate}
+                  onChange={(date) => {
+                    setEndDate(date);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="To date"
+                />
               </div>
             </CardContent>
           </Card>
@@ -736,18 +728,6 @@ export default function AuditTrailPage() {
                           </div>
                         </div>
                       )}
-
-                    {/* Metadata */}
-                    {selectedLog.details?.metadata && (
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-sm">
-                          Additional Information
-                        </h4>
-                        <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto">
-                          {JSON.stringify(selectedLog.details.metadata, null, 2)}
-                        </pre>
-                      </div>
-                    )}
 
                     {/* Technical Info */}
                     {(selectedLog.ipAddress || selectedLog.userAgent) && (
