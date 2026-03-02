@@ -256,8 +256,7 @@ const log = {
   success: (msg: string) =>
     console.log(`${COLORS.green}✓${COLORS.reset} ${msg}`),
   error: (msg: string) => console.log(`${COLORS.red}✗${COLORS.reset} ${msg}`),
-  warn: (msg: string) =>
-    console.log(`${COLORS.yellow}⚠${COLORS.reset} ${msg}`),
+  warn: (msg: string) => console.log(`${COLORS.yellow}⚠${COLORS.reset} ${msg}`),
   header: (msg: string) =>
     console.log(`\n${COLORS.bright}${COLORS.cyan}${msg}${COLORS.reset}\n`),
 };
@@ -424,7 +423,9 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
       const timeStr = formatResponseTime(result.responseTime);
       const methodStr = `${COLORS.magenta}${route.method.padEnd(6)}${COLORS.reset}`;
       const pathStr = route.path.padEnd(35);
-      const icon = result.success ? `${COLORS.green}✓${COLORS.reset}` : `${COLORS.red}✗${COLORS.reset}`;
+      const icon = result.success
+        ? `${COLORS.green}✓${COLORS.reset}`
+        : `${COLORS.red}✗${COLORS.reset}`;
 
       console.log(
         `${icon} ${methodStr} ${pathStr} ${statusStr.padEnd(15)} ${timeStr.padEnd(15)} ${result.message}`
@@ -434,7 +435,9 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
 
   // Test protected routes
   if (protectedRoutes.length > 0) {
-    console.log(`\n${COLORS.bright}Protected Routes (requires auth):${COLORS.reset}`);
+    console.log(
+      `\n${COLORS.bright}Protected Routes (requires auth):${COLORS.reset}`
+    );
     console.log("─".repeat(70));
 
     for (const route of protectedRoutes) {
@@ -445,7 +448,9 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
       const timeStr = formatResponseTime(result.responseTime);
       const methodStr = `${COLORS.magenta}${route.method.padEnd(6)}${COLORS.reset}`;
       const pathStr = route.path.padEnd(35);
-      const icon = result.success ? `${COLORS.green}✓${COLORS.reset}` : `${COLORS.red}✗${COLORS.reset}`;
+      const icon = result.success
+        ? `${COLORS.green}✓${COLORS.reset}`
+        : `${COLORS.red}✗${COLORS.reset}`;
 
       console.log(
         `${icon} ${methodStr} ${pathStr} ${statusStr.padEnd(15)} ${timeStr.padEnd(15)} ${result.message}`
@@ -464,7 +469,9 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
 
   console.log(`  Total routes tested: ${results.length}`);
   console.log(`  ${COLORS.green}Passed: ${passed}${COLORS.reset}`);
-  console.log(`  ${failed > 0 ? COLORS.red : COLORS.dim}Failed: ${failed}${COLORS.reset}`);
+  console.log(
+    `  ${failed > 0 ? COLORS.red : COLORS.dim}Failed: ${failed}${COLORS.reset}`
+  );
   console.log(`  Average response time: ${avgTime}ms`);
 
   // Show failed routes
@@ -472,15 +479,21 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
   if (failedResults.length > 0) {
     console.log(`\n${COLORS.red}${COLORS.bright}Failed Routes:${COLORS.reset}`);
     failedResults.forEach((r) => {
-      console.log(`  ${COLORS.red}✗${COLORS.reset} ${r.route.method} ${r.route.path}`);
-      console.log(`    ${COLORS.dim}${r.message}${r.error ? `: ${r.error}` : ""}${COLORS.reset}`);
+      console.log(
+        `  ${COLORS.red}✗${COLORS.reset} ${r.route.method} ${r.route.path}`
+      );
+      console.log(
+        `    ${COLORS.dim}${r.message}${r.error ? `: ${r.error}` : ""}${COLORS.reset}`
+      );
     });
   }
 
   // Show slow routes (>500ms)
   const slowRoutes = results.filter((r) => r.responseTime > 500);
   if (slowRoutes.length > 0) {
-    console.log(`\n${COLORS.yellow}${COLORS.bright}Slow Routes (>500ms):${COLORS.reset}`);
+    console.log(
+      `\n${COLORS.yellow}${COLORS.bright}Slow Routes (>500ms):${COLORS.reset}`
+    );
     slowRoutes.forEach((r) => {
       console.log(
         `  ${COLORS.yellow}⚠${COLORS.reset} ${r.route.method} ${r.route.path} - ${r.responseTime}ms`
