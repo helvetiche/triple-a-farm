@@ -67,13 +67,6 @@ export function InventoryAddDialog({
     setFormData(prev => ({ ...prev, [field]: date }))
   }
 
-  const calculateStatus = (current: number, min: number): "adequate" | "low" | "critical" => {
-    if (current === 0) return "critical"
-    if (current <= min * 0.5) return "critical"
-    if (current <= min) return "low"
-    return "adequate"
-  }
-
   const handleSubmit = async () => {
     // Validation
     if (!formData.name || !formData.category || !formData.currentStock || !formData.minStock || !formData.unit || !formData.supplier) {

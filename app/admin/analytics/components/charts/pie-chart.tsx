@@ -28,44 +28,7 @@ export function SimplePieChart({ title, description, data }: PieChartProps) {
     fill: item.color
   }))
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload[0]) {
-      const data = payload[0].payload
-      const total = chartData.reduce((sum, item) => sum + item.value, 0)
-      const percentage = ((data.value / total) * 100).toFixed(1)
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{data.name}</p>
-          <p className="text-sm text-gray-600">Revenue: ₱{data.value.toLocaleString()}</p>
-          <p className="text-sm text-gray-600">Percentage: {percentage}%</p>
-        </div>
-      )
-    }
-    return null
-  }
-  
-  const renderCustomizedLabel = (props: any) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props
-    const RADIAN = Math.PI / 180
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-midAngle * RADIAN)
-    const y = cy + radius * Math.sin(-midAngle * RADIAN)
-
-    if (percent < 0.05) return null // Don't show label for very small slices
-
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        className="text-xs font-medium"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    )
-  }
+  const total = chartData.reduce((sum, item) => sum + item.value, 0)
   
   return (
     <Card className="border-[#3d6c58]/20">
@@ -84,7 +47,6 @@ export function SimplePieChart({ title, description, data }: PieChartProps) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={renderCustomizedLabel}
               outerRadius={100}
               fill="#8884d8"
               dataKey="value"
@@ -93,16 +55,24 @@ export function SimplePieChart({ title, description, data }: PieChartProps) {
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+              formatter={(value, name) => {
+                const numValue = Number(value ?? 0)
+                return [
+                  `₱${numValue.toLocaleString()} (${((numValue / total) * 100).toFixed(1)}%)`,
+                  name as string
+                ]
+              }}
+            />
             <Legend 
               verticalAlign="middle" 
               align="right" 
               layout="vertical"
-              formatter={(value, entry: any) => (
-                <span style={{ color: entry.color }}>
-                  {value} (₱{entry.payload.value.toLocaleString()})
-                </span>
-              )}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -130,44 +100,6 @@ export function DonutChart({ title, description, data }: DonutChartProps) {
   
   const total = chartData.reduce((sum, item) => sum + item.value, 0)
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload[0]) {
-      const data = payload[0].payload
-      const percentage = ((data.value / total) * 100).toFixed(1)
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{data.name}</p>
-          <p className="text-sm text-gray-600">Sales: {data.value.toLocaleString()}</p>
-          <p className="text-sm text-gray-600">Percentage: {percentage}%</p>
-        </div>
-      )
-    }
-    return null
-  }
-  
-  const renderCustomizedLabel = (props: any) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props
-    const RADIAN = Math.PI / 180
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-midAngle * RADIAN)
-    const y = cy + radius * Math.sin(-midAngle * RADIAN)
-
-    if (percent < 0.05) return null // Don't show label for very small slices
-
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        className="text-xs font-medium"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    )
-  }
-  
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -185,7 +117,6 @@ export function DonutChart({ title, description, data }: DonutChartProps) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={renderCustomizedLabel}
               innerRadius={40}
               outerRadius={100}
               fill="#8884d8"
@@ -195,16 +126,24 @@ export function DonutChart({ title, description, data }: DonutChartProps) {
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+              formatter={(value, name) => {
+                const numValue = Number(value ?? 0)
+                return [
+                  `${numValue.toLocaleString()} (${((numValue / total) * 100).toFixed(1)}%)`,
+                  name as string
+                ]
+              }}
+            />
             <Legend 
               verticalAlign="middle" 
               align="right" 
               layout="vertical"
-              formatter={(value, entry: any) => (
-                <span style={{ color: entry.color }}>
-                  {value} ({entry.payload.value.toLocaleString()})
-                </span>
-              )}
             />
           </PieChart>
         </ResponsiveContainer>

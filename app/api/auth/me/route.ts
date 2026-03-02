@@ -29,11 +29,12 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as Error;
     console.error("[AUTH/ME] Get current user error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
+      message: err?.message,
+      stack: err?.stack,
+      name: err?.name,
     });
     return jsonError(
       "SESSION_INVALID",

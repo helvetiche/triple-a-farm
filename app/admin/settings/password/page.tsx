@@ -219,7 +219,7 @@ export default function PasswordSettingsPage() {
                           <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                           <div>
                             <h4 className="text-sm font-medium text-[#1f3f2c]">Use a Strong Password</h4>
-                            <p className="text-xs text-[#4a6741]">Create a unique password that you don't use elsewhere</p>
+                            <p className="text-xs text-[#4a6741]">Create a unique password that you don&apos;t use elsewhere</p>
                           </div>
                         </div>
                         

@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import dynamic from 'next/dynamic';
 
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import {
   RoosterGalleryHeader,
   AdvancedFilters,
@@ -14,8 +12,6 @@ import {
 } from './components';
 import type { Rooster } from '@/app/admin/data/roosters';
 import type { RoosterStats } from '@/app/roosters/types';
-
-const Lightbox = dynamic(() => import('yet-another-react-lightbox'), { ssr: false });
 
 export default function RoosterGalleryPage() {
   const [query, setQuery] = useState('');
@@ -53,7 +49,7 @@ export default function RoosterGalleryPage() {
   }, []);
 
   const filteredAndSorted = useMemo(() => {
-    let filtered = roosters.filter((r) => {
+    const filtered = roosters.filter((r) => {
       // Search filter
       const matchesQuery = !query.trim() ||
         r.id.toLowerCase().includes(query.toLowerCase()) ||

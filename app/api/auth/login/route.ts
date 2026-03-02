@@ -135,6 +135,7 @@ export async function POST(request: Request) {
         uid: decodedClaims.uid,
         email: decodedClaims.email ?? "",
         roles: [],
+        claims: decodedClaims,
       },
       {
         action: "login",
@@ -153,21 +154,22 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error: unknown) {
+    const err = error as Error;
     // More specific error handling
-    if (error.message === "Authentication request timed out") {
+    if (err?.message === "Authentication request timed out") {
       console.error("[LOGIN] Authentication timeout:", error);
       return jsonError("TIMEOUT", "Authentication request timed out. Please try again.", 408);
     }
     
-    if (error.message === "User record update timed out") {
+    if (err?.message === "User record update timed out") {
       console.error("[LOGIN] User update timeout:", error);
       // Continue with login since session was created successfully
     }
     
     console.error("[LOGIN] Unexpected login error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
+      message: err?.message,
+      stack: err?.stack,
+      name: err?.name,
     });
     
     return jsonError(

@@ -32,7 +32,7 @@ export function NoSearchResultsState({ searchValue }: { searchValue: string }) {
         <Search className="h-16 w-16 text-[#4a6741] mb-4" />
         <h3 className="text-xl font-semibold text-[#1f3f2c] mb-2">No items found</h3>
         <p className="text-[#4a6741] text-center mb-6 max-w-md">
-          We couldn't find any inventory items matching "{searchValue}". Try adjusting your search terms or browse all items.
+          We couldn&apos;t find any inventory items matching &quot;{searchValue}&quot;. Try adjusting your search terms or browse all items.
         </p>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#3d6c58]/20">

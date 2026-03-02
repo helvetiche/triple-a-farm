@@ -308,7 +308,7 @@ export function AdvancedFilters({
         {/* Search Info */}
         {query && (
           <div className="text-sm text-gray-500">
-            Search: <span className="font-medium text-gray-700">"{query}"</span>
+            Search: <span className="font-medium text-gray-700">&quot;{query}&quot;</span>
           </div>
         )}
       </div>

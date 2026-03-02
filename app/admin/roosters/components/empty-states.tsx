@@ -18,7 +18,7 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
           </EmptyMedia>
           <EmptyTitle>No roosters found</EmptyTitle>
           <EmptyDescription>
-            We couldn't find any roosters matching your search criteria. 
+            We couldn&apos;t find any roosters matching your search criteria. 
             Try adjusting your search terms or filters.
           </EmptyDescription>
           {onClearSearch && (
@@ -39,7 +39,7 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
         </EmptyMedia>
         <EmptyTitle>No roosters yet</EmptyTitle>
         <EmptyDescription>
-          You haven't added any roosters to your inventory yet. 
+          You haven&apos;t added any roosters to your inventory yet. 
           Get started by adding your first rooster to track their health, 
           feed schedules, and sales information.
         </EmptyDescription>

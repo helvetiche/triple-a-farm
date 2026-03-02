@@ -43,9 +43,10 @@ export const signUp = async (
     );
 
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sign up error:", error);
-    toast.error(error.message || "Failed to create account. Please try again.");
+    const message = error instanceof Error ? error.message : "Failed to create account. Please try again.";
+    toast.error(message);
     return false;
   }
 };
@@ -72,9 +73,10 @@ export const signIn = async (
 
     toast.success("Welcome back! Login successful.");
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sign in error:", error);
-    toast.error(error.message || "Failed to sign in. Please try again.");
+    const message = error instanceof Error ? error.message : "Failed to sign in. Please try again.";
+    toast.error(message);
     return false;
   }
 };
@@ -93,7 +95,7 @@ export const logout = async (): Promise<void> => {
     }
 
     toast.success("Logged out successfully.");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Logout error:", error);
     toast.error("Failed to logout. Please try again.");
   }
@@ -128,7 +130,7 @@ export const getCurrentUserData = async (): Promise<{
       },
       profile: data.profile ?? null,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error getting user data:", error);
     return { user: null, profile: null };
   }

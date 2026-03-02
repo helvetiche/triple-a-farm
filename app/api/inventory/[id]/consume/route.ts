@@ -31,7 +31,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const updated = await consumeInventoryItem(sessionUser, id, amount, reason);
 
     return jsonSuccess(updated, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

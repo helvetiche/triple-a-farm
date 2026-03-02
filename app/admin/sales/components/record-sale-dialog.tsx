@@ -284,7 +284,7 @@ export function RecordSaleDialog({
                         {roosters.length > 0 ? (
                           <>
                             <p className="text-xs text-gray-400">
-                              {roosters.length} rooster{roosters.length !== 1 ? 's' : ''} found, but none are marked as "Available"
+                              {roosters.length} rooster{roosters.length !== 1 ? 's' : ''} found, but none are marked as &quot;Available&quot;
                             </p>
                             <p className="text-xs text-gray-400">
                               Update rooster status in the Roosters management page
@@ -412,7 +412,7 @@ export function RecordSaleDialog({
                 <Label htmlFor="paymentMethod" className="flex items-center gap-1">
                   Payment Method
                 </Label>
-                <Select value={formData.paymentMethod} onValueChange={(value: any) => handleInputChange("paymentMethod", value)}>
+                <Select value={formData.paymentMethod} onValueChange={(value: string) => handleInputChange("paymentMethod", value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>

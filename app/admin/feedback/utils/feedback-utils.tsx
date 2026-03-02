@@ -23,11 +23,20 @@ export function getStatusColor(status: string) {
   }
 }
 
-export function filterReviews<T extends { [key: string]: any }>(reviews: T[], searchValue: string) {
+interface ReviewFilterable {
+  id?: string
+  customer?: string
+  rooster?: string
+  comment?: string
+  status?: string
+  date?: string
+}
+
+export function filterReviews<T extends ReviewFilterable>(reviews: T[], searchValue: string) {
   if (!searchValue) return reviews
 
   const search = searchValue.toLowerCase()
-  return reviews.filter((review: any) =>
+  return reviews.filter((review) =>
     [
       review.id,
       review.customer,

@@ -13,7 +13,7 @@ export async function GET() {
 
     const suppliers = await getAllSuppliers();
     return jsonSuccess(suppliers, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

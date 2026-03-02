@@ -16,7 +16,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     const activities = await getInventoryActivity(sessionUser, id, 100);
 
     return jsonSuccess(activities, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

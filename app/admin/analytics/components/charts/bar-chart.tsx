@@ -9,7 +9,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   Cell
 } from "recharts"
@@ -101,19 +100,6 @@ export function HorizontalBarChart({
     fill: item.color || '#3d6c58'
   }))
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{data.name}</p>
-          <p className="text-sm text-gray-600">Sales: {data.sales}</p>
-        </div>
-      )
-    }
-    return null
-  }
-  
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -140,7 +126,13 @@ export function HorizontalBarChart({
               axisLine={{ stroke: '#e5e7eb' }}
               width={80}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+            />
             <Bar 
               dataKey="sales" 
               radius={[0, 0, 0, 0]}

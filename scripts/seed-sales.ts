@@ -100,6 +100,20 @@ function formatSalesTransactionId(documentId: string, date: string): string {
   return `#${idPart}-${month}${day}`;
 }
 
+interface TransactionData {
+  transactionId: string;
+  date: string;
+  roosterId: string;
+  breed: string;
+  customerName: string;
+  customerContact: string;
+  amount: number;
+  paymentMethod: string;
+  notes?: string;
+  commission?: number;
+  agentName?: string;
+}
+
 async function seedSales() {
   const { adminDb } = await import("../lib/firebase");
 
@@ -115,7 +129,7 @@ async function seedSales() {
       console.log("Do you want to add more? The script will add 50 new transactions.\n");
     }
 
-    const transactions = [];
+    const transactions: Array<{ docRef: FirebaseFirestore.DocumentReference; data: TransactionData }> = [];
     const numTransactions = 50;
 
     console.log(`Generating ${numTransactions} sales transactions...\n`);
@@ -126,7 +140,7 @@ async function seedSales() {
       const amount = randomPrice();
       const hasAgent = Math.random() > 0.6;
 
-      const transaction = {
+      const transaction: TransactionData = {
         transactionId: formatSalesTransactionId(docRef.id, date),
         date,
         roosterId: `RST-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
@@ -140,12 +154,7 @@ async function seedSales() {
         agentName: hasAgent ? randomElement(agentNames) : undefined,
       };
 
-      // Remove undefined values
-      const cleanTransaction = Object.fromEntries(
-        Object.entries(transaction).filter(([, v]) => v !== undefined)
-      );
-
-      transactions.push({ docRef, data: cleanTransaction });
+      transactions.push({ docRef, data: transaction });
     }
 
     // Sort by date for display

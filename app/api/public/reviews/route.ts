@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       { id: docRef.id, ...newReview },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("POST /api/public/reviews error:", error);
     return jsonError(
       "REVIEW_CREATE_FAILED",

@@ -15,11 +15,12 @@ import dynamic from "next/dynamic"
 
 import Zoom from "yet-another-react-lightbox/plugins/zoom"
 import { useLightbox } from "@/hooks/use-lightbox"
+import type { Rooster } from "@/app/admin/data/roosters"
 
 const Lightbox = dynamic(() => import("yet-another-react-lightbox"), { ssr: false })
 
 interface RoosterCardsProps {
-  roosters: any[]
+  roosters: Rooster[]
   onViewDetails: (id: string) => void
   onEdit: (id: string) => void
   onDelete: (id: string) => void

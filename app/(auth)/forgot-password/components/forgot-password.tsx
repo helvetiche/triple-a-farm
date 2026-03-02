@@ -13,7 +13,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-const getResetErrorMessage = (error: any): string => {
+interface ResetError {
+  code?: string;
+  message?: string;
+}
+
+const getResetErrorMessage = (error: ResetError): string => {
   const code = error?.code;
 
   switch (code) {
@@ -76,9 +81,10 @@ export function ForgotPasswordForm({
       setTimeout(() => {
         router.push("/login");
       }, 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password reset error:", error);
-      const errorMessage = getResetErrorMessage(error);
+      const err = error as ResetError;
+      const errorMessage = getResetErrorMessage(err);
       toast.error(errorMessage);
     }
 

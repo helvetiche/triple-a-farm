@@ -69,7 +69,7 @@ export function validateRequestBody<T>(
     if (!(fieldName in data) || data[fieldName] === undefined || data[fieldName] === null) {
       errors.push(`Missing required field: ${fieldName}`);
     } else {
-      (result as any)[field] = data[fieldName];
+      (result as Record<string, unknown>)[fieldName] = data[fieldName];
     }
   }
   
@@ -77,7 +77,7 @@ export function validateRequestBody<T>(
   for (const field of optionalFields) {
     const fieldName = String(field);
     if (fieldName in data && data[fieldName] !== undefined) {
-      (result as any)[field] = data[fieldName];
+      (result as Record<string, unknown>)[fieldName] = data[fieldName];
     }
   }
   

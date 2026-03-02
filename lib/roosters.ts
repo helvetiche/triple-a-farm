@@ -1,7 +1,7 @@
 import { adminDb } from "@/lib/firebase";
 import type { SessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
-import type { Rooster } from "@/app/admin/data/roosters";
+import type { Rooster, Vaccination } from "@/app/admin/data/roosters";
 import { logAuditEvent } from "@/lib/audit";
 
 type RoosterAction = "read" | "create" | "update" | "delete" | "readStats";
@@ -71,7 +71,7 @@ export const getRoosters = async (
       locationAddress: (data.locationAddress as string) || undefined,
       owner: data.owner as string | undefined,
       image: data.image as string | undefined,
-      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
+      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
     };
 
     return rooster;
@@ -111,7 +111,7 @@ export const getRoosterById = async (
     locationAddress: (data.locationAddress as string) || undefined,
     owner: data.owner as string | undefined,
     image: data.image as string | undefined,
-    vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
+    vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
   };
 
   return rooster;

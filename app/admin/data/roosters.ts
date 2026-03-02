@@ -33,7 +33,7 @@ export const getRoosterBreeds = async (): Promise<string[]> => {
     const result = await response.json();
     
     if (result.success && result.data) {
-      return result.data.map((breed: any) => breed.name);
+      return result.data.map((breed: { name: string }) => breed.name);
     }
     
     // Fallback to hardcoded breeds if API fails
@@ -73,7 +73,7 @@ export const getRoosterLocations = async (): Promise<string[]> => {
     const result = await response.json();
 
     if (result.success && result.data) {
-      return result.data.map((location: any) => location.name);
+      return result.data.map((location: { name: string }) => location.name);
     }
 
     // Fallback to default location if API fails
@@ -91,7 +91,7 @@ export const getRoosterLocationsWithIds = async (): Promise<LocationOption[]> =>
     const result = await response.json();
 
     if (result.success && result.data) {
-      return result.data.map((location: any) => ({
+      return result.data.map((location: { locationId?: string; id?: string; name: string; address?: string }) => ({
         locationId: location.locationId || location.id,
         name: location.name,
         address: location.address,

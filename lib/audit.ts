@@ -73,7 +73,7 @@ export const createAuditLog = async (
     entityName: input.entityName,
     userId: user.uid,
     userEmail: user.email || "",
-    userName: user.name || user.email?.split("@")[0],
+    userName: user.email?.split("@")[0],
     userRole: user.roles?.[0],
     description: input.description,
     details: input.details,

@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     });
 
     return jsonSuccess(reviews, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       { id: docRef.id, ...newReview },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("POST /api/feedback/reviews error:", error);
     return jsonError(
       "REVIEW_CREATE_FAILED",
@@ -186,7 +186,7 @@ export async function PUT(request: NextRequest) {
       { id, status, message: "Review status updated successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PUT /api/feedback/reviews error:", error);
     return jsonError(
       "REVIEW_UPDATE_FAILED",

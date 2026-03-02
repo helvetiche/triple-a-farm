@@ -26,11 +26,12 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Forgot password error:", error);
+    const err = error as Error;
     return jsonError(
       "AUTH_FORGOT_PASSWORD_FAILED",
-      error?.message || "Failed to send password reset link.",
+      err?.message || "Failed to send password reset link.",
       400
     );
   }

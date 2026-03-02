@@ -190,7 +190,7 @@ export function Ratings() {
                   >
                     <Quote className="w-8 h-8 text-white/40 mb-4" />
                     <p className="text-white/90 mb-6 leading-relaxed">
-                      "{testimonial.text}"
+                      &quot;{testimonial.text}&quot;
                     </p>
                     <div className="flex items-center justify-between mt-auto">
                       <div>

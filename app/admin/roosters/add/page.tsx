@@ -397,7 +397,7 @@ export default function AddRoosterPage() {
                       </div>
                       {vaccinations.length === 0 ? (
                         <p className="text-sm text-[#4a6741]">
-                          No vaccination records yet. Click "Add Vaccination" to add one.
+                          No vaccination records yet. Click &quot;Add Vaccination&quot; to add one.
                         </p>
                       ) : (
                         <div className="space-y-3">

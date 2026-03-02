@@ -12,8 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
   LineChart,
-  Line,
-  ComposedChart
+  Line
 } from "recharts"
 
 interface AreaChartProps {
@@ -43,22 +42,6 @@ export function SimpleAreaChart({
     profit: item.value2 || 0
   }))
   
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: ₱{entry.value.toLocaleString()}
-            </p>
-          ))}
-        </div>
-      )
-    }
-    return null
-  }
-  
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -81,7 +64,14 @@ export function SimpleAreaChart({
               tick={{ fill: '#6b7280', fontSize: 12 }}
               axisLine={{ stroke: '#e5e7eb' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+              formatter={(value) => [`₱${(value ?? 0).toLocaleString()}`, '']}
+            />
             <Legend 
               wrapperStyle={{ paddingTop: '20px' }}
               iconType="square"
@@ -134,20 +124,6 @@ export function SimpleLineChart({
     value: item.value
   }))
   
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{label}</p>
-          <p className="text-sm" style={{ color }}>
-            Health Score: {payload[0].value}%
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
-  
   return (
     <Card>
       <CardHeader>
@@ -170,7 +146,14 @@ export function SimpleLineChart({
               tick={{ fill: '#6b7280', fontSize: 12 }}
               axisLine={{ stroke: '#e5e7eb' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+              formatter={(value) => [`${value ?? 0}%`, 'Health Score']}
+            />
             <Line 
               type="monotone" 
               dataKey="value" 

@@ -41,9 +41,10 @@ export function VerifyEmailClient() {
         toast.error('Invalid or expired verification link.');
         router.push('/login');
         
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Email verification error:', error);
-        toast.error(error.message || 'An error occurred during verification.');
+        const err = error as Error;
+        toast.error(err?.message || 'An error occurred during verification.');
         router.push('/login');
       }
     };

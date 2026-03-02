@@ -200,7 +200,12 @@ const applyUpdateToInventoryItem = (
 
   const status = calculateInventoryStatus(updatedCurrentStock, updatedMinStock);
 
-  const result: any = {
+  const price = input.price === null ? undefined : input.price ?? existing.price;
+  const description = input.description === null ? undefined : input.description ?? existing.description;
+  const expiryDate = input.expiryDate === null ? undefined : input.expiryDate ?? existing.expiryDate;
+  const locationAddress = input.locationAddress === null ? undefined : input.locationAddress ?? existing.locationAddress;
+
+  const result: Omit<InventoryItem, "id"> = {
     name: input.name ?? existing.name,
     category: input.category ?? existing.category,
     currentStock: updatedCurrentStock,
@@ -211,38 +216,15 @@ const applyUpdateToInventoryItem = (
     status,
     locationId: input.locationId ?? existing.locationId,
     locationName: input.locationName ?? existing.locationName,
+    ...(existing.createdAt && { createdAt: existing.createdAt }),
+    ...(existing.displayId && { displayId: existing.displayId }),
+    ...(price !== undefined && { price }),
+    ...(description !== undefined && { description }),
+    ...(expiryDate !== undefined && { expiryDate }),
+    ...(locationAddress !== undefined && { locationAddress }),
   };
 
-  // Only include optional fields if they have values
-  if (existing.createdAt) {
-    result.createdAt = existing.createdAt;
-  }
-  
-  if (existing.displayId) {
-    result.displayId = existing.displayId;
-  }
-
-  const price = input.price === null ? undefined : input.price ?? existing.price;
-  if (price !== undefined) {
-    result.price = price;
-  }
-
-  const description = input.description === null ? undefined : input.description ?? existing.description;
-  if (description !== undefined) {
-    result.description = description;
-  }
-
-  const expiryDate = input.expiryDate === null ? undefined : input.expiryDate ?? existing.expiryDate;
-  if (expiryDate !== undefined) {
-    result.expiryDate = expiryDate;
-  }
-
-  const locationAddress = input.locationAddress === null ? undefined : input.locationAddress ?? existing.locationAddress;
-  if (locationAddress !== undefined) {
-    result.locationAddress = locationAddress;
-  }
-
-  return result as Omit<InventoryItem, "id">;
+  return result;
 };
 
 const recalculateInventoryStats = async (locationId?: string): Promise<InventoryStats> => {
@@ -645,13 +627,13 @@ export const getInventoryActivity = async (
 ): Promise<InventoryActivity[]> => {
   assertInventoryPermission(user, "readActivity");
 
-  let query = inventoryActivityCollectionRef()
-    .orderBy("performedAt", "desc")
-    .limit(limit);
+  let query: FirebaseFirestore.Query = inventoryActivityCollectionRef();
 
   if (itemId) {
-    query = query.where("itemId", "==", itemId) as any;
+    query = query.where("itemId", "==", itemId);
   }
+
+  query = query.orderBy("performedAt", "desc").limit(limit);
 
   const snapshot = await query.get();
 

@@ -10,6 +10,10 @@ export interface SalesTransaction {
   customerContact: string
   amount: number
   paymentMethod: "cash" | "gcash" | "bank_transfer" | "paypal"
+  paymentStatus?: "pending" | "partial" | "paid"
+  status?: "pending" | "completed" | "cancelled"
+  amountPaid?: number
+  lastPaymentDate?: string
   notes?: string
   commission?: number
   agentName?: string
@@ -18,6 +22,7 @@ export interface SalesTransaction {
 export interface SalesStats {
   totalRevenue: number
   totalTransactions: number
+  pendingTransactions: number
   averageSaleAmount: number
   monthlyGrowth: number
   topBreed: string

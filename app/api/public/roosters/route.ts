@@ -32,14 +32,14 @@ export async function GET() {
         locationAddress: (data.locationAddress as string) || undefined,
         owner: data.owner as string | undefined,
         image: data.image as string | undefined,
-        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as any[]) : undefined,
+        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Array<{ name: string; date: string; nextDue?: string }>) : undefined,
       };
 
       return rooster;
     });
 
     return jsonSuccess(roosters, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET /api/public/roosters error:", error);
     return jsonError(
       "ROOSTERS_LIST_FAILED",

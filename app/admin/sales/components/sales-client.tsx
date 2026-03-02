@@ -58,6 +58,7 @@ export function SalesClient() {
   const [stats, setStats] = useState<SalesStats>({
     totalRevenue: 0,
     totalTransactions: 0,
+    pendingTransactions: 0,
     averageSaleAmount: 0,
     monthlyGrowth: 0,
     topBreed: ""
@@ -69,7 +70,7 @@ export function SalesClient() {
   const [selectedSale, setSelectedSale] = useState<SalesTransaction | null>(null)
   const [showViewDialog, setShowViewDialog] = useState(false)
   const [isSendingConfirmation, setIsSendingConfirmation] = useState(false)
-  const [prefilledRoosterData, setPrefilledRoosterData] = useState<any>(null)
+  const [prefilledRoosterData, setPrefilledRoosterData] = useState<{ roosterId: string; breed: string; price: number; name: string } | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8
   

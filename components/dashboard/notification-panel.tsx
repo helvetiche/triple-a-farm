@@ -42,9 +42,9 @@ export function NotificationPanel() {
         const result = await response.json()
         
         if (result.success && result.data) {
-          setNotificationsList(result.data.map((n: any) => ({
+          setNotificationsList(result.data.map((n: { id: string; title: string; message: string; type: string; timestamp: string }) => ({
             ...n,
-            read: false, // All notifications start as unread
+            read: false,
           })))
         }
       } catch (error) {

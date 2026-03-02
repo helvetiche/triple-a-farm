@@ -28,7 +28,7 @@ export async function GET() {
     });
 
     return jsonSuccess(locations, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET /api/public/locations error:", error);
     return jsonError("LOCATIONS_FETCH_FAILED", "Failed to load locations.", 500);
   }

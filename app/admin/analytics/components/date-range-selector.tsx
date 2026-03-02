@@ -1,11 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
-import { Calendar as CalendarIcon, ArrowRight } from "lucide-react"
+import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "../data/mock-data"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -24,7 +23,7 @@ export function DateRangeSelector({
     to: initialDateRange?.endDate || new Date()
   })
 
-  const handleSelect = (range: { from?: Date; to?: Date } | undefined) => {
+  const _handleSelect = (range: { from?: Date; to?: Date } | undefined) => {
     if (range?.from && range?.to) {
       const newRange = { from: range.from, to: range.to }
       setDateRange(newRange)

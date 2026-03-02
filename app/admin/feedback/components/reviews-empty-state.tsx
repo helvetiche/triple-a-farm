@@ -18,7 +18,7 @@ export function ReviewsEmptyState({ searchValue, onClearSearch }: ReviewsEmptySt
             <Search className="w-6 h-6 text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-[#1f3f2c] mb-2">No reviews found</h3>
-          <p className="text-[#4a6741] mb-4">No reviews match your search for "{searchValue}"</p>
+          <p className="text-[#4a6741] mb-4">No reviews match your search for &quot;{searchValue}&quot;</p>
           <Button variant="outline" className="border-[#3d6c58]/20" onClick={onClearSearch}>
             Clear Search
           </Button>

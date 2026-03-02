@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       .slice(0, limit);
 
     return jsonSuccess(sorted, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET /api/public/testimonials error:", error);
     return jsonError(
       "TESTIMONIALS_FETCH_FAILED",

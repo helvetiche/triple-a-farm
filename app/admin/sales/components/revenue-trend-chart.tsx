@@ -16,7 +16,6 @@ export function RevenueTrendChart({
   title = "Sales Overview", 
   description = "Daily revenue and transaction trends" 
 }: RevenueTrendChartProps) {
-  // Format data for the chart
   const chartData = data.map(item => ({
     date: new Date(item.date).toLocaleDateString('en-US', { 
       month: 'short', 
@@ -26,27 +25,9 @@ export function RevenueTrendChart({
     transactions: item.transactions,
   }))
 
-  // Calculate totals
   const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0)
   const totalTransactions = data.reduce((sum, item) => sum + item.transactions, 0)
   const averageRevenue = totalRevenue / data.length || 0
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900">{label}</p>
-          <p className="text-sm text-green-600">
-            Revenue: ₱{payload[0].value.toLocaleString()}
-          </p>
-          <p className="text-sm text-blue-600">
-            Transactions: {payload[1].value}
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
 
   return (
     <Card className="border-[#3d6c58]/20">
@@ -85,7 +66,17 @@ export function RevenueTrendChart({
                 axisLine={false}
                 tickFormatter={(value: number) => `₱${(value / 1000).toFixed(0)}k`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px'
+                }}
+                formatter={(value, name) => [
+                  name === 'revenue' ? `₱${(value ?? 0).toLocaleString()}` : value ?? 0,
+                  name === 'revenue' ? 'Revenue' : 'Transactions'
+                ]}
+              />
               <Line
                 type="monotone"
                 dataKey="revenue"
@@ -108,7 +99,6 @@ export function RevenueTrendChart({
           </ResponsiveContainer>
         </div>
         
-        {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-200">
           <div className="text-center">
             <p className="text-2xl font-bold text-[#1f3f2c]">

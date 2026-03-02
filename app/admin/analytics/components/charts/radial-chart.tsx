@@ -34,25 +34,6 @@ export function SimpleRadialChart({
     fill: item.color || '#3d6c58'
   }))
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      const percentage = ((data.value / 100) * 100).toFixed(1)
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{data.name}</p>
-          <p className="text-sm" style={{ color: data.fill }}>
-            Score: {data.value}%
-          </p>
-          <p className="text-sm text-gray-600">
-            Performance: {percentage}%
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
-  
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -79,7 +60,13 @@ export function SimpleRadialChart({
               fill="#3d6c58"
               label={{ position: 'insideStart', fill: '#fff' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 0
+              }}
+            />
             <Legend 
               iconSize={10}
               layout="vertical"
@@ -92,7 +79,6 @@ export function SimpleRadialChart({
           </RadialBarChart>
         </ResponsiveContainer>
         
-        {/* Performance Summary */}
         <div className="mt-4 space-y-2">
           <h4 className="text-sm font-medium text-[#1f3f2c]">Performance Summary</h4>
           <div className="grid grid-cols-2 gap-4">
@@ -143,7 +129,6 @@ interface PerformanceRadialChartProps {
 }
 
 export function PerformanceRadialChart({ title, description, data }: PerformanceRadialChartProps) {
-  // Use the latest data point for current values
   const latestData = data[data.length - 1]
   
   const radialData = [
@@ -161,13 +146,13 @@ export function PerformanceRadialChart({ title, description, data }: Performance
     },
     {
       label: "Low Disease",
-      value: 100 - latestData.diseaseIncidence, // Invert so higher is better
+      value: 100 - latestData.diseaseIncidence,
       maxValue: 100,
       color: '#4c6ef5'
     },
     {
       label: "Low Mortality",
-      value: 100 - latestData.mortalityRate, // Invert so higher is better
+      value: 100 - latestData.mortalityRate,
       maxValue: 100,
       color: '#f59f00'
     }

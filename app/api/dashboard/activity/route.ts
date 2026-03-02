@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       const recentSales = sales
         .filter((sale) => {
           const saleDate = new Date(sale.date);
-          return saleDate >= thirtyDaysAgo && sale.status === "completed";
+          return saleDate >= thirtyDaysAgo;
         })
         .sort((a, b) => {
           const dateA = new Date(a.date).getTime();
@@ -190,7 +190,7 @@ export async function GET(request: NextRequest) {
     const limitedActivities = activities.slice(0, 10);
 
     return jsonSuccess(limitedActivities, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

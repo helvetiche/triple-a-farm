@@ -1,5 +1,5 @@
 'use client';
-import { GalleryVerticalEnd, ChevronLeft } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import { LoginForm } from "@/app/(auth)/login/components/login-form"
 import Image from "next/image"
 import Link from "next/link"

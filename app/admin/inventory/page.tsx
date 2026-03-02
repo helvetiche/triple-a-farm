@@ -35,7 +35,6 @@ import { Pagination } from "@/components/ui/pagination";
 import {
   PageHeader,
   PageHeaderAddButton,
-  PageHeaderLinkButton,
   StatCards,
 } from "@/components/dashboard";
 import {
@@ -49,7 +48,6 @@ import {
 import {
   InventoryFilters,
   InventoryTable,
-  LoadingSpinner,
   StatsCardsSkeleton,
   PageHeaderSkeleton,
   TabsSkeleton,
@@ -89,7 +87,7 @@ export default function InventoryPage() {
   const { userData } = useAuth();
   
   // State and settings
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -143,7 +141,7 @@ export default function InventoryPage() {
         const json = await response.json();
 
         if (response.ok && json?.success) {
-          const locations = (json.data || []).map((loc: any) => ({
+          const locations = (json.data || []).map((loc: { locationId?: string; id?: string; name: string; address?: string }) => ({
             locationId: loc.locationId || loc.id,
             name: loc.name,
             address: loc.address,
@@ -458,7 +456,7 @@ export default function InventoryPage() {
     handleRefreshStats();
   };
 
-  const handleItemRestocked = (item: InventoryItem, restockAmount: number) => {
+  const handleItemRestocked = (item: InventoryItem, _restockAmount: number) => {
     setItems((prev) =>
       prev.map((existing) => (existing.id === item.id ? item : existing))
     );
@@ -469,7 +467,7 @@ export default function InventoryPage() {
     }
   };
 
-  const handleItemConsumed = (item: InventoryItem, consumeAmount: number) => {
+  const handleItemConsumed = (item: InventoryItem, _consumeAmount: number) => {
     setItems((prev) =>
       prev.map((existing) => (existing.id === item.id ? item : existing))
     );

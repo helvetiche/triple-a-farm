@@ -63,7 +63,7 @@ export async function GET() {
     });
 
     return jsonSuccess(locations, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       { id: docRef.id, ...newLocation },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -174,7 +174,7 @@ export async function PUT(request: NextRequest) {
       { id, ...updatedLocation },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
@@ -228,7 +228,7 @@ export async function DELETE(request: NextRequest) {
       { message: "Location deleted successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

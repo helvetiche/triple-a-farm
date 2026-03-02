@@ -28,11 +28,12 @@ import { useMemo, useState } from "react"
 import dynamic from "next/dynamic"
 
 import Zoom from "yet-another-react-lightbox/plugins/zoom"
+import type { Rooster } from "@/app/admin/data/roosters"
 
 const Lightbox = dynamic(() => import("yet-another-react-lightbox"), { ssr: false })
 
 interface RoosterViewDialogProps {
-  rooster: any | null
+  rooster: Rooster | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onEdit?: (id: string) => void
@@ -46,19 +47,22 @@ export function RoosterViewDialog({
   onEdit, 
   onDelete 
 }: RoosterViewDialogProps) {
-  if (!rooster) return null
-
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const slides = useMemo(
-    () => [
-      {
-        src: rooster.image || "/images/roosters/rooster-sample.jpg",
-        alt: `${rooster.breed || "Rooster"} - ${rooster.id}`,
-      },
-    ],
+    () => {
+      if (!rooster) return []
+      return [
+        {
+          src: rooster.image || "/images/roosters/rooster-sample.jpg",
+          alt: `${rooster.breed || "Rooster"} - ${rooster.id}`,
+        },
+      ]
+    },
     [rooster]
   )
+
+  if (!rooster) return null
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {

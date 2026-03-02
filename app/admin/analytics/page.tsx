@@ -9,7 +9,6 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
@@ -17,31 +16,22 @@ import {
   TrendingUp, 
   TrendingDown, 
   Bird, 
-  Package, 
   Heart, 
   Download, 
-  Calendar, 
-  PhilippinePeso,
-  Target,
-  PieChart as PieChartIcon,
-  Activity
+  PhilippinePeso
 } from "lucide-react"
 import { 
   DateRangeSelector,
   AnalyticsStatsCardsSkeleton,
   RevenueChartSkeleton,
   HealthMetricsSkeleton,
-  HealthChartSkeleton,
   BreedPerformanceSkeleton,
   CustomerRatingsSkeleton,
   PageHeaderSkeleton,
   SimpleBarChart,
-  SimplePieChart,
-  DonutChart,
   SimpleAreaChart,
   SimpleLineChart,
   HealthRadarChart,
-  PerformanceRadialChart,
   CustomerRatingsChart
 } from "./components"
 import { 
@@ -149,17 +139,6 @@ export function AnalyticsPage() {
     return analyticsData.monthlyTrends.map(item => ({
       label: item.month,
       value: item.sales
-    }))
-  }, [analyticsData])
-
-  const breedPerformanceData = useMemo(() => {
-    if (!analyticsData?.breedPerformance) return []
-    const colors = ['#3d6c58', '#82c91e', '#4c6ef5', '#f59f00', '#e03131']
-    return analyticsData.breedPerformance.map((item, index) => ({
-      label: item.breed,
-      value: item.revenue,
-      percentage: item.percentage,
-      color: colors[index % colors.length]
     }))
   }, [analyticsData])
 

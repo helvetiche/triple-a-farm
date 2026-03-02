@@ -54,11 +54,12 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sign up error:", error);
+    const err = error as Error;
     return jsonError(
       "AUTH_SIGN_UP_FAILED",
-      error?.message || "Failed to create account.",
+      err?.message || "Failed to create account.",
       400
     );
   }

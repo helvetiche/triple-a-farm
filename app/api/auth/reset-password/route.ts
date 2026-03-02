@@ -82,11 +82,12 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Reset password error:", error);
+    const err = error as Error;
     return jsonError(
       "AUTH_RESET_PASSWORD_FAILED",
-      error?.message || "Failed to reset password.",
+      err?.message || "Failed to reset password.",
       400
     );
   }

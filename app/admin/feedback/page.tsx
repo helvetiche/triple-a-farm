@@ -58,11 +58,12 @@ export default function FeedbackPage() {
       }
       const data = await response.json()
       setReviews(data.data || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching reviews:', error)
       
       // Retry up to 3 times for network errors
-      if (retryCount < 3 && error?.message?.includes('Failed to fetch')) {
+      const err = error as Error
+      if (retryCount < 3 && err?.message?.includes('Failed to fetch')) {
         setTimeout(() => fetchReviews(retryCount + 1, isRefresh), 1000 * (retryCount + 1))
         return
       }
@@ -527,7 +528,7 @@ export default function FeedbackPage() {
                   {renderStars(selectedReview.rating)}
                   <span className="ml-2 text-sm text-[#4a6741]">({selectedReview.rating}/5)</span>
                 </div>
-                <p className="text-sm text-[#4a6741] line-clamp-3">"{selectedReview.comment}"</p>
+                <p className="text-sm text-[#4a6741] line-clamp-3">&quot;{selectedReview.comment}&quot;</p>
               </div>
               <div className="flex justify-end gap-2">
                 <Button 
@@ -566,7 +567,7 @@ export default function FeedbackPage() {
                   {renderStars(selectedReview.rating)}
                   <span className="ml-2 text-sm text-[#4a6741]">({selectedReview.rating}/5)</span>
                 </div>
-                <p className="text-sm text-[#4a6741] line-clamp-3">"{selectedReview.comment}"</p>
+                <p className="text-sm text-[#4a6741] line-clamp-3">&quot;{selectedReview.comment}&quot;</p>
               </div>
               <div className="flex justify-end gap-2">
                 <Button 

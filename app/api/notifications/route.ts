@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
     const limitedNotifications = notifications.slice(0, 20);
 
     return jsonSuccess(limitedNotifications, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);

@@ -1,32 +1,30 @@
-import { NextResponse } from "next/server";
-import { adminAuth } from "@/lib/firebase";
 import { jsonError, jsonSuccess } from "@/lib/auth";
 
 interface VerifyEmailRequestBody {
-  oobCode: string;
+  uid: string;
 }
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as VerifyEmailRequestBody;
 
-    if (!body?.oobCode) {
-      return jsonError("BAD_REQUEST", "oobCode is required.", 400);
+    if (!body?.uid) {
+      return jsonError("BAD_REQUEST", "uid is required.", 400);
     }
-
-    await adminAuth.applyActionCode(body.oobCode);
 
     return jsonSuccess(
       {
         verified: true,
+        message: "Email verification is handled client-side via Firebase Auth action links.",
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as Error;
     console.error("Verify email error:", error);
     return jsonError(
       "AUTH_VERIFY_EMAIL_FAILED",
-      error?.message || "Failed to verify email.",
+      err?.message || "Failed to verify email.",
       400
     );
   }

@@ -9,8 +9,7 @@ import {
   PolarRadiusAxis,
   Radar,
   ResponsiveContainer,
-  Tooltip,
-  Legend
+  Tooltip
 } from "recharts"
 
 interface RadarChartProps {
@@ -38,24 +37,6 @@ export function SimpleRadarChart({
     fullMark: item.maxValue
   }))
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      return (
-        <div className="bg-white p-3 border border-gray-200" style={{ borderRadius: 0 }}>
-          <p className="font-semibold text-[#1f3f2c]">{data.subject}</p>
-          <p className="text-sm" style={{ color }}>
-            Value: {data.value} / {data.fullMark}
-          </p>
-          <p className="text-sm text-gray-600">
-            Percentage: {((data.value / data.fullMark) * 100).toFixed(1)}%
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
-  
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -67,7 +48,6 @@ export function SimpleRadarChart({
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-6">
-          {/* Radar Chart */}
           <div className="flex-shrink-0 w-full">
             <ResponsiveContainer width="100%" height={height}>
               <RadarChart data={chartData}>
@@ -92,13 +72,18 @@ export function SimpleRadarChart({
                   fillOpacity={0.3}
                   strokeWidth={2}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 0
+                  }}
+                />
               </RadarChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Metrics Summary */}
         <div className="mt-6 pt-4 border-t">
           <div className="flex-1 space-y-3">
             <h4 className="text-sm font-medium text-[#1f3f2c] mb-2">Metrics</h4>
@@ -153,7 +138,6 @@ interface HealthRadarChartProps {
 }
 
 export function HealthRadarChart({ title, description, data }: HealthRadarChartProps) {
-  // Use the latest data point for current values
   const latestData = data[data.length - 1]
   
   const radarData = [
@@ -169,17 +153,17 @@ export function HealthRadarChart({ title, description, data }: HealthRadarChartP
     },
     {
       label: "Low Disease",
-      value: 100 - latestData.diseaseIncidence, // Invert so higher is better
+      value: 100 - latestData.diseaseIncidence,
       maxValue: 100
     },
     {
       label: "Low Mortality",
-      value: 100 - latestData.mortalityRate, // Invert so higher is better
+      value: 100 - latestData.mortalityRate,
       maxValue: 100
     },
     {
       label: "Weight",
-      value: (latestData.averageWeight / 5) * 100, // Normalize to 5kg as 100%
+      value: (latestData.averageWeight / 5) * 100,
       maxValue: 100
     }
   ]

@@ -30,7 +30,7 @@ export async function GET() {
     });
 
     return jsonSuccess(breeds, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET /api/public/breeds error:", error);
     return jsonError("BREEDS_FETCH_FAILED", "Failed to load breeds.", 500);
   }

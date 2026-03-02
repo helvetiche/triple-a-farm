@@ -339,6 +339,7 @@ export const getSalesStats = async (
   return {
     totalRevenue,
     totalTransactions,
+    pendingTransactions: 0,
     averageSaleAmount,
     monthlyGrowth,
     topBreed,

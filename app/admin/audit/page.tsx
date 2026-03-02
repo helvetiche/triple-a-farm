@@ -582,6 +582,8 @@ export default function AuditTrailPage() {
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={setCurrentPage}
+                        totalItems={total}
+                        itemsPerPage={ITEMS_PER_PAGE}
                       />
                     </div>
                   )}

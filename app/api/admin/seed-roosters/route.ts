@@ -212,7 +212,7 @@ async function verifySeeding() {
     
     // Show breed distribution
     const breedCounts: Record<string, number> = {};
-    const roosterData: any[] = [];
+    const roosterData: Array<{ id: string; breed: string; status: string; health: string }> = [];
     
     roostersSnapshot.docs.forEach(doc => {
       const data = doc.data();
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
       verification
     }, { status: 200 });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("\n💥 Seeding failed:", error);
     return jsonError("SEEDING_FAILED", "Failed to seed the database.", 500);
   }

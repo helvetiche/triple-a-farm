@@ -173,7 +173,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
         <DialogHeader>
           <DialogTitle className="text-[#3d6c58]">Share Your Feedback</DialogTitle>
           <DialogDescription>
-            We'd love to hear your thoughts about Triple A Gamefarm. Your feedback helps us improve!
+            We&apos;d love to hear your thoughts about Triple A Gamefarm. Your feedback helps us improve!
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">

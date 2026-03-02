@@ -178,7 +178,7 @@ export default function Page() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {isLoading ? (
                   // Skeleton cards
-                  Array.from({ length: 4 }).map((_: any, i: number) => (
+                  Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="border-[#3d6c58]/20">
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <Skeleton className="h-4 w-24" />
@@ -275,7 +275,7 @@ export default function Page() {
                   <CardContent className="space-y-3">
                     {isLoading ? (
                       // Skeleton buttons
-                      Array.from({ length: 4 }).map((_: any, i: number) => (
+                      Array.from({ length: 4 }).map((_, i) => (
                         <Skeleton key={i} className="h-9 w-full" />
                       ))
                     ) : (
@@ -339,7 +339,7 @@ export default function Page() {
                     {isLoading ? (
                       // Skeleton roosters
                       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {Array.from({ length: 3 }).map((_: any, i: number) => (
+                        {Array.from({ length: 3 }).map((_, i) => (
                           <div key={i} className="border p-4 space-y-2">
                             <Skeleton className="aspect-square w-full mb-3" />
                             <div className="flex items-center justify-between">
@@ -428,7 +428,7 @@ export default function Page() {
                   {isLoading ? (
                     // Skeleton activities
                     <div className="space-y-4">
-                      {Array.from({ length: 4 }).map((_: any, i: number) => (
+                      {Array.from({ length: 4 }).map((_, i) => (
                         <div key={i} className="flex items-center space-x-4">
                           <Skeleton className="h-5 w-5" />
                           <div className="flex-1 min-w-0">
