@@ -115,7 +115,7 @@ export const formatInventoryDisplayId = (
     return `#${item.id.slice(0, 4).toUpperCase()}-0000`;
   }
 
-  const [year, month, day] = dateSource.split("-");
+  const [, month, day] = dateSource.split("-");
 
   if (!month || !day) {
     return `#${item.id.slice(0, 4).toUpperCase()}-0000`;

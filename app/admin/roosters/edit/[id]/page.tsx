@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Upload, Bird, Save, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";

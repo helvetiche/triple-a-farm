@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   Home,
   Bird,
@@ -80,10 +81,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="/admin">
                 <div className="flex aspect-square size-8 items-center justify-center">
-                  <img
+                  <Image
                     src="/images/logo-png.png"
                     alt="Triple A Gamefarm"
-                    className="size-6 object-contain"
+                    width={24}
+                    height={24}
+                    className="object-contain"
                   />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">

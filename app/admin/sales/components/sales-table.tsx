@@ -98,7 +98,7 @@ export function SalesTable({
               </div>
               <div>
                 <div className="text-[#4a6741]">Status</div>
-                <Badge className={getStatusColor("sold")}>Sold</Badge>
+                <Badge className={getStatusColor()}>Sold</Badge>
               </div>
             </div>
 

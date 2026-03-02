@@ -27,7 +27,7 @@ export interface Review {
   transactionId?: string;
 }
 
-const getReviews = async (user: SessionUser | null): Promise<Review[]> => {
+const getReviews = async (): Promise<Review[]> => {
   const snapshot = await adminDb
     .collection(REVIEWS_COLLECTION)
     .orderBy("date", "desc")
@@ -54,14 +54,13 @@ export const getAnalyticsStats = async (
   startDate?: Date,
   endDate?: Date
 ): Promise<AnalyticsStats> => {
-  const [salesStats, roosterStats, inventoryStats, transactions, reviews] =
-    await Promise.all([
-      getSalesStats(user),
-      getRoosterStats(user),
-      getInventoryStats(user),
-      getSalesTransactions(user),
-      getReviews(user),
-    ]);
+  const [, roosterStats, , transactions] = await Promise.all([
+    getSalesStats(user),
+    getRoosterStats(user),
+    getInventoryStats(user),
+    getSalesTransactions(user),
+    getReviews(),
+  ]);
 
   let filteredTransactions = transactions;
   if (startDate && endDate) {
@@ -188,7 +187,6 @@ export const getMonthlyTrends = async (
   filteredTransactions.forEach((transaction) => {
     const date = new Date(transaction.date);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const monthName = date.toLocaleDateString("en-US", { month: "short" });
 
     if (!monthlyMap.has(monthKey)) {
       monthlyMap.set(monthKey, []);
@@ -304,7 +302,6 @@ export const getHealthMetrics = async (
   filteredRoosters.forEach((rooster) => {
     const date = new Date(rooster.dateAdded);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const monthName = date.toLocaleDateString("en-US", { month: "short" });
 
     if (!monthlyMap.has(monthKey)) {
       monthlyMap.set(monthKey, []);
@@ -377,7 +374,7 @@ export const getCustomerRatings = async (
   startDate?: Date,
   endDate?: Date
 ): Promise<CustomerRating[]> => {
-  const reviews = await getReviews(user);
+  const reviews = await getReviews();
 
   let filteredReviews = reviews;
   if (startDate && endDate) {

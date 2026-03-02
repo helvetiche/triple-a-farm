@@ -38,10 +38,12 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <img
+        <Image
           src="/images/bg.png"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover"
+          alt="Authentication background"
+          fill
+          className="object-cover"
+          priority
         />
         <div className="absolute inset-0 bg-green-100/30"></div>
       </div>

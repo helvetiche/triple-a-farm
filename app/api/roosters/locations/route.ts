@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const sessionUser = await assertLocationPermission("update");
+    await assertLocationPermission("update");
 
     const body = await request.json();
     const { id, name, address } = body;
@@ -221,7 +221,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const sessionUser = await assertLocationPermission("delete");
+    await assertLocationPermission("delete");
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");

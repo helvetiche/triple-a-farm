@@ -109,7 +109,7 @@ export function ConsumeDialog({
       setReason("");
       setCustomReason("");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toastCRUD.updateError(
         "Consume",
         "Failed to consume item. Please try again."

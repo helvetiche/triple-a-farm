@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { adminAuth } from "@/lib/firebase";
 import {
   SESSION_COOKIE_NAME,
@@ -9,7 +8,7 @@ import {
 } from "@/lib/auth";
 import { logAuditEvent } from "@/lib/audit";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value;

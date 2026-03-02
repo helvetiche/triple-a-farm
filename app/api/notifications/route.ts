@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getSalesTransactions } from "@/lib/sales";
 import { getInventoryItems } from "@/lib/inventory";
@@ -36,7 +35,7 @@ const formatTimeAgo = (date: Date): string => {
   return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const sessionUser = await getSessionUser();
 

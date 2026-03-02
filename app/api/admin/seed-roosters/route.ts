@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase";
 import { hasRequiredRole } from "@/lib/roles";
@@ -112,12 +111,8 @@ const sampleRoosters = [
 ];
 
 // Generate unique ID with format: BREED-FIRST-3-LETTERS-YEAR-RANDOM
-function generateRoosterId(breed: string, index: number): string {
+function generateRoosterId(breed: string): string {
   const breedCode = breed.toUpperCase().substring(0, 3);
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const randomLetters = Array.from({ length: 3 }, () =>
-    letters.charAt(Math.floor(Math.random() * letters.length))
-  ).join("");
   const year = new Date().getFullYear();
   const random = Math.floor(Math.random() * 1000)
     .toString()
@@ -189,9 +184,9 @@ async function seedRoosters() {
     const batch = adminDb.batch();
     const generatedIds: string[] = [];
 
-    sampleRoosters.forEach((rooster, index) => {
+    sampleRoosters.forEach((rooster) => {
       const docRef = adminDb.collection(ROOSTERS_COLLECTION).doc();
-      const roosterId = generateRoosterId(rooster.breed, index);
+      const roosterId = generateRoosterId(rooster.breed);
       generatedIds.push(roosterId);
 
       const roosterWithId = {
@@ -271,7 +266,7 @@ async function verifySeeding() {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Check if user is admin
     const sessionUser = await getSessionUser();

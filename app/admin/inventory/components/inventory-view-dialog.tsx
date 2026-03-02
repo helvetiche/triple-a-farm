@@ -68,13 +68,6 @@ export function InventoryViewDialog({
     return Math.min(percentage, 100);
   };
 
-  const getProgressColor = (current: number, min: number) => {
-    const percentage = (current / min) * 100;
-    if (percentage >= 100) return "bg-green-500";
-    if (percentage >= 50) return "bg-yellow-500";
-    return "bg-red-500";
-  };
-
   const stockPercentage = getStockProgress(item.currentStock, item.minStock);
   const isLowStock = item.status !== "adequate";
 

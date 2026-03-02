@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase";
 import { DEFAULT_ROLE, type AppRole } from "@/lib/roles";
 import { jsonError, jsonSuccess } from "@/lib/auth";

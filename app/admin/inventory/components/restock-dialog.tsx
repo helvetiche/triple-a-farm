@@ -104,7 +104,7 @@ export function RestockDialog({
       setReason("");
       setCustomReason("");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toastCRUD.updateError(
         "Restock",
         "Failed to restock item. Please try again."

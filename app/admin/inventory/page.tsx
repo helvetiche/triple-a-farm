@@ -183,6 +183,7 @@ export default function InventoryPage() {
     };
 
     loadLocations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load data from API
@@ -462,10 +463,6 @@ export default function InventoryPage() {
     // TODO: Open filter modal or drawer
   };
 
-  const handleClearSearch = () => {
-    setSearchValue("");
-  };
-
   const handleItemAdded = (newItem: InventoryItem) => {
     setItems((prev) => [...prev, newItem]);
     handleRefreshStats();
@@ -704,7 +701,6 @@ export default function InventoryPage() {
                     searchValue={searchValue}
                     onSearchChange={setSearchValue}
                     onFilterClick={handleFilterClick}
-                    onClearSearch={handleClearSearch}
                   />
 
                   {/* Inventory Table */}

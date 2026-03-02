@@ -41,6 +41,7 @@ export function ActivityLogDialog({
     if (open && item) {
       loadActivities();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, item]);
 
   const loadActivities = async () => {

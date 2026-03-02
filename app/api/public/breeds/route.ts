@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { jsonError, jsonSuccess } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase";
 

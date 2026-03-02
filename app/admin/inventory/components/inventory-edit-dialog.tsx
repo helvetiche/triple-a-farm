@@ -88,16 +88,6 @@ export function InventoryEditDialog({
     setFormData((prev) => ({ ...prev, [field]: date }));
   };
 
-  const calculateStatus = (
-    current: number,
-    min: number
-  ): "adequate" | "low" | "critical" => {
-    const percentage = (current / min) * 100;
-    if (percentage >= 100) return "adequate";
-    if (percentage >= 50) return "low";
-    return "critical";
-  };
-
   const handleSubmit = async () => {
     if (
       !formData.name ||
@@ -172,7 +162,7 @@ export function InventoryEditDialog({
       toastCRUD.itemUpdated(updatedItem.name);
 
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toastCRUD.updateError(
         "Inventory item",
         "Failed to update item. Please try again."

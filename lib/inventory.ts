@@ -1,13 +1,12 @@
 import { adminDb } from "@/lib/firebase";
 import type { SessionUser } from "@/lib/auth";
-import { hasRequiredRole, type AppRole } from "@/lib/roles";
+import { hasRequiredRole } from "@/lib/roles";
 import {
   calculateInventoryStatus,
   formatInventoryDisplayId,
   type InventoryItem,
   type InventoryStats,
   type InventoryActivity,
-  type InventoryActivityType,
 } from "@/lib/inventory-types";
 import { logAuditEvent } from "@/lib/audit";
 

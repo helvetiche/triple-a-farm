@@ -77,7 +77,7 @@ Contact: +639123456789`;
       setRecipientEmail("");
       setCustomMessage("");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toastCRUD.createError(
         "Confirmation",
         "Failed to send confirmation. Please try again."
@@ -85,12 +85,6 @@ Contact: +639123456789`;
     } finally {
       setIsSending(false);
     }
-  };
-
-  const getMessagePreview = () => {
-    if (customMessage) return customMessage;
-    if (sendMethod === "email") return defaultEmailMessage;
-    return defaultSMSMessage;
   };
 
   return (

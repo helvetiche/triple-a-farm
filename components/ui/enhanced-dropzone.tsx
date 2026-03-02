@@ -103,6 +103,7 @@ export function EnhancedDropzone({
         onValueChange(limitedFiles);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [value, onValueChange, multiple, maxFiles, maxSize, accept]
   );
 
@@ -167,7 +168,7 @@ export function EnhancedDropzone({
     setUploadProgress(progressMap);
 
     try {
-      const uploadPromises = value.map(async (file, index) => {
+      const uploadPromises = value.map(async (file) => {
         const formData = new FormData();
         formData.append("image", file);
 
@@ -226,7 +227,7 @@ export function EnhancedDropzone({
           description: `${failedUploads.length} files failed to upload`,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Upload failed", {
         description: "An unexpected error occurred during upload",
       });

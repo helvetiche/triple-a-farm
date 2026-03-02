@@ -106,6 +106,7 @@ export default function FeedbackPage() {
   // Fetch reviews from API with retry mechanism
   useEffect(() => {
     fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRefresh = () => {

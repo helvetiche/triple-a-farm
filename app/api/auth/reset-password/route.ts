@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { jsonError, jsonSuccess } from "@/lib/auth";
 
 interface ResetPasswordRequestBody {

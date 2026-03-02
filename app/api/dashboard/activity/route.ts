@@ -1,12 +1,8 @@
-import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getSalesTransactions } from "@/lib/sales";
 import { getInventoryItems } from "@/lib/inventory";
 import { getRoosters } from "@/lib/roosters";
-import { adminDb } from "@/lib/firebase";
 import { hasRequiredRole } from "@/lib/roles";
-
-const REVIEWS_COLLECTION = "reviews";
 
 interface Activity {
   action: string;
@@ -34,7 +30,7 @@ const formatTimeAgo = (date: Date): string => {
   return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const sessionUser = await getSessionUser();
 

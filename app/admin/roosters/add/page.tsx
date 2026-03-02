@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { EnhancedDropzone } from "@/components/ui/enhanced-dropzone";
-import { ArrowLeft, Upload, Bird, X } from "lucide-react";
+import { ArrowLeft, Bird, X } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toastCRUD } from "../utils/toast";
 import {
@@ -34,7 +34,6 @@ import {
   healthStatuses,
   type LocationOption,
 } from "../../data/roosters";
-import Image from "next/image";
 
 export const description = "Add New Rooster";
 
@@ -65,7 +64,6 @@ export default function AddRoosterPage() {
     Array<{ name: string; date: string }>
   >([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [images, setImages] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Fetch breeds and locations on component mount
@@ -164,7 +162,6 @@ export default function AddRoosterPage() {
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
-      setImages(uploadedUrls);
 
       const dateAdded = new Date().toISOString().split("T")[0];
 

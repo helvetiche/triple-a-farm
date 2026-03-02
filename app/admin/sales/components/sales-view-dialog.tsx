@@ -21,7 +21,6 @@ import {
   PhilippinePeso,
 } from "lucide-react";
 import { SalesTransaction } from "../types";
-import { toastCRUD } from "../utils/toast";
 
 interface SalesViewDialogProps {
   transaction: SalesTransaction | null;
@@ -36,8 +35,7 @@ export function SalesViewDialog({
 }: SalesViewDialogProps) {
   if (!transaction) return null;
 
-  const getStatusColor = (status: string) => {
-    // All sales are sold/completed
+  const getStatusColor = () => {
     return "bg-green-100 text-green-800 border-green-200";
   };
 
@@ -72,7 +70,7 @@ export function SalesViewDialog({
               </div>
             </div>
             <div className="flex gap-2">
-              <Badge className={getStatusColor("sold")}>
+              <Badge className={getStatusColor()}>
                 <CheckCircle className="w-3 h-3 mr-1" />
                 Sold
               </Badge>
