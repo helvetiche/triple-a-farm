@@ -13,6 +13,7 @@ import {
   Settings2,
   Users,
   Settings,
+  Shield,
 } from "lucide-react"
 
 import { NavMain } from "@/components/dashboard/nav-main"
@@ -64,6 +65,11 @@ const data = {
       title: "Feedback & Ratings",
       url: "/admin/feedback",
       icon: Star,
+    },
+    {
+      title: "Audit Trail",
+      url: "/admin/audit",
+      icon: Shield,
     },
   ],
   navSecondary: [],

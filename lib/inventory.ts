@@ -9,6 +9,7 @@ import {
   type InventoryActivity,
   type InventoryActivityType,
 } from "@/lib/inventory-types";
+import { logAuditEvent } from "@/lib/audit";
 
 type InventoryAction =
   | "read"
@@ -313,10 +314,28 @@ export const createInventoryItem = async (
     tx.set(inventoryStatsDocRef(), stats, { merge: true });
   });
 
-  return {
+  const createdItem = {
     id: docRef.id,
     ...docData,
   };
+
+  logAuditEvent(user, {
+    action: "create",
+    entity: "inventory",
+    entityId: createdItem.id,
+    entityName: createdItem.name,
+    description: `Created inventory item: ${createdItem.name}`,
+    details: {
+      metadata: {
+        category: createdItem.category,
+        currentStock: createdItem.currentStock,
+        unit: createdItem.unit,
+        locationName: createdItem.locationName,
+      },
+    },
+  });
+
+  return createdItem;
 };
 
 export const updateInventoryItem = async (
@@ -359,7 +378,26 @@ export const updateInventoryItem = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
-  return updated;
+  const updatedItem = updated as InventoryItem;
+
+  logAuditEvent(user, {
+    action: "update",
+    entity: "inventory",
+    entityId: updatedItem.id,
+    entityName: updatedItem.name,
+    description: `Updated inventory item: ${updatedItem.name}`,
+    details: {
+      changes: Object.entries(input)
+        .filter(([, v]) => v !== undefined)
+        .map(([field, newValue]) => ({
+          field,
+          oldValue: undefined,
+          newValue,
+        })),
+    },
+  });
+
+  return updatedItem;
 };
 
 export const deleteInventoryItem = async (
@@ -370,6 +408,8 @@ export const deleteInventoryItem = async (
 
   const docRef = inventoryCollectionRef().doc(id);
 
+  let deletedItemName = "";
+
   await adminDb.runTransaction(async (tx) => {
     const snapshot = await tx.get(docRef);
 
@@ -377,10 +417,22 @@ export const deleteInventoryItem = async (
       throw new Error("NOT_FOUND");
     }
 
+    const data = snapshot.data() as Omit<InventoryItem, "id">;
+    deletedItemName = data.name;
+
     tx.delete(docRef);
 
     const stats = await recalculateInventoryStats();
     tx.set(inventoryStatsDocRef(), stats, { merge: true });
+  });
+
+  logAuditEvent(user, {
+    action: "delete",
+    entity: "inventory",
+    entityId: id,
+    entityName: deletedItemName,
+    description: `Deleted inventory item: ${deletedItemName}`,
+    severity: "critical",
   });
 };
 
@@ -455,7 +507,27 @@ export const restockInventoryItem = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
-  return updated;
+  const restockedItem = updated as InventoryItem;
+
+  logAuditEvent(user, {
+    action: "restock",
+    entity: "inventory",
+    entityId: restockedItem.id,
+    entityName: restockedItem.name,
+    description: `Restocked inventory: ${restockedItem.name} (+${amount} ${restockedItem.unit})`,
+    details: {
+      changes: [
+        {
+          field: "currentStock",
+          oldValue: restockedItem.currentStock - amount,
+          newValue: restockedItem.currentStock,
+        },
+      ],
+      metadata: { reason, amount },
+    },
+  });
+
+  return restockedItem;
 };
 
 export const getInventoryStats = async (
@@ -543,7 +615,27 @@ export const consumeInventoryItem = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
-  return updated;
+  const consumedItem = updated as InventoryItem;
+
+  logAuditEvent(user, {
+    action: "consume",
+    entity: "inventory",
+    entityId: consumedItem.id,
+    entityName: consumedItem.name,
+    description: `Consumed inventory: ${consumedItem.name} (-${amount} ${consumedItem.unit})`,
+    details: {
+      changes: [
+        {
+          field: "currentStock",
+          oldValue: consumedItem.currentStock + amount,
+          newValue: consumedItem.currentStock,
+        },
+      ],
+      metadata: { reason, amount },
+    },
+  });
+
+  return consumedItem;
 };
 
 export const getInventoryActivity = async (
