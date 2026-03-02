@@ -206,7 +206,8 @@ export function RestockDialog({
               {maxRestockAmount !== undefined ? (
                 maxRestockAmount > 0 ? (
                   <p className="text-sm text-gray-500">
-                    You can add up to {maxRestockAmount} {item.unit} (max capacity: {item.maxStock} {item.unit})
+                    You can add up to {maxRestockAmount} {item.unit} (max
+                    capacity: {item.maxStock} {item.unit})
                   </p>
                 ) : (
                   <p className="text-sm text-amber-600 font-medium">
@@ -260,39 +261,41 @@ export function RestockDialog({
             {/* Stock Preview */}
             {restockAmount &&
               !isNaN(parseInt(restockAmount)) &&
-              parseInt(restockAmount) > 0 && (
-                (() => {
-                  const amount = parseInt(restockAmount);
-                  const newStock = item.currentStock + amount;
-                  const exceedsMax = item.maxStock && newStock > item.maxStock;
-                  
-                  return exceedsMax ? (
-                    <div className="bg-red-50 p-4 border border-red-200">
-                      <h4 className="text-sm font-medium text-red-900 mb-2">
-                        Exceeds Maximum Capacity
-                      </h4>
-                      <div className="text-lg font-bold text-red-900">
-                        {newStock} / {item.maxStock} {item.unit}
-                      </div>
-                      <div className="text-sm text-red-700">
-                        Cannot add {amount} {item.unit}. Maximum allowed: {maxRestockAmount} {item.unit}
-                      </div>
+              parseInt(restockAmount) > 0 &&
+              (() => {
+                const amount = parseInt(restockAmount);
+                const newStock = item.currentStock + amount;
+                const exceedsMax = item.maxStock && newStock > item.maxStock;
+
+                return exceedsMax ? (
+                  <div className="bg-red-50 p-4 border border-red-200">
+                    <h4 className="text-sm font-medium text-red-900 mb-2">
+                      Exceeds Maximum Capacity
+                    </h4>
+                    <div className="text-lg font-bold text-red-900">
+                      {newStock} / {item.maxStock} {item.unit}
                     </div>
-                  ) : (
-                    <div className="bg-green-50 p-4 border border-green-200">
-                      <h4 className="text-sm font-medium text-green-900 mb-2">
-                        Stock After Restock
-                      </h4>
-                      <div className="text-lg font-bold text-green-900">
-                        {newStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
-                      </div>
-                      <div className="text-sm text-green-700">
-                        +{amount} {item.unit} from current {item.currentStock} {item.unit}
-                      </div>
+                    <div className="text-sm text-red-700">
+                      Cannot add {amount} {item.unit}. Maximum allowed:{" "}
+                      {maxRestockAmount} {item.unit}
                     </div>
-                  );
-                })()
-              )}
+                  </div>
+                ) : (
+                  <div className="bg-green-50 p-4 border border-green-200">
+                    <h4 className="text-sm font-medium text-green-900 mb-2">
+                      Stock After Restock
+                    </h4>
+                    <div className="text-lg font-bold text-green-900">
+                      {newStock}
+                      {item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
+                    </div>
+                    <div className="text-sm text-green-700">
+                      +{amount} {item.unit} from current {item.currentStock}{" "}
+                      {item.unit}
+                    </div>
+                  </div>
+                );
+              })()}
           </div>
         </div>
 
@@ -313,7 +316,8 @@ export function RestockDialog({
               !reason ||
               (reason === "Other" && !customReason.trim()) ||
               maxRestockAmount === 0 ||
-              (maxRestockAmount !== undefined && parseInt(restockAmount) > maxRestockAmount)
+              (maxRestockAmount !== undefined &&
+                parseInt(restockAmount) > maxRestockAmount)
             }
           >
             {isSubmitting ? (

@@ -217,9 +217,7 @@ const applyUpdateToInventoryItem = (
       ? undefined
       : (input.locationAddress ?? existing.locationAddress);
   const maxStock =
-    input.maxStock === null
-      ? undefined
-      : (input.maxStock ?? existing.maxStock);
+    input.maxStock === null ? undefined : (input.maxStock ?? existing.maxStock);
 
   const result: Omit<InventoryItem, "id"> = {
     name: input.name ?? existing.name,

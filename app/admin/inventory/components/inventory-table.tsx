@@ -160,14 +160,12 @@ export function InventoryTable({
                 <div className="flex items-center justify-between text-sm">
                   <div className="text-[#4a6741]">Stock</div>
                   <div className="text-[#1f3f2c] font-medium">
-                    {item.currentStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
+                    {item.currentStock}
+                    {item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
                   </div>
                 </div>
                 <div className="mt-2">
-                  <Progress
-                    value={getStockProgress(item)}
-                    className="h-2"
-                  />
+                  <Progress value={getStockProgress(item)} className="h-2" />
                 </div>
               </div>
 
@@ -243,7 +241,9 @@ export function InventoryTable({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {item.currentStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
+                          {item.currentStock}
+                          {item.maxStock ? ` / ${item.maxStock}` : ""}{" "}
+                          {item.unit}
                         </span>
                       </div>
                       <Progress

@@ -29,10 +29,12 @@ const COLORS = {
 
 const log = {
   info: (msg: string) => console.log(`${COLORS.blue}ℹ${COLORS.reset} ${msg}`),
-  success: (msg: string) => console.log(`${COLORS.green}✓${COLORS.reset} ${msg}`),
+  success: (msg: string) =>
+    console.log(`${COLORS.green}✓${COLORS.reset} ${msg}`),
   error: (msg: string) => console.log(`${COLORS.red}✗${COLORS.reset} ${msg}`),
   warn: (msg: string) => console.log(`${COLORS.yellow}⚠${COLORS.reset} ${msg}`),
-  header: (msg: string) => console.log(`\n${COLORS.bright}${COLORS.cyan}${msg}${COLORS.reset}\n`),
+  header: (msg: string) =>
+    console.log(`\n${COLORS.bright}${COLORS.cyan}${msg}${COLORS.reset}\n`),
 };
 
 interface InventoryItem {
@@ -52,7 +54,9 @@ const initializeFirebase = () => {
 
   const serviceAccountJson = process.env.NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountJson) {
-    throw new Error("NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT environment variable is not set");
+    throw new Error(
+      "NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT environment variable is not set"
+    );
   }
 
   let serviceAccount: Record<string, unknown>;

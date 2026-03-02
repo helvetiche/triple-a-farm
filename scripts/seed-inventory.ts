@@ -345,7 +345,7 @@ function randomizeStock(baseStock: number): number {
 async function clearExistingInventory(adminDb: FirebaseFirestore.Firestore) {
   console.log("Clearing existing inventory items...");
   const snapshot = await adminDb.collection(INVENTORY_COLLECTION).get();
-  
+
   if (snapshot.empty) {
     console.log("  No existing items to clear.\n");
     return;

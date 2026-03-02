@@ -30,10 +30,12 @@ const COLORS = {
 
 const log = {
   info: (msg: string) => console.log(`${COLORS.blue}ℹ${COLORS.reset} ${msg}`),
-  success: (msg: string) => console.log(`${COLORS.green}✓${COLORS.reset} ${msg}`),
+  success: (msg: string) =>
+    console.log(`${COLORS.green}✓${COLORS.reset} ${msg}`),
   error: (msg: string) => console.log(`${COLORS.red}✗${COLORS.reset} ${msg}`),
   warn: (msg: string) => console.log(`${COLORS.yellow}⚠${COLORS.reset} ${msg}`),
-  header: (msg: string) => console.log(`\n${COLORS.bright}${COLORS.cyan}${msg}${COLORS.reset}\n`),
+  header: (msg: string) =>
+    console.log(`\n${COLORS.bright}${COLORS.cyan}${msg}${COLORS.reset}\n`),
 };
 
 interface InventoryItem {
@@ -52,7 +54,9 @@ const initializeFirebase = () => {
 
   const serviceAccountJson = process.env.NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountJson) {
-    throw new Error("NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT environment variable is not set");
+    throw new Error(
+      "NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT environment variable is not set"
+    );
   }
 
   let serviceAccount: Record<string, unknown>;
@@ -78,7 +82,7 @@ const initializeFirebase = () => {
 const main = async () => {
   const args = process.argv.slice(2);
   const dryRun = !args.includes("--apply");
-  
+
   let multiplier = 3;
   const multiplierIndex = args.indexOf("--multiplier");
   if (multiplierIndex !== -1 && args[multiplierIndex + 1]) {
@@ -96,7 +100,7 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
 `);
 
   log.info(`Multiplier: ${multiplier}x (maxStock = minStock × ${multiplier})`);
-  
+
   if (dryRun) {
     log.warn("DRY RUN MODE - No changes will be made");
     log.info("Use --apply flag to actually apply changes");
@@ -166,7 +170,9 @@ ${COLORS.bright}${COLORS.cyan}╔═══════════════�
 
   if (dryRun) {
     log.info("Run with --apply to set these maxStock values");
-    log.info(`Example: npx tsx scripts/set-max-stock.ts --multiplier ${multiplier} --apply`);
+    log.info(
+      `Example: npx tsx scripts/set-max-stock.ts --multiplier ${multiplier} --apply`
+    );
     return;
   }
 
