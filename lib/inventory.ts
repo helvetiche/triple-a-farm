@@ -464,6 +464,10 @@ export const restockInventoryItem = async (
 
     const newCurrentStock = existing.currentStock + amount;
 
+    if (existing.maxStock && newCurrentStock > existing.maxStock) {
+      throw new Error("EXCEEDS_MAX_STOCK");
+    }
+
     const updatedDoc = applyUpdateToInventoryItem(existing, {
       currentStock: newCurrentStock,
       lastRestocked: nowIso,

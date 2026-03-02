@@ -50,6 +50,7 @@ export function InventoryAddDialog({
     category: "",
     currentStock: "",
     minStock: "",
+    maxStock: "",
     unit: "",
     supplier: "",
     price: "",
@@ -116,6 +117,7 @@ export function InventoryAddDialog({
           category: formData.category,
           currentStock: parseInt(formData.currentStock),
           minStock: parseInt(formData.minStock),
+          maxStock: formData.maxStock ? parseInt(formData.maxStock) : undefined,
           unit: formData.unit,
           supplier: formData.supplier,
           price: formData.price ? parseFloat(formData.price) : undefined,
@@ -155,6 +157,7 @@ export function InventoryAddDialog({
         category: "",
         currentStock: "",
         minStock: "",
+        maxStock: "",
         unit: "",
         supplier: "",
         price: "",
@@ -290,6 +293,23 @@ export function InventoryAddDialog({
                     }
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maxStock" className="flex items-center gap-1">
+                    Maximum Stock
+                  </Label>
+                  <Input
+                    id="maxStock"
+                    type="number"
+                    placeholder="Optional"
+                    value={formData.maxStock}
+                    onChange={(e) =>
+                      handleInputChange("maxStock", e.target.value)
+                    }
+                  />
+                  <p className="text-xs text-gray-500">
+                    Leave empty for unlimited capacity
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="unit" className="flex items-center gap-1">

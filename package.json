@@ -15,7 +15,9 @@
     "seed:dev": "node scripts/seed-dev.js",
     "test:routes": "npx tsx scripts/test-routes.ts",
     "test:routes:public": "npx tsx scripts/test-routes.ts --public-only",
-    "test:routes:verbose": "npx tsx scripts/test-routes.ts --verbose"
+    "test:routes:verbose": "npx tsx scripts/test-routes.ts --verbose",
+    "fix:overstock": "npx tsx scripts/fix-overstock.ts --dry-run",
+    "fix:overstock:apply": "npx tsx scripts/fix-overstock.ts --apply"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

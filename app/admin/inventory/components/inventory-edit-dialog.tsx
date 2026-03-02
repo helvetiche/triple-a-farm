@@ -49,6 +49,7 @@ export function InventoryEditDialog({
     category: "",
     currentStock: "",
     minStock: "",
+    maxStock: "",
     unit: "",
     supplier: "",
     price: "",
@@ -69,6 +70,7 @@ export function InventoryEditDialog({
         category: item.category,
         currentStock: item.currentStock.toString(),
         minStock: item.minStock.toString(),
+        maxStock: item.maxStock?.toString() || "",
         unit: item.unit,
         supplier: item.supplier,
         price: item.price?.toString() || "",
@@ -127,6 +129,7 @@ export function InventoryEditDialog({
           category: formData.category,
           currentStock: parseInt(formData.currentStock),
           minStock: parseInt(formData.minStock),
+          maxStock: formData.maxStock ? parseInt(formData.maxStock) : null,
           unit: formData.unit,
           supplier: formData.supplier,
           price: formData.price ? parseFloat(formData.price) : null,
@@ -297,6 +300,26 @@ export function InventoryEditDialog({
                     }
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="edit-maxStock"
+                    className="flex items-center gap-1"
+                  >
+                    Maximum Stock
+                  </Label>
+                  <Input
+                    id="edit-maxStock"
+                    type="number"
+                    placeholder="Optional"
+                    value={formData.maxStock}
+                    onChange={(e) =>
+                      handleInputChange("maxStock", e.target.value)
+                    }
+                  />
+                  <p className="text-xs text-gray-500">
+                    Leave empty for unlimited capacity
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label

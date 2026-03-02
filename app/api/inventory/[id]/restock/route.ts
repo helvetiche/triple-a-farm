@@ -60,6 +60,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       if (error.message === "REASON_REQUIRED") {
         return jsonError("INVALID_REQUEST", "Reason is required.", 400);
       }
+
+      if (error.message === "EXCEEDS_MAX_STOCK") {
+        return jsonError(
+          "EXCEEDS_MAX_STOCK",
+          "Cannot restock beyond maximum stock capacity.",
+          400
+        );
+      }
     }
 
     console.error("POST /api/inventory/[id]/restock error:", error);

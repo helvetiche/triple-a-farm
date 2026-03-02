@@ -47,12 +47,23 @@ export function RestockDialog({
   const [customReason, setCustomReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const maxRestockAmount = item?.maxStock
+    ? Math.max(0, item.maxStock - item.currentStock)
+    : undefined;
+
   const handleSubmit = async () => {
     if (!item) return;
 
     const amount = parseInt(restockAmount);
     if (!restockAmount || isNaN(amount) || amount <= 0) {
       toastCRUD.validationError("Please enter a valid restock amount");
+      return;
+    }
+
+    if (maxRestockAmount !== undefined && amount > maxRestockAmount) {
+      toastCRUD.validationError(
+        `Cannot restock more than ${maxRestockAmount} ${item.unit}. Max capacity is ${item.maxStock} ${item.unit}.`
+      );
       return;
     }
 
@@ -148,19 +159,27 @@ export function RestockDialog({
                 </p>
               </div>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
+            <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Current Stock:</span>
+                <span className="text-gray-500">Current:</span>
                 <span className="ml-2 font-medium">
                   {item.currentStock} {item.unit}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500">Min Stock:</span>
+                <span className="text-gray-500">Min:</span>
                 <span className="ml-2 font-medium">
                   {item.minStock} {item.unit}
                 </span>
               </div>
+              {item.maxStock && (
+                <div>
+                  <span className="text-gray-500">Max:</span>
+                  <span className="ml-2 font-medium">
+                    {item.maxStock} {item.unit}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -180,12 +199,25 @@ export function RestockDialog({
                 value={restockAmount}
                 onChange={(e) => setRestockAmount(e.target.value)}
                 min="1"
+                max={maxRestockAmount}
                 required
                 className="text-lg"
               />
-              <p className="text-sm text-gray-500">
-                Enter the number of {item.unit} to add to current stock
-              </p>
+              {maxRestockAmount !== undefined ? (
+                maxRestockAmount > 0 ? (
+                  <p className="text-sm text-gray-500">
+                    You can add up to {maxRestockAmount} {item.unit} (max capacity: {item.maxStock} {item.unit})
+                  </p>
+                ) : (
+                  <p className="text-sm text-amber-600 font-medium">
+                    Stock is at maximum capacity ({item.maxStock} {item.unit})
+                  </p>
+                )
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Enter the number of {item.unit} to add to current stock
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -229,18 +261,37 @@ export function RestockDialog({
             {restockAmount &&
               !isNaN(parseInt(restockAmount)) &&
               parseInt(restockAmount) > 0 && (
-                <div className="bg-green-50 p-4 border border-green-200">
-                  <h4 className="text-sm font-medium text-green-900 mb-2">
-                    Stock After Restock
-                  </h4>
-                  <div className="text-lg font-bold text-green-900">
-                    {item.currentStock + parseInt(restockAmount)} {item.unit}
-                  </div>
-                  <div className="text-sm text-green-700">
-                    +{parseInt(restockAmount)} {item.unit} from current{" "}
-                    {item.currentStock} {item.unit}
-                  </div>
-                </div>
+                (() => {
+                  const amount = parseInt(restockAmount);
+                  const newStock = item.currentStock + amount;
+                  const exceedsMax = item.maxStock && newStock > item.maxStock;
+                  
+                  return exceedsMax ? (
+                    <div className="bg-red-50 p-4 border border-red-200">
+                      <h4 className="text-sm font-medium text-red-900 mb-2">
+                        Exceeds Maximum Capacity
+                      </h4>
+                      <div className="text-lg font-bold text-red-900">
+                        {newStock} / {item.maxStock} {item.unit}
+                      </div>
+                      <div className="text-sm text-red-700">
+                        Cannot add {amount} {item.unit}. Maximum allowed: {maxRestockAmount} {item.unit}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-green-50 p-4 border border-green-200">
+                      <h4 className="text-sm font-medium text-green-900 mb-2">
+                        Stock After Restock
+                      </h4>
+                      <div className="text-lg font-bold text-green-900">
+                        {newStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
+                      </div>
+                      <div className="text-sm text-green-700">
+                        +{amount} {item.unit} from current {item.currentStock} {item.unit}
+                      </div>
+                    </div>
+                  );
+                })()
               )}
           </div>
         </div>
@@ -260,7 +311,9 @@ export function RestockDialog({
               !restockAmount ||
               parseInt(restockAmount) <= 0 ||
               !reason ||
-              (reason === "Other" && !customReason.trim())
+              (reason === "Other" && !customReason.trim()) ||
+              maxRestockAmount === 0 ||
+              (maxRestockAmount !== undefined && parseInt(restockAmount) > maxRestockAmount)
             }
           >
             {isSubmitting ? (

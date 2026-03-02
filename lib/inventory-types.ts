@@ -15,6 +15,7 @@ export interface InventoryItem {
   category: string;
   currentStock: number;
   minStock: number;
+  maxStock?: number;
   unit: string;
   lastRestocked: string;
   supplier: string;
