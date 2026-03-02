@@ -48,9 +48,7 @@ import {
   User,
   Clock,
   FileText,
-  Shield,
   AlertTriangle,
-  Info,
   RefreshCw,
   ChevronRight,
   Package,
@@ -104,36 +102,21 @@ const getEntityIcon = (entity: AuditEntity) => {
 
 const getActionColor = (action: AuditAction) => {
   switch (action) {
-    case "create":
-      return "bg-green-100 text-green-800";
-    case "update":
-      return "bg-blue-100 text-blue-800";
     case "delete":
-      return "bg-red-100 text-red-800";
-    case "login":
-    case "logout":
-      return "bg-purple-100 text-purple-800";
-    case "restock":
-      return "bg-teal-100 text-teal-800";
     case "consume":
-      return "bg-orange-100 text-orange-800";
-    case "export":
-    case "import":
-      return "bg-indigo-100 text-indigo-800";
+    case "permission_change":
+    case "settings_change":
+      return "bg-red-100 text-red-700";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-[#e8f0e5] text-[#4a6741]";
   }
 };
 
 const getSeverityIcon = (severity: AuditSeverity) => {
-  switch (severity) {
-    case "critical":
-      return AlertTriangle;
-    case "warning":
-      return Shield;
-    default:
-      return Info;
+  if (severity === "critical") {
+    return AlertTriangle;
   }
+  return Activity;
 };
 
 export default function AuditTrailPage() {
@@ -279,20 +262,22 @@ export default function AuditTrailPage() {
           {/* Stats Cards */}
           {stats ? (
             <div className="grid gap-4 md:grid-cols-3">
-              <Card>
+              <Card className="border-[#4a6741]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     Total Activities
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <Activity className="h-4 w-4 text-[#4a6741]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalLogs}</div>
+                  <div className="text-2xl font-bold text-[#1f3f2c]">
+                    {stats.totalLogs}
+                  </div>
                   <p className="text-xs text-muted-foreground">Last 30 days</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-red-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     Critical Events
@@ -309,15 +294,15 @@ export default function AuditTrailPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-[#4a6741]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     Active Users
                   </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Users className="h-4 w-4 text-[#4a6741]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-[#1f3f2c]">
                     {stats.recentUsers?.length || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -343,8 +328,9 @@ export default function AuditTrailPage() {
           )}
 
           {/* Filters */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative flex-1 max-w-sm">
+          <div className="space-y-3">
+            {/* Search */}
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search activities..."
@@ -353,11 +339,12 @@ export default function AuditTrailPage() {
                   setSearchValue(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-9 h-9"
+                className="pl-9 h-9 w-full"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Filter Dropdowns */}
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
               <Select
                 value={actionFilter}
                 onValueChange={(value) => {
@@ -365,7 +352,7 @@ export default function AuditTrailPage() {
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="h-9 w-[130px]">
+                <SelectTrigger className="h-9 w-full sm:w-[130px]">
                   <SelectValue placeholder="Action" />
                 </SelectTrigger>
                 <SelectContent>
@@ -385,7 +372,7 @@ export default function AuditTrailPage() {
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="h-9 w-[130px]">
+                <SelectTrigger className="h-9 w-full sm:w-[130px]">
                   <SelectValue placeholder="Entity" />
                 </SelectTrigger>
                 <SelectContent>
@@ -405,18 +392,30 @@ export default function AuditTrailPage() {
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="h-9 w-[120px]">
+                <SelectTrigger className="h-9 w-full sm:w-[120px]">
                   <SelectValue placeholder="Severity" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Severity</SelectItem>
-                  <SelectItem value="info">Info</SelectItem>
+                  <SelectItem value="info">Normal</SelectItem>
                   <SelectItem value="warning">Warning</SelectItem>
                   <SelectItem value="critical">Critical</SelectItem>
                 </SelectContent>
               </Select>
 
-              <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-9 w-full sm:w-auto"
+              >
+                Reset
+              </Button>
+            </div>
+
+            {/* Date Filters */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 flex-1">
                 <DatePicker
                   label=""
                   value={startDate}
@@ -424,7 +423,7 @@ export default function AuditTrailPage() {
                     setStartDate(date);
                     setCurrentPage(1);
                   }}
-                  placeholder="From"
+                  placeholder="From date"
                 />
                 <span className="text-muted-foreground text-sm">to</span>
                 <DatePicker
@@ -434,18 +433,9 @@ export default function AuditTrailPage() {
                     setEndDate(date);
                     setCurrentPage(1);
                   }}
-                  placeholder="To"
+                  placeholder="To date"
                 />
               </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleResetFilters}
-                className="h-9 px-3"
-              >
-                Reset
-              </Button>
             </div>
           </div>
 
@@ -489,105 +479,176 @@ export default function AuditTrailPage() {
                 </div>
               ) : (
                 <>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">Timestamp</TableHead>
-                        <TableHead>Activity</TableHead>
-                        <TableHead>User</TableHead>
-                        <TableHead>Action</TableHead>
-                        <TableHead>Severity</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {logs.map((log) => {
-                        const { date, time } = formatTimestamp(log.timestamp);
-                        const EntityIcon = getEntityIcon(log.entity);
-                        const SeverityIcon = getSeverityIcon(log.severity);
-                        const severityConfig =
-                          AUDIT_SEVERITY_CONFIG[log.severity];
+                  {/* Mobile Card View */}
+                  <div className="space-y-3 md:hidden">
+                    {logs.map((log) => {
+                      const { date, time } = formatTimestamp(log.timestamp);
+                      const EntityIcon = getEntityIcon(log.entity);
+                      const severityConfig = AUDIT_SEVERITY_CONFIG[log.severity];
 
-                        return (
-                          <TableRow
-                            key={log.id}
-                            className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => handleViewDetails(log)}
-                          >
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <div className="font-medium text-sm">
-                                    {date}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {time}
-                                  </div>
-                                </div>
+                      return (
+                        <div
+                          key={log.id}
+                          className="border rounded-lg p-4 cursor-pointer hover:bg-muted/50 active:bg-muted transition-colors"
+                          onClick={() => handleViewDetails(log)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              handleViewDetails(log);
+                            }
+                          }}
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`View details for ${log.description}`}
+                        >
+                          {/* Header with icon and badges */}
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e8f0e5] shrink-0">
+                                <EntityIcon className="h-4 w-4 text-[#4a6741]" />
                               </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                                  <EntityIcon className="h-4 w-4" />
-                                </div>
-                                <div>
-                                  <div className="font-medium text-sm">
-                                    {log.description}
-                                  </div>
-                                  {log.entityName && (
-                                    <div className="text-xs text-muted-foreground">
-                                      {AUDIT_ENTITY_LABELS[log.entity]}:{" "}
-                                      {log.entityName}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
-                                  <User className="h-3.5 w-3.5 text-primary" />
-                                </div>
-                                <div>
-                                  <div className="text-sm font-medium">
-                                    {log.userName ||
-                                      log.userEmail.split("@")[0]}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {log.userRole || "User"}
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
                               <Badge
                                 variant="secondary"
                                 className={getActionColor(log.action)}
                               >
                                 {AUDIT_ACTION_LABELS[log.action]}
                               </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant="secondary"
-                                className={`${severityConfig.bgColor} ${severityConfig.color}`}
-                              >
-                                <SeverityIcon className="h-3 w-3 mr-1" />
-                                {severityConfig.label}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="icon">
-                                <ChevronRight className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                            </div>
+                            <Badge
+                              variant="secondary"
+                              className={`${severityConfig.bgColor} ${severityConfig.color} shrink-0`}
+                            >
+                              {severityConfig.label}
+                            </Badge>
+                          </div>
+
+                          {/* Description */}
+                          <p className="font-medium text-sm mb-1 line-clamp-2">
+                            {log.description}
+                          </p>
+                          {log.entityName && (
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {AUDIT_ENTITY_LABELS[log.entity]}: {log.entityName}
+                            </p>
+                          )}
+
+                          {/* Footer with user and time */}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                            <div className="flex items-center gap-1.5">
+                              <User className="h-3 w-3" />
+                              <span>{log.userName || log.userEmail.split("@")[0]}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{date}, {time}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[180px]">Timestamp</TableHead>
+                          <TableHead>Activity</TableHead>
+                          <TableHead className="hidden lg:table-cell">User</TableHead>
+                          <TableHead>Action</TableHead>
+                          <TableHead className="hidden xl:table-cell">Severity</TableHead>
+                          <TableHead className="w-[50px]"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {logs.map((log) => {
+                          const { date, time } = formatTimestamp(log.timestamp);
+                          const EntityIcon = getEntityIcon(log.entity);
+                          const SeverityIcon = getSeverityIcon(log.severity);
+                          const severityConfig =
+                            AUDIT_SEVERITY_CONFIG[log.severity];
+
+                          return (
+                            <TableRow
+                              key={log.id}
+                              className="cursor-pointer hover:bg-muted/50"
+                              onClick={() => handleViewDetails(log)}
+                            >
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-muted-foreground hidden lg:block" />
+                                  <div>
+                                    <div className="font-medium text-sm">
+                                      {date}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {time}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e8f0e5] shrink-0">
+                                    <EntityIcon className="h-4 w-4 text-[#4a6741]" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-medium text-sm truncate max-w-[200px] lg:max-w-[300px]">
+                                      {log.description}
+                                    </div>
+                                    {log.entityName && (
+                                      <div className="text-xs text-muted-foreground truncate">
+                                        {AUDIT_ENTITY_LABELS[log.entity]}:{" "}
+                                        {log.entityName}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="hidden lg:table-cell">
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 shrink-0">
+                                    <User className="h-3.5 w-3.5 text-primary" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="text-sm font-medium truncate">
+                                      {log.userName ||
+                                        log.userEmail.split("@")[0]}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {log.userRole || "User"}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant="secondary"
+                                  className={getActionColor(log.action)}
+                                >
+                                  {AUDIT_ACTION_LABELS[log.action]}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="hidden xl:table-cell">
+                                <Badge
+                                  variant="secondary"
+                                  className={`${severityConfig.bgColor} ${severityConfig.color}`}
+                                >
+                                  <SeverityIcon className="h-3 w-3 mr-1" />
+                                  {severityConfig.label}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Button variant="ghost" size="icon">
+                                  <ChevronRight className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
 
                   {totalPages > 1 && (
                     <div className="mt-4">
@@ -607,7 +668,7 @@ export default function AuditTrailPage() {
 
           {/* Detail Dialog */}
           <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-hidden">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
@@ -619,12 +680,12 @@ export default function AuditTrailPage() {
               </DialogHeader>
 
               {selectedLog && (
-                <ScrollArea className="max-h-[60vh]">
-                  <div className="space-y-6 pr-4">
+                <ScrollArea className="max-h-[calc(90vh-120px)] sm:max-h-[60vh]">
+                  <div className="space-y-4 sm:space-y-6 pr-4">
                     {/* Header Info */}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-base sm:text-lg break-words">
                           {selectedLog.description}
                         </h3>
                         <p className="text-sm text-muted-foreground">
@@ -634,18 +695,16 @@ export default function AuditTrailPage() {
                       </div>
                       <Badge
                         variant="secondary"
-                        className={
-                          AUDIT_SEVERITY_CONFIG[selectedLog.severity].bgColor +
-                          " " +
-                          AUDIT_SEVERITY_CONFIG[selectedLog.severity].color
-                        }
+                        className={`shrink-0 w-fit ${
+                          AUDIT_SEVERITY_CONFIG[selectedLog.severity].bgColor
+                        } ${AUDIT_SEVERITY_CONFIG[selectedLog.severity].color}`}
                       >
                         {AUDIT_SEVERITY_CONFIG[selectedLog.severity].label}
                       </Badge>
                     </div>
 
                     {/* Details Grid */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Action</p>
                         <Badge
@@ -666,10 +725,10 @@ export default function AuditTrailPage() {
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">User</p>
                         <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 shrink-0">
                             <User className="h-3 w-3 text-primary" />
                           </div>
-                          <span className="font-medium">
+                          <span className="font-medium text-sm break-all">
                             {selectedLog.userName || selectedLog.userEmail}
                           </span>
                         </div>
@@ -683,11 +742,11 @@ export default function AuditTrailPage() {
                       </div>
 
                       {selectedLog.entityId && (
-                        <div className="space-y-1">
+                        <div className="space-y-1 col-span-1 sm:col-span-2">
                           <p className="text-sm text-muted-foreground">
                             Entity ID
                           </p>
-                          <code className="text-xs bg-muted px-2 py-1 rounded">
+                          <code className="text-xs bg-muted px-2 py-1 rounded break-all block">
                             {selectedLog.entityId}
                           </code>
                         </div>
@@ -698,7 +757,7 @@ export default function AuditTrailPage() {
                           <p className="text-sm text-muted-foreground">
                             Entity Name
                           </p>
-                          <p className="font-medium">
+                          <p className="font-medium break-words">
                             {selectedLog.entityName}
                           </p>
                         </div>
@@ -710,7 +769,39 @@ export default function AuditTrailPage() {
                       selectedLog.details.changes.length > 0 && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-sm">Changes Made</h4>
-                          <div className="rounded-lg border">
+                          {/* Mobile: Stack view */}
+                          <div className="space-y-3 sm:hidden">
+                            {selectedLog.details.changes.map((change, index) => (
+                              <div
+                                key={index}
+                                className="border rounded-lg p-3 space-y-2"
+                              >
+                                <p className="font-medium text-sm">
+                                  {change.field}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">
+                                      Old
+                                    </p>
+                                    <p className="text-red-600 break-words">
+                                      {String(change.oldValue ?? "-")}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">
+                                      New
+                                    </p>
+                                    <p className="text-green-600 break-words">
+                                      {String(change.newValue ?? "-")}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Desktop: Table view */}
+                          <div className="hidden sm:block rounded-lg border overflow-x-auto">
                             <Table>
                               <TableHeader>
                                 <TableRow>
@@ -726,10 +817,10 @@ export default function AuditTrailPage() {
                                       <TableCell className="font-medium">
                                         {change.field}
                                       </TableCell>
-                                      <TableCell className="text-red-600">
+                                      <TableCell className="text-red-600 break-words max-w-[150px]">
                                         {String(change.oldValue ?? "-")}
                                       </TableCell>
-                                      <TableCell className="text-green-600">
+                                      <TableCell className="text-green-600 break-words max-w-[150px]">
                                         {String(change.newValue ?? "-")}
                                       </TableCell>
                                     </TableRow>
@@ -754,7 +845,7 @@ export default function AuditTrailPage() {
                           </div>
                         )}
                         {selectedLog.userAgent && (
-                          <div className="text-xs">
+                          <div className="text-xs break-all">
                             <span className="text-muted-foreground">
                               User Agent:{" "}
                             </span>

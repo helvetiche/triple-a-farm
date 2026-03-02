@@ -108,14 +108,14 @@ export const AUDIT_SEVERITY_CONFIG: Record<
   { label: string; color: string; bgColor: string }
 > = {
   info: {
-    label: "Info",
-    color: "text-blue-700",
-    bgColor: "bg-blue-100",
+    label: "Normal",
+    color: "text-[#4a6741]",
+    bgColor: "bg-[#e8f0e5]",
   },
   warning: {
     label: "Warning",
-    color: "text-yellow-700",
-    bgColor: "bg-yellow-100",
+    color: "text-[#4a6741]",
+    bgColor: "bg-[#e8f0e5]",
   },
   critical: {
     label: "Critical",
