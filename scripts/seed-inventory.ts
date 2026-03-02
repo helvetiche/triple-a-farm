@@ -3,12 +3,11 @@
  * Run with: npx tsx scripts/seed-inventory.ts
  */
 
-import "dotenv/config";
 import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
+import * as path from "path";
 
-import { adminDb } from "../lib/firebase";
-import { calculateInventoryStatus, formatInventoryDisplayId } from "../lib/inventory-types";
+// Load env before importing firebase
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 const INVENTORY_COLLECTION = "inventoryItems";
 const LOCATIONS_COLLECTION = "farm_locations";
@@ -122,29 +121,29 @@ const inventoryTemplates = [
   },
 ];
 
-async function getLocations(): Promise<FarmLocation[]> {
-  const snapshot = await adminDb.collection(LOCATIONS_COLLECTION).get();
-  
-  return snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      locationId: data.locationId || doc.id,
-      name: data.name || "",
-      address: data.address || "",
-    };
-  });
-}
-
 function randomizeStock(baseStock: number): number {
   const variance = Math.floor(baseStock * 0.3);
   return baseStock + Math.floor(Math.random() * variance * 2) - variance;
 }
 
 async function seedInventory() {
+  // Dynamic import after env is loaded
+  const { adminDb } = await import("../lib/firebase");
+  const { calculateInventoryStatus, formatInventoryDisplayId } = await import("../lib/inventory-types");
+
   console.log("Starting inventory seeding...\n");
 
   try {
-    const locations = await getLocations();
+    const locationsSnapshot = await adminDb.collection(LOCATIONS_COLLECTION).get();
+    
+    const locations: FarmLocation[] = locationsSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        locationId: data.locationId || doc.id,
+        name: data.name || "",
+        address: data.address || "",
+      };
+    });
 
     if (locations.length === 0) {
       console.log("No farm locations found. Please create locations first.");
