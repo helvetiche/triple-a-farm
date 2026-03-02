@@ -112,7 +112,10 @@ export function Pagination({
           {getMobilePageNumbers().map((page, index) => {
             if (page === "ellipsis") {
               return (
-                <span key={`ellipsis-${index}`} className="px-1 text-[#4a6741] text-sm">
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-1 text-[#4a6741] text-sm"
+                >
                   ...
                 </span>
               );

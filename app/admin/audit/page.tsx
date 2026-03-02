@@ -484,7 +484,8 @@ export default function AuditTrailPage() {
                     {logs.map((log) => {
                       const { date, time } = formatTimestamp(log.timestamp);
                       const EntityIcon = getEntityIcon(log.entity);
-                      const severityConfig = AUDIT_SEVERITY_CONFIG[log.severity];
+                      const severityConfig =
+                        AUDIT_SEVERITY_CONFIG[log.severity];
 
                       return (
                         <div
@@ -527,7 +528,8 @@ export default function AuditTrailPage() {
                           </p>
                           {log.entityName && (
                             <p className="text-xs text-muted-foreground mb-2">
-                              {AUDIT_ENTITY_LABELS[log.entity]}: {log.entityName}
+                              {AUDIT_ENTITY_LABELS[log.entity]}:{" "}
+                              {log.entityName}
                             </p>
                           )}
 
@@ -535,11 +537,15 @@ export default function AuditTrailPage() {
                           <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
                             <div className="flex items-center gap-1.5">
                               <User className="h-3 w-3" />
-                              <span>{log.userName || log.userEmail.split("@")[0]}</span>
+                              <span>
+                                {log.userName || log.userEmail.split("@")[0]}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              <span>{date}, {time}</span>
+                              <span>
+                                {date}, {time}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -554,9 +560,13 @@ export default function AuditTrailPage() {
                         <TableRow>
                           <TableHead className="w-[180px]">Timestamp</TableHead>
                           <TableHead>Activity</TableHead>
-                          <TableHead className="hidden lg:table-cell">User</TableHead>
+                          <TableHead className="hidden lg:table-cell">
+                            User
+                          </TableHead>
                           <TableHead>Action</TableHead>
-                          <TableHead className="hidden xl:table-cell">Severity</TableHead>
+                          <TableHead className="hidden xl:table-cell">
+                            Severity
+                          </TableHead>
                           <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -771,34 +781,36 @@ export default function AuditTrailPage() {
                           <h4 className="font-medium text-sm">Changes Made</h4>
                           {/* Mobile: Stack view */}
                           <div className="space-y-3 sm:hidden">
-                            {selectedLog.details.changes.map((change, index) => (
-                              <div
-                                key={index}
-                                className="border rounded-lg p-3 space-y-2"
-                              >
-                                <p className="font-medium text-sm">
-                                  {change.field}
-                                </p>
-                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                  <div>
-                                    <p className="text-xs text-muted-foreground mb-1">
-                                      Old
-                                    </p>
-                                    <p className="text-red-600 break-words">
-                                      {String(change.oldValue ?? "-")}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-muted-foreground mb-1">
-                                      New
-                                    </p>
-                                    <p className="text-green-600 break-words">
-                                      {String(change.newValue ?? "-")}
-                                    </p>
+                            {selectedLog.details.changes.map(
+                              (change, index) => (
+                                <div
+                                  key={index}
+                                  className="border rounded-lg p-3 space-y-2"
+                                >
+                                  <p className="font-medium text-sm">
+                                    {change.field}
+                                  </p>
+                                  <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">
+                                        Old
+                                      </p>
+                                      <p className="text-red-600 break-words">
+                                        {String(change.oldValue ?? "-")}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">
+                                        New
+                                      </p>
+                                      <p className="text-green-600 break-words">
+                                        {String(change.newValue ?? "-")}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
+                              )
+                            )}
                           </div>
                           {/* Desktop: Table view */}
                           <div className="hidden sm:block rounded-lg border overflow-x-auto">
