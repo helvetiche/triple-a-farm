@@ -1,6 +1,13 @@
 /**
  * Seed script to add inventory items for each farm location
- * Run with: npx tsx scripts/seed-inventory.ts
+ *
+ * Usage:
+ *   npm run seed:inventory         # Add inventory (keeps existing)
+ *   npm run seed:inventory:fresh   # Clear existing and seed fresh
+ *
+ * Or directly:
+ *   npx tsx scripts/seed-inventory.ts
+ *   npx tsx scripts/seed-inventory.ts --clear
  */
 
 import * as dotenv from "dotenv";
@@ -19,106 +26,314 @@ interface FarmLocation {
 }
 
 const inventoryTemplates = [
+  // ===== FEEDS =====
   {
-    name: "Premium Gamefowl Pellets",
+    name: "B-MEG Integra Power Maxx",
     category: "Feed",
-    currentStock: 150,
-    minStock: 50,
+    currentStock: 45,
+    minStock: 20,
+    maxStock: 100,
     unit: "sacks",
-    supplier: "AgriFeeds Corp",
-    price: 1250,
+    supplier: "San Miguel Foods (B-MEG)",
+    price: 1850,
     description:
-      "High-protein pellets formulated for gamefowl conditioning and growth.",
+      "Premium conditioning pellet for gamebirds with high protein content for muscle development and peak performance.",
   },
   {
-    name: "Vitamin B Complex",
+    name: "Salto Power Pellet",
+    category: "Feed",
+    currentStock: 30,
+    minStock: 15,
+    maxStock: 80,
+    unit: "sacks",
+    supplier: "Salto Philippines",
+    price: 1650,
+    description:
+      "Fat-burning conditioning pellet with HYPERFLEX formula for stronger power and faster reflex. For gamefowls 16 months and above.",
+  },
+  {
+    name: "Sagupaan Hi-Protein Booster",
+    category: "Feed",
+    currentStock: 25,
+    minStock: 10,
+    maxStock: 60,
+    unit: "sacks",
+    supplier: "Sagupaan Superfeeds",
+    price: 1450,
+    description:
+      "Winning Line hi-protein power booster pellets formulated for gamefowl conditioning and muscle building.",
+  },
+  {
+    name: "B-MEG Integra 3000 Plus",
+    category: "Feed",
+    currentStock: 60,
+    minStock: 25,
+    maxStock: 120,
+    unit: "sacks",
+    supplier: "San Miguel Foods (B-MEG)",
+    price: 1350,
+    description:
+      "Mixed pellet and grains with balanced nutrition for daily maintenance of fighting cocks.",
+  },
+
+  // ===== VITAMINS & SUPPLEMENTS =====
+  {
+    name: "Lakpue Vitavet Plus",
+    category: "Supplements",
+    currentStock: 35,
+    minStock: 15,
+    maxStock: 80,
+    unit: "jars",
+    supplier: "Lakpue Drug Inc.",
+    price: 485,
+    description:
+      "Egg and cockerel booster with highly concentrated multivitamins and amino acids. Available in 100g jars.",
+  },
+  {
+    name: "LDI B12 5500",
+    category: "Supplements",
+    currentStock: 50,
+    minStock: 20,
+    maxStock: 100,
+    unit: "bottles",
+    supplier: "Lakpue Drug Inc.",
+    price: 320,
+    description:
+      "Injectable Vitamin B12 with Cyanocobalamin and Hydroxocobalamine for conditioning and stamina boost.",
+  },
+  {
+    name: "Belamyl B-Complex",
+    category: "Supplements",
+    currentStock: 40,
+    minStock: 15,
+    maxStock: 80,
+    unit: "boxes",
+    supplier: "Vetklix II",
+    price: 280,
+    description:
+      "Vitamin B Complex with Liver Extract (10ml). Essential for gamefowl rooster conditioning and recovery.",
+  },
+  {
+    name: "Battlecock VitminPRO",
+    category: "Supplements",
+    currentStock: 20,
+    minStock: 10,
+    maxStock: 50,
+    unit: "packs",
+    supplier: "Battlecock Products",
+    price: 600,
+    description:
+      "Water-soluble vitamins, minerals, amino acids, and probiotics (1kg). For maintenance and conditioning periods.",
+  },
+  {
+    name: "Multi-Lyte Electrolytes",
     category: "Supplements",
     currentStock: 45,
     minStock: 20,
-    unit: "bottles",
-    supplier: "VetMed Supply",
-    price: 320,
-    description: "Essential B vitamins for energy and metabolism support.",
+    maxStock: 100,
+    unit: "sachets",
+    supplier: "Lakpue Drug Inc.",
+    price: 85,
+    description:
+      "Electrolyte powder for rehydration, stress recovery, and hot weather conditioning.",
   },
   {
-    name: "Electrolyte Powder",
+    name: "Laktamino XE",
     category: "Supplements",
+    currentStock: 25,
+    minStock: 10,
+    maxStock: 60,
+    unit: "bottles",
+    supplier: "Lakpue Drug Inc.",
+    price: 520,
+    description:
+      "Amino acid supplement for muscle development and faster recovery after fights.",
+  },
+
+  // ===== MEDICINE =====
+  {
+    name: "Sulpar QR Tablets",
+    category: "Medicine",
     currentStock: 30,
     minStock: 15,
+    maxStock: 60,
     unit: "boxes",
-    supplier: "VetMed Supply",
-    price: 180,
-    description: "Rehydration formula for stress recovery and hot weather.",
+    supplier: "Battlecock Products",
+    price: 380,
+    description:
+      "Antibiotic with Sulfadiazine and Paracetamol. Treats coccidiosis, fowl typhoid, and fowl cholera. 1 tablet daily for 3 days.",
   },
   {
-    name: "Antibacterial Solution",
-    category: "Medicine",
-    currentStock: 12,
-    minStock: 10,
-    unit: "bottles",
-    supplier: "VetMed Supply",
-    price: 450,
-    description: "Broad-spectrum antibacterial for wound treatment.",
-  },
-  {
-    name: "Deworming Tablets",
-    category: "Medicine",
-    currentStock: 8,
-    minStock: 15,
-    unit: "boxes",
-    supplier: "VetMed Supply",
-    price: 280,
-    description: "Internal parasite control tablets.",
-  },
-  {
-    name: "Wound Spray",
+    name: "Vermex 4 Dewormer",
     category: "Medicine",
     currentStock: 25,
     minStock: 10,
-    unit: "bottles",
-    supplier: "VetMed Supply",
-    price: 195,
-    description: "Antiseptic spray for minor cuts and abrasions.",
+    maxStock: 50,
+    unit: "boxes",
+    supplier: "Lakpue Drug Inc.",
+    price: 295,
+    description:
+      "Broad-spectrum dewormer with Niclosamide, Levamisole, Albendazole, and Praziquantel. Effective against tapeworms, roundworms, and gapeworms.",
   },
   {
-    name: "Disinfectant Concentrate",
-    category: "Cleaning",
+    name: "Coxiban Anticoccidial",
+    category: "Medicine",
     currentStock: 18,
     minStock: 8,
-    unit: "liters",
-    supplier: "CleanPro Solutions",
-    price: 520,
-    description: "Heavy-duty disinfectant for pen and equipment sanitation.",
+    maxStock: 40,
+    unit: "sachets",
+    supplier: "Lakpue Drug Inc.",
+    price: 165,
+    description:
+      "Amprolium Hydrochloride for treating and preventing coccidiosis. 5g per 4L water for 3-7 days.",
   },
   {
-    name: "Leg Bands (Assorted)",
+    name: "Red Gel Forte Plus",
+    category: "Medicine",
+    currentStock: 22,
+    minStock: 10,
+    maxStock: 50,
+    unit: "tubes",
+    supplier: "Lakpue Drug Inc.",
+    price: 245,
+    description:
+      "Wound healing gel with antibacterial properties. For cuts, abrasions, and post-fight recovery.",
+  },
+  {
+    name: "Thiabex XS",
+    category: "Medicine",
+    currentStock: 15,
+    minStock: 8,
+    maxStock: 35,
+    unit: "bottles",
+    supplier: "Lakpue Drug Inc.",
+    price: 420,
+    description:
+      "Anti-parasitic solution for external parasites, lice, and mites. Keeps feathers healthy and clean.",
+  },
+
+  // ===== CLEANING & BIOSECURITY =====
+  {
+    name: "Virkon S Disinfectant",
+    category: "Cleaning",
+    currentStock: 12,
+    minStock: 5,
+    maxStock: 30,
+    unit: "packs",
+    supplier: "LANXESS (Virkon)",
+    price: 1850,
+    description:
+      "Broad-spectrum disinfectant effective against 500+ viruses, bacteria, and fungi including Avian Influenza and Newcastle Disease. 1kg pack.",
+  },
+  {
+    name: "Clorox Bleach",
+    category: "Cleaning",
+    currentStock: 25,
+    minStock: 10,
+    maxStock: 50,
+    unit: "gallons",
+    supplier: "Clorox Philippines",
+    price: 285,
+    description:
+      "Multi-purpose bleach for pen sanitation, water treatment, and equipment disinfection.",
+  },
+
+  // ===== EQUIPMENT & ACCESSORIES =====
+  {
+    name: "Aluminum Leg Bands",
+    category: "Equipment",
+    currentStock: 300,
+    minStock: 100,
+    maxStock: 600,
+    unit: "pieces",
+    supplier: "Pintakasi Gamefowl Supply",
+    price: 12,
+    description:
+      "Numbered aluminum leg bands for rooster identification and record-keeping. Assorted colors available.",
+  },
+  {
+    name: "Wing Bands",
     category: "Equipment",
     currentStock: 200,
-    minStock: 100,
+    minStock: 80,
+    maxStock: 400,
     unit: "pieces",
-    supplier: "Farm Supply Co",
-    price: 15,
-    description: "Colored leg bands for identification.",
+    supplier: "Renesance Tech",
+    price: 18,
+    description:
+      "Durable wing bands for permanent identification. Numbered and color-coded.",
   },
   {
-    name: "Feeding Troughs",
+    name: "Gaffing Tape",
+    category: "Equipment",
+    currentStock: 50,
+    minStock: 20,
+    maxStock: 100,
+    unit: "rolls",
+    supplier: "Pintakasi Gamefowl Supply",
+    price: 85,
+    description:
+      "High-quality gaffing tape for securing tari. Available in red, yellow, black, blue, green, and white.",
+  },
+  {
+    name: "Tari Knife Set",
+    category: "Equipment",
+    currentStock: 15,
+    minStock: 5,
+    maxStock: 30,
+    unit: "sets",
+    supplier: "Kampfstahl",
+    price: 2800,
+    description:
+      "Semi-full slasher tari knives set (12 pieces). Premium steel for durability and sharpness.",
+  },
+  {
+    name: "Plastic Feeders",
+    category: "Equipment",
+    currentStock: 40,
+    minStock: 15,
+    maxStock: 80,
+    unit: "pieces",
+    supplier: "Prime Feathers Corp",
+    price: 95,
+    description:
+      "Durable plastic hanging feeders for gamefowl pens. Easy to clean and refill.",
+  },
+  {
+    name: "Bell Drinkers",
     category: "Equipment",
     currentStock: 35,
-    minStock: 20,
+    minStock: 15,
+    maxStock: 70,
     unit: "pieces",
-    supplier: "Farm Supply Co",
-    price: 85,
-    description: "Durable plastic feeding troughs.",
+    supplier: "Prime Feathers Corp",
+    price: 145,
+    description:
+      "Automatic bell drinkers with adjustable water flow. Keeps water clean and accessible.",
   },
   {
-    name: "Water Dispensers",
+    name: "Cord Ties (Marking)",
     category: "Equipment",
-    currentStock: 28,
-    minStock: 15,
+    currentStock: 500,
+    minStock: 200,
+    maxStock: 1000,
     unit: "pieces",
-    supplier: "Farm Supply Co",
-    price: 120,
-    description: "Automatic water dispensers for pens.",
+    supplier: "Pintakasi Gamefowl Supply",
+    price: 5,
+    description:
+      "Colored marking cable ties for temporary rooster identification during conditioning.",
+  },
+  {
+    name: "Digital Weighing Scale",
+    category: "Equipment",
+    currentStock: 5,
+    minStock: 2,
+    maxStock: 10,
+    unit: "units",
+    supplier: "Renesance Tech",
+    price: 1650,
+    description:
+      "Precision digital scale for accurate rooster weighing. Capacity up to 10kg with 1g accuracy.",
   },
 ];
 
@@ -127,15 +342,38 @@ function randomizeStock(baseStock: number): number {
   return baseStock + Math.floor(Math.random() * variance * 2) - variance;
 }
 
+async function clearExistingInventory(adminDb: FirebaseFirestore.Firestore) {
+  console.log("Clearing existing inventory items...");
+  const snapshot = await adminDb.collection(INVENTORY_COLLECTION).get();
+  
+  if (snapshot.empty) {
+    console.log("  No existing items to clear.\n");
+    return;
+  }
+
+  const batch = adminDb.batch();
+  snapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+  await batch.commit();
+  console.log(`  Deleted ${snapshot.size} existing items.\n`);
+}
+
 async function seedInventory() {
   // Dynamic import after env is loaded
   const { adminDb } = await import("../lib/firebase");
   const { calculateInventoryStatus, formatInventoryDisplayId } =
     await import("../lib/inventory-types");
 
+  const shouldClear = process.argv.includes("--clear");
+
   console.log("Starting inventory seeding...\n");
 
   try {
+    if (shouldClear) {
+      await clearExistingInventory(adminDb);
+    }
+
     const locationsSnapshot = await adminDb
       .collection(LOCATIONS_COLLECTION)
       .get();
@@ -190,6 +428,7 @@ async function seedInventory() {
           category: template.category,
           currentStock,
           minStock: template.minStock,
+          maxStock: template.maxStock,
           unit: template.unit,
           supplier: template.supplier,
           price: template.price,
@@ -203,7 +442,7 @@ async function seedInventory() {
 
         await docRef.set(inventoryItem);
         console.log(
-          `  + ${template.name} (${currentStock} ${template.unit}) - ${status}`
+          `  + ${template.name} (${currentStock}/${template.maxStock} ${template.unit}) - ${status}`
         );
         totalCreated++;
       }

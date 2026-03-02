@@ -58,9 +58,14 @@ export function InventoryTable({
     }
   };
 
-  const getStockProgress = (current: number, min: number) => {
-    const percentage = (current / min) * 100;
-    return Math.min(percentage, 100);
+  const getStockProgress = (item: InventoryItem) => {
+    if (item.maxStock && item.maxStock > 0) {
+      return Math.min((item.currentStock / item.maxStock) * 100, 100);
+    }
+    // Fallback: use minStock * 3 as a reasonable "full" reference
+    const referenceMax = item.minStock * 3;
+    if (referenceMax === 0) return 100;
+    return Math.min((item.currentStock / referenceMax) * 100, 100);
   };
 
   if (items.length === 0) {
@@ -155,12 +160,12 @@ export function InventoryTable({
                 <div className="flex items-center justify-between text-sm">
                   <div className="text-[#4a6741]">Stock</div>
                   <div className="text-[#1f3f2c] font-medium">
-                    {item.currentStock} / {item.minStock} {item.unit}
+                    {item.currentStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
                   </div>
                 </div>
                 <div className="mt-2">
                   <Progress
-                    value={getStockProgress(item.currentStock, item.minStock)}
+                    value={getStockProgress(item)}
                     className="h-2"
                   />
                 </div>
@@ -238,14 +243,11 @@ export function InventoryTable({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm">
-                          {item.currentStock} / {item.minStock} {item.unit}
+                          {item.currentStock}{item.maxStock ? ` / ${item.maxStock}` : ""} {item.unit}
                         </span>
                       </div>
                       <Progress
-                        value={getStockProgress(
-                          item.currentStock,
-                          item.minStock
-                        )}
+                        value={getStockProgress(item)}
                         className="h-2"
                       />
                     </div>

@@ -50,17 +50,28 @@ const initializeFirebase = () => {
     return admin.app();
   }
 
-  const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-  if (!serviceAccountBase64) {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is not set");
+  const serviceAccountJson = process.env.NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT;
+  if (!serviceAccountJson) {
+    throw new Error("NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT environment variable is not set");
   }
 
-  const serviceAccount = JSON.parse(
-    Buffer.from(serviceAccountBase64, "base64").toString("utf8")
-  );
+  let serviceAccount: Record<string, unknown>;
+  try {
+    const trimmed = serviceAccountJson.trim();
+    const withoutOuterQuotes =
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+        ? trimmed.slice(1, -1)
+        : trimmed;
+    serviceAccount = JSON.parse(withoutOuterQuotes);
+  } catch {
+    throw new Error("NEXT_PRIVATE_FIREBASE_SERVICE_ACCOUNT is not valid JSON");
+  }
 
   return admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+    projectId: process.env.NEXT_PRIVATE_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PRIVATE_FIREBASE_STORAGE_BUCKET,
   });
 };
 

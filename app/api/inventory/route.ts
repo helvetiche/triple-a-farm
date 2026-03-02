@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       category: body.category,
       currentStock: body.currentStock,
       minStock: body.minStock,
+      maxStock: body.maxStock,
       unit: body.unit,
       supplier: body.supplier,
       price: body.price,

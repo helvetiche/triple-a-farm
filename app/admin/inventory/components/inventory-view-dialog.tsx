@@ -63,12 +63,15 @@ export function InventoryViewDialog({
     }
   };
 
-  const getStockProgress = (current: number, min: number) => {
-    const percentage = (current / min) * 100;
+  const getStockProgress = (current: number, max?: number) => {
+    if (!max || max === 0) return 100;
+    const percentage = (current / max) * 100;
     return Math.min(percentage, 100);
   };
 
-  const stockPercentage = getStockProgress(item.currentStock, item.minStock);
+  const stockPercentage = item.maxStock
+    ? getStockProgress(item.currentStock, item.maxStock)
+    : 100;
   const isLowStock = item.status !== "adequate";
 
   return (
@@ -125,17 +128,26 @@ export function InventoryViewDialog({
                       <span className="text-md font-bold text-[#1f3f2c]">
                         {item.currentStock}
                       </span>
-                      <span className="text-gray-500">/</span>
-                      <span className="text-md text-gray-600">
-                        {item.minStock} {item.unit}
-                      </span>
+                      {item.maxStock && (
+                        <>
+                          <span className="text-gray-500">/</span>
+                          <span className="text-md text-gray-600">
+                            {item.maxStock}
+                          </span>
+                        </>
+                      )}
+                      <span className="text-md text-gray-600">{item.unit}</span>
                     </div>
                     <p className="text-sm text-[#4a6741] font-medium">
-                      {stockPercentage >= 100
-                        ? "Adequate stock"
-                        : stockPercentage >= 50
-                          ? "Low stock - consider restocking"
-                          : "Critical - restock immediately"}
+                      {item.maxStock
+                        ? stockPercentage >= 100
+                          ? "At maximum capacity"
+                          : stockPercentage >= 50
+                            ? "Adequate stock"
+                            : stockPercentage >= 25
+                              ? "Low stock - consider restocking"
+                              : "Critical - restock immediately"
+                        : "No maximum set"}
                     </p>
                   </div>
                 </div>

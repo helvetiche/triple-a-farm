@@ -131,6 +131,7 @@ export interface CreateInventoryItemInput {
   category: string;
   currentStock: number;
   minStock: number;
+  maxStock?: number;
   unit: string;
   supplier: string;
   price?: number;
@@ -147,6 +148,7 @@ export interface UpdateInventoryItemInput {
   category?: string;
   currentStock?: number;
   minStock?: number;
+  maxStock?: number | null;
   unit?: string;
   supplier?: string;
   price?: number | null;
@@ -173,6 +175,7 @@ const buildInventoryDocFromCreate = (
     category: input.category,
     currentStock,
     minStock,
+    maxStock: input.maxStock,
     unit: input.unit,
     supplier: input.supplier,
     price: input.price,
@@ -213,6 +216,10 @@ const applyUpdateToInventoryItem = (
     input.locationAddress === null
       ? undefined
       : (input.locationAddress ?? existing.locationAddress);
+  const maxStock =
+    input.maxStock === null
+      ? undefined
+      : (input.maxStock ?? existing.maxStock);
 
   const result: Omit<InventoryItem, "id"> = {
     name: input.name ?? existing.name,
@@ -231,6 +238,7 @@ const applyUpdateToInventoryItem = (
     ...(description !== undefined && { description }),
     ...(expiryDate !== undefined && { expiryDate }),
     ...(locationAddress !== undefined && { locationAddress }),
+    ...(maxStock !== undefined && { maxStock }),
   };
 
   return result;
