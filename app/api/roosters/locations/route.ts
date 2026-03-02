@@ -14,7 +14,9 @@ export interface FarmLocation {
   createdBy?: string;
 }
 
-const assertLocationPermission = async (action: "read" | "create" | "update" | "delete") => {
+const assertLocationPermission = async (
+  action: "read" | "create" | "update" | "delete"
+) => {
   const sessionUser = await getSessionUser();
 
   if (!sessionUser) {
@@ -48,7 +50,9 @@ export async function GET() {
   try {
     await assertLocationPermission("read");
 
-    const snapshot = await locationsCollectionRef().orderBy("name", "asc").get();
+    const snapshot = await locationsCollectionRef()
+      .orderBy("name", "asc")
+      .get();
 
     const locations: FarmLocation[] = snapshot.docs.map((doc) => {
       const data = doc.data();
@@ -69,12 +73,20 @@ export async function GET() {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to view locations.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to view locations.",
+          403
+        );
       }
     }
 
     console.error("GET /api/roosters/locations error:", error);
-    return jsonError("LOCATIONS_FETCH_FAILED", "Failed to load locations.", 500);
+    return jsonError(
+      "LOCATIONS_FETCH_FAILED",
+      "Failed to load locations.",
+      500
+    );
   }
 }
 
@@ -95,7 +107,11 @@ export async function POST(request: NextRequest) {
       .get();
 
     if (!existingSnapshot.empty) {
-      return jsonError("LOCATION_EXISTS", "A location with this name already exists.", 409);
+      return jsonError(
+        "LOCATION_EXISTS",
+        "A location with this name already exists.",
+        409
+      );
     }
 
     const newLocation: Omit<FarmLocation, "id"> = {
@@ -108,22 +124,27 @@ export async function POST(request: NextRequest) {
 
     const docRef = await locationsCollectionRef().add(newLocation);
 
-    return jsonSuccess(
-      { id: docRef.id, ...newLocation },
-      { status: 201 }
-    );
+    return jsonSuccess({ id: docRef.id, ...newLocation }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to create locations.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to create locations.",
+          403
+        );
       }
     }
 
     console.error("POST /api/roosters/locations error:", error);
-    return jsonError("LOCATION_CREATE_FAILED", "Failed to create location.", 500);
+    return jsonError(
+      "LOCATION_CREATE_FAILED",
+      "Failed to create location.",
+      500
+    );
   }
 }
 
@@ -159,7 +180,11 @@ export async function PUT(request: NextRequest) {
     );
 
     if (conflictingLocation) {
-      return jsonError("LOCATION_EXISTS", "A location with this name already exists.", 409);
+      return jsonError(
+        "LOCATION_EXISTS",
+        "A location with this name already exists.",
+        409
+      );
     }
 
     const updatedLocation = {
@@ -170,22 +195,27 @@ export async function PUT(request: NextRequest) {
 
     await docRef.update(updatedLocation);
 
-    return jsonSuccess(
-      { id, ...updatedLocation },
-      { status: 200 }
-    );
+    return jsonSuccess({ id, ...updatedLocation }, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to update locations.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to update locations.",
+          403
+        );
       }
     }
 
     console.error("PUT /api/roosters/locations error:", error);
-    return jsonError("LOCATION_UPDATE_FAILED", "Failed to update location.", 500);
+    return jsonError(
+      "LOCATION_UPDATE_FAILED",
+      "Failed to update location.",
+      500
+    );
   }
 }
 
@@ -234,11 +264,19 @@ export async function DELETE(request: NextRequest) {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to delete locations.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to delete locations.",
+          403
+        );
       }
     }
 
     console.error("DELETE /api/roosters/locations error:", error);
-    return jsonError("LOCATION_DELETE_FAILED", "Failed to delete location.", 500);
+    return jsonError(
+      "LOCATION_DELETE_FAILED",
+      "Failed to delete location.",
+      500
+    );
   }
 }

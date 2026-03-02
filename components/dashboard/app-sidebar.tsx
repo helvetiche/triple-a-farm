@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Home,
   Bird,
@@ -8,16 +8,11 @@ import {
   PhilippinePeso,
   BarChart3,
   Star,
-  LifeBuoy,
-  Send,
-  Settings2,
-  Users,
-  Settings,
   Shield,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/dashboard/nav-main"
-import { NavUser } from "@/components/dashboard/nav-user"
+import { NavMain } from "@/components/dashboard/nav-main";
+import { NavUser } from "@/components/dashboard/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +21,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const data = {
   user: {
@@ -74,24 +69,27 @@ const data = {
   ],
   navSecondary: [],
   projects: [],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar
-      className="h-svh!"
-      {...props}
-    >
+    <Sidebar className="h-svh!" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/admin">
                 <div className="flex aspect-square size-8 items-center justify-center">
-                  <img src="/images/logo-png.png" alt="Triple A Gamefarm" className="size-6 object-contain" />
+                  <img
+                    src="/images/logo-png.png"
+                    alt="Triple A Gamefarm"
+                    className="size-6 object-contain"
+                  />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Triple A Gamefarm</span>
+                  <span className="truncate font-medium">
+                    Triple A Gamefarm
+                  </span>
                   <span className="truncate text-xs">Management System</span>
                 </div>
               </a>
@@ -106,5 +104,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

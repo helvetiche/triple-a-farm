@@ -15,9 +15,7 @@ const breedsCollectionRef = () => adminDb.collection(BREEDS_COLLECTION);
 
 export async function GET() {
   try {
-    const snapshot = await breedsCollectionRef()
-      .orderBy("name", "asc")
-      .get();
+    const snapshot = await breedsCollectionRef().orderBy("name", "asc").get();
 
     const breeds: RoosterBreed[] = snapshot.docs.map((doc) => {
       const data = doc.data();

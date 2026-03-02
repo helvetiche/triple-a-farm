@@ -20,7 +20,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limitParam = searchParams.get("limit") || "10";
-    const limit = Math.max(1, Math.min(50, Number.parseInt(limitParam, 10) || 10));
+    const limit = Math.max(
+      1,
+      Math.min(50, Number.parseInt(limitParam, 10) || 10)
+    );
 
     // NOTE:
     // Using `.where('status','==','published').orderBy('date','desc')` requires a composite index.

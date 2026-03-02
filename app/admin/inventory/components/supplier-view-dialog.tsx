@@ -64,7 +64,9 @@ export function SupplierViewDialog({
                   <User className="h-4 w-4 text-[#4a6741] mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">Contact Person</p>
-                    <p className="text-sm font-medium">{supplier.contactPerson}</p>
+                    <p className="text-sm font-medium">
+                      {supplier.contactPerson}
+                    </p>
                   </div>
                 </div>
               )}

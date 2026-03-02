@@ -10,17 +10,25 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { 
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Phone, Book, History as HistoryIcon, TrendingUp, TrendingDown, User, Calendar as CalendarIcon } from "lucide-react";
+import {
+  Phone,
+  Book,
+  History as HistoryIcon,
+  TrendingUp,
+  TrendingDown,
+  User,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,12 +45,7 @@ import {
   PageHeaderAddButton,
   StatCards,
 } from "@/components/dashboard";
-import {
-  Package,
-  AlertTriangle,
-  AlertCircle,
-  Download,
-} from "lucide-react";
+import { Package, AlertTriangle, AlertCircle, Download } from "lucide-react";
 
 // Import modular components
 import {
@@ -71,7 +74,11 @@ import {
 } from "./components";
 
 import { filterInventoryItems, getStatusColor } from "./data/helpers";
-import type { InventoryItem, InventoryStats, InventoryActivity } from "@/lib/inventory-types";
+import type {
+  InventoryItem,
+  InventoryStats,
+  InventoryActivity,
+} from "@/lib/inventory-types";
 import type { Supplier } from "@/lib/supplier-types";
 
 // Import toast utilities
@@ -85,9 +92,8 @@ export const description = "Farm Supply & Inventory Management";
 export default function InventoryPage() {
   // Auth
   const { userData } = useAuth();
-  
+
   // State and settings
-  const [_isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -95,8 +101,12 @@ export default function InventoryPage() {
   const [allActivities, setAllActivities] = useState<InventoryActivity[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
   const [activitySearchValue, setActivitySearchValue] = useState("");
-  const [activityTypeFilter, setActivityTypeFilter] = useState<"all" | "restock" | "consume">("all");
-  const [activityDateFilter, setActivityDateFilter] = useState<"all" | "today" | "week" | "month">("all");
+  const [activityTypeFilter, setActivityTypeFilter] = useState<
+    "all" | "restock" | "consume"
+  >("all");
+  const [activityDateFilter, setActivityDateFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [activityPage, setActivityPage] = useState(1);
   const itemsPerPage = 8;
@@ -110,10 +120,14 @@ export default function InventoryPage() {
   const [isActivityLogDialogOpen, setIsActivityLogDialogOpen] = useState(false);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoadingSuppliers, setIsLoadingSuppliers] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
-  const [isSupplierViewDialogOpen, setIsSupplierViewDialogOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
+    null
+  );
+  const [isSupplierViewDialogOpen, setIsSupplierViewDialogOpen] =
+    useState(false);
   const [isSupplierAddDialogOpen, setIsSupplierAddDialogOpen] = useState(false);
-  const [isSupplierEditDialogOpen, setIsSupplierEditDialogOpen] = useState(false);
+  const [isSupplierEditDialogOpen, setIsSupplierEditDialogOpen] =
+    useState(false);
   const [supplierSearchValue, setSupplierSearchValue] = useState("");
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -129,7 +143,9 @@ export default function InventoryPage() {
 
   // Location state
   const [farmLocations, setFarmLocations] = useState<FarmLocation[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<FarmLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<FarmLocation | null>(
+    null
+  );
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
 
   // Load locations on mount
@@ -141,13 +157,20 @@ export default function InventoryPage() {
         const json = await response.json();
 
         if (response.ok && json?.success) {
-          const locations = (json.data || []).map((loc: { locationId?: string; id?: string; name: string; address?: string }) => ({
-            locationId: loc.locationId || loc.id,
-            name: loc.name,
-            address: loc.address,
-          }));
+          const locations = (json.data || []).map(
+            (loc: {
+              locationId?: string;
+              id?: string;
+              name: string;
+              address?: string;
+            }) => ({
+              locationId: loc.locationId || loc.id,
+              name: loc.name,
+              address: loc.address,
+            })
+          );
           setFarmLocations(locations);
-          
+
           if (locations.length > 0 && !selectedLocation) {
             setSelectedLocation(locations[0]);
           }
@@ -170,8 +193,8 @@ export default function InventoryPage() {
       try {
         setIsDataLoading(true);
 
-        const locationParam = selectedLocation?.locationId 
-          ? `?locationId=${selectedLocation.locationId}` 
+        const locationParam = selectedLocation?.locationId
+          ? `?locationId=${selectedLocation.locationId}`
           : "";
 
         const [itemsResponse, statsResponse] = await Promise.all([
@@ -206,7 +229,6 @@ export default function InventoryPage() {
         toastCRUD.networkError();
       } finally {
         setIsDataLoading(false);
-        setIsLoading(false);
       }
     };
 
@@ -215,8 +237,8 @@ export default function InventoryPage() {
 
   const handleRefreshStats = async () => {
     try {
-      const locationParam = selectedLocation?.locationId 
-        ? `?locationId=${selectedLocation.locationId}` 
+      const locationParam = selectedLocation?.locationId
+        ? `?locationId=${selectedLocation.locationId}`
         : "";
       const response = await fetch(`/api/inventory/stats${locationParam}`);
       const json = await response.json();
@@ -316,7 +338,7 @@ export default function InventoryPage() {
       const activityDate = new Date(activity.performedAt);
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       switch (activityDateFilter) {
         case "today":
           if (activityDate < today) return false;
@@ -456,7 +478,7 @@ export default function InventoryPage() {
     handleRefreshStats();
   };
 
-  const handleItemRestocked = (item: InventoryItem, _restockAmount: number) => {
+  const handleItemRestocked = (item: InventoryItem) => {
     setItems((prev) =>
       prev.map((existing) => (existing.id === item.id ? item : existing))
     );
@@ -467,7 +489,7 @@ export default function InventoryPage() {
     }
   };
 
-  const handleItemConsumed = (item: InventoryItem, _consumeAmount: number) => {
+  const handleItemConsumed = (item: InventoryItem) => {
     setItems((prev) =>
       prev.map((existing) => (existing.id === item.id ? item : existing))
     );
@@ -585,10 +607,14 @@ export default function InventoryPage() {
                     className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                     onClick={() => {
                       try {
-                        const exportedBy = userData 
+                        const exportedBy = userData
                           ? `${userData.firstName} ${userData.lastName} (${userData.email})`
                           : "Unknown";
-                        exportInventoryToExcel(items, stats || undefined, exportedBy);
+                        exportInventoryToExcel(
+                          items,
+                          stats || undefined,
+                          exportedBy
+                        );
                         toast.success(
                           "Inventory report exported successfully!"
                         );
@@ -653,14 +679,18 @@ export default function InventoryPage() {
               )}
 
               {/* Tabs */}
-              <Tabs defaultValue="inventory" className="space-y-4" onValueChange={(value) => {
-                if (value === "activity" && allActivities.length === 0) {
-                  loadAllActivities();
-                }
-                if (value === "suppliers" && suppliers.length === 0) {
-                  loadSuppliers();
-                }
-              }}>
+              <Tabs
+                defaultValue="inventory"
+                className="space-y-4"
+                onValueChange={(value) => {
+                  if (value === "activity" && allActivities.length === 0) {
+                    loadAllActivities();
+                  }
+                  if (value === "suppliers" && suppliers.length === 0) {
+                    loadSuppliers();
+                  }
+                }}
+              >
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="inventory">Inventory</TabsTrigger>
                   <TabsTrigger value="alerts">Stock Alerts</TabsTrigger>
@@ -784,11 +814,15 @@ export default function InventoryPage() {
                               type="text"
                               placeholder="Search by item name, reason, user, or type..."
                               value={activitySearchValue}
-                              onChange={(e) => setActivitySearchValue(e.target.value)}
+                              onChange={(e) =>
+                                setActivitySearchValue(e.target.value)
+                              }
                               className="w-full px-4 py-2 border border-[#3d6c58]/20 focus:outline-none focus:ring-2 focus:ring-[#3d6c58] rounded-none"
                             />
                           </div>
-                          {(activitySearchValue || activityTypeFilter !== "all" || activityDateFilter !== "all") && (
+                          {(activitySearchValue ||
+                            activityTypeFilter !== "all" ||
+                            activityDateFilter !== "all") && (
                             <Button
                               variant="outline"
                               onClick={() => {
@@ -809,17 +843,21 @@ export default function InventoryPage() {
                             </label>
                             <Select
                               value={activityTypeFilter}
-                              onValueChange={(value: "all" | "restock" | "consume") =>
-                                setActivityTypeFilter(value)
-                              }
+                              onValueChange={(
+                                value: "all" | "restock" | "consume"
+                              ) => setActivityTypeFilter(value)}
                             >
                               <SelectTrigger className="w-full rounded-none border-[#3d6c58]/20">
                                 <SelectValue placeholder="All Types" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="all">All Types</SelectItem>
-                                <SelectItem value="restock">Restock Only</SelectItem>
-                                <SelectItem value="consume">Consume Only</SelectItem>
+                                <SelectItem value="restock">
+                                  Restock Only
+                                </SelectItem>
+                                <SelectItem value="consume">
+                                  Consume Only
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -829,9 +867,9 @@ export default function InventoryPage() {
                             </label>
                             <Select
                               value={activityDateFilter}
-                              onValueChange={(value: "all" | "today" | "week" | "month") =>
-                                setActivityDateFilter(value)
-                              }
+                              onValueChange={(
+                                value: "all" | "today" | "week" | "month"
+                              ) => setActivityDateFilter(value)}
                             >
                               <SelectTrigger className="w-full rounded-none border-[#3d6c58]/20">
                                 <SelectValue placeholder="All Time" />
@@ -839,8 +877,12 @@ export default function InventoryPage() {
                               <SelectContent>
                                 <SelectItem value="all">All Time</SelectItem>
                                 <SelectItem value="today">Today</SelectItem>
-                                <SelectItem value="week">Last 7 Days</SelectItem>
-                                <SelectItem value="month">Last 30 Days</SelectItem>
+                                <SelectItem value="week">
+                                  Last 7 Days
+                                </SelectItem>
+                                <SelectItem value="month">
+                                  Last 30 Days
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -864,7 +906,8 @@ export default function InventoryPage() {
                     <CardContent>
                       {isLoadingActivities ? (
                         <TableSkeleton />
-                      ) : filteredActivities.length === 0 && activitySearchValue ? (
+                      ) : filteredActivities.length === 0 &&
+                        activitySearchValue ? (
                         <div className="text-center py-12">
                           <HistoryIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                           <p className="text-gray-600">No activities found</p>
@@ -875,9 +918,12 @@ export default function InventoryPage() {
                       ) : filteredActivities.length === 0 ? (
                         <div className="text-center py-12">
                           <HistoryIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                          <p className="text-gray-600">No activity logs found</p>
+                          <p className="text-gray-600">
+                            No activity logs found
+                          </p>
                           <p className="text-sm text-gray-500 mt-1">
-                            Activity will appear here when items are restocked or consumed
+                            Activity will appear here when items are restocked
+                            or consumed
                           </p>
                         </div>
                       ) : (
@@ -932,7 +978,9 @@ export default function InventoryPage() {
                                               : "text-red-600"
                                           }`}
                                         >
-                                          {activity.type === "restock" ? "+" : "-"}
+                                          {activity.type === "restock"
+                                            ? "+"
+                                            : "-"}
                                           {activity.amount} {activity.unit}
                                         </span>
                                       </TableCell>
@@ -941,24 +989,23 @@ export default function InventoryPage() {
                                       </TableCell>
                                       <TableCell>
                                         <span className="text-sm text-gray-600">
-                                          {activity.previousStock} → {activity.newStock}{" "}
-                                          {activity.unit}
+                                          {activity.previousStock} →{" "}
+                                          {activity.newStock} {activity.unit}
                                         </span>
                                       </TableCell>
                                       <TableCell className="text-sm">
                                         {activity.performedBy}
                                       </TableCell>
                                       <TableCell className="text-sm">
-                                        {new Date(activity.performedAt).toLocaleString(
-                                          "en-US",
-                                          {
-                                            month: "short",
-                                            day: "numeric",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          }
-                                        )}
+                                        {new Date(
+                                          activity.performedAt
+                                        ).toLocaleString("en-US", {
+                                          month: "short",
+                                          day: "numeric",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -1001,7 +1048,9 @@ export default function InventoryPage() {
                                   </div>
                                   <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                      <span className="text-gray-500">Amount:</span>
+                                      <span className="text-gray-500">
+                                        Amount:
+                                      </span>
                                       <span
                                         className={`font-semibold ${
                                           activity.type === "restock"
@@ -1009,19 +1058,25 @@ export default function InventoryPage() {
                                             : "text-red-600"
                                         }`}
                                       >
-                                        {activity.type === "restock" ? "+" : "-"}
+                                        {activity.type === "restock"
+                                          ? "+"
+                                          : "-"}
                                         {activity.amount} {activity.unit}
                                       </span>
                                     </div>
                                     <div className="flex justify-between">
-                                      <span className="text-gray-500">Stock Change:</span>
+                                      <span className="text-gray-500">
+                                        Stock Change:
+                                      </span>
                                       <span className="text-gray-700">
-                                        {activity.previousStock} → {activity.newStock}{" "}
-                                        {activity.unit}
+                                        {activity.previousStock} →{" "}
+                                        {activity.newStock} {activity.unit}
                                       </span>
                                     </div>
                                     <div>
-                                      <span className="text-gray-500">Reason: </span>
+                                      <span className="text-gray-500">
+                                        Reason:{" "}
+                                      </span>
                                       <span className="text-gray-700">
                                         {activity.reason}
                                       </span>
@@ -1033,16 +1088,15 @@ export default function InventoryPage() {
                                     <div className="flex items-center gap-1 text-gray-500">
                                       <CalendarIcon className="h-3 w-3" />
                                       <span>
-                                        {new Date(activity.performedAt).toLocaleString(
-                                          "en-US",
-                                          {
-                                            month: "short",
-                                            day: "numeric",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          }
-                                        )}
+                                        {new Date(
+                                          activity.performedAt
+                                        ).toLocaleString("en-US", {
+                                          month: "short",
+                                          day: "numeric",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
                                       </span>
                                     </div>
                                   </div>
@@ -1051,13 +1105,16 @@ export default function InventoryPage() {
                           </div>
 
                           {/* Pagination */}
-                          {Math.ceil(filteredActivities.length / activitiesPerPage) > 1 && (
+                          {Math.ceil(
+                            filteredActivities.length / activitiesPerPage
+                          ) > 1 && (
                             <Card className="border-[#3d6c58]/20 mt-4">
                               <CardContent className="pt-6">
                                 <Pagination
                                   currentPage={activityPage}
                                   totalPages={Math.ceil(
-                                    filteredActivities.length / activitiesPerPage
+                                    filteredActivities.length /
+                                      activitiesPerPage
                                   )}
                                   onPageChange={setActivityPage}
                                   totalItems={filteredActivities.length}
@@ -1082,7 +1139,9 @@ export default function InventoryPage() {
                             type="text"
                             placeholder="Search suppliers by name, contact, or phone..."
                             value={supplierSearchValue}
-                            onChange={(e) => setSupplierSearchValue(e.target.value)}
+                            onChange={(e) =>
+                              setSupplierSearchValue(e.target.value)
+                            }
                             className="w-full px-4 py-2 border border-[#3d6c58]/20 focus:outline-none focus:ring-2 focus:ring-[#3d6c58] rounded-none"
                           />
                         </div>
@@ -1122,15 +1181,19 @@ export default function InventoryPage() {
                       ) : suppliers.length === 0 && !supplierSearchValue ? (
                         <NoSuppliersState />
                       ) : suppliers.filter((supplier) => {
-                        if (!supplierSearchValue) return true;
-                        const searchLower = supplierSearchValue.toLowerCase();
-                        return (
-                          supplier.name.toLowerCase().includes(searchLower) ||
-                          supplier.phone.toLowerCase().includes(searchLower) ||
-                          supplier.contactPerson?.toLowerCase().includes(searchLower) ||
-                          supplier.email?.toLowerCase().includes(searchLower)
-                        );
-                      }).length === 0 ? (
+                          if (!supplierSearchValue) return true;
+                          const searchLower = supplierSearchValue.toLowerCase();
+                          return (
+                            supplier.name.toLowerCase().includes(searchLower) ||
+                            supplier.phone
+                              .toLowerCase()
+                              .includes(searchLower) ||
+                            supplier.contactPerson
+                              ?.toLowerCase()
+                              .includes(searchLower) ||
+                            supplier.email?.toLowerCase().includes(searchLower)
+                          );
+                        }).length === 0 ? (
                         <div className="text-center py-12">
                           <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                           <p className="text-gray-600">No suppliers found</p>
@@ -1143,16 +1206,28 @@ export default function InventoryPage() {
                           {suppliers
                             .filter((supplier) => {
                               if (!supplierSearchValue) return true;
-                              const searchLower = supplierSearchValue.toLowerCase();
+                              const searchLower =
+                                supplierSearchValue.toLowerCase();
                               return (
-                                supplier.name.toLowerCase().includes(searchLower) ||
-                                supplier.phone.toLowerCase().includes(searchLower) ||
-                                supplier.contactPerson?.toLowerCase().includes(searchLower) ||
-                                supplier.email?.toLowerCase().includes(searchLower)
+                                supplier.name
+                                  .toLowerCase()
+                                  .includes(searchLower) ||
+                                supplier.phone
+                                  .toLowerCase()
+                                  .includes(searchLower) ||
+                                supplier.contactPerson
+                                  ?.toLowerCase()
+                                  .includes(searchLower) ||
+                                supplier.email
+                                  ?.toLowerCase()
+                                  .includes(searchLower)
                               );
                             })
                             .map((supplier) => (
-                              <Card key={supplier.id} className="border-[#3d6c58]/20">
+                              <Card
+                                key={supplier.id}
+                                className="border-[#3d6c58]/20"
+                              >
                                 <CardHeader className="pb-3">
                                   <CardTitle className="text-base text-[#1f3f2c]">
                                     {supplier.name}
@@ -1187,7 +1262,9 @@ export default function InventoryPage() {
                                     variant="outline"
                                     size="sm"
                                     className="w-full border-[#3d6c58]/20"
-                                    onClick={() => handleViewSupplier(supplier.id)}
+                                    onClick={() =>
+                                      handleViewSupplier(supplier.id)
+                                    }
                                   >
                                     View Details
                                   </Button>

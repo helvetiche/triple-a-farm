@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import type { Rooster } from '@/app/admin/data/roosters';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import type { Rooster } from "@/app/admin/data/roosters";
 
 export function RoosterPreview() {
   const [roosters, setRoosters] = useState<Rooster[]>([]);
@@ -14,17 +14,17 @@ export function RoosterPreview() {
   useEffect(() => {
     const fetchRoosters = async () => {
       try {
-        const response = await fetch('/api/public/roosters');
+        const response = await fetch("/api/public/roosters");
         const result = await response.json();
         if (result.success) {
           // Get only available roosters and limit to 4
           const availableRoosters = (result.data || [])
-            .filter((r: Rooster) => r.status === 'Available')
+            .filter((r: Rooster) => r.status === "Available")
             .slice(0, 4);
           setRoosters(availableRoosters);
         }
       } catch (error) {
-        console.error('Error fetching roosters:', error);
+        console.error("Error fetching roosters:", error);
       } finally {
         setIsLoading(false);
       }
@@ -46,7 +46,10 @@ export function RoosterPreview() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-100 rounded-none h-80 animate-pulse" />
+              <div
+                key={i}
+                className="bg-gray-100 rounded-none h-80 animate-pulse"
+              />
             ))}
           </div>
         </div>
@@ -83,7 +86,7 @@ export function RoosterPreview() {
                   src={
                     rooster.image ||
                     rooster.images?.[0] ||
-                    '/images/roosters/rooster-sample.jpg'
+                    "/images/roosters/rooster-sample.jpg"
                   }
                   alt={`${rooster.breed} - ${rooster.id}`}
                   fill
@@ -102,7 +105,9 @@ export function RoosterPreview() {
                       className="object-contain"
                     />
                   </div>
-                  <span className="text-xs text-gray-500 font-medium">Triple A Gamefarm</span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Triple A Gamefarm
+                  </span>
                 </div>
                 <h3 className="text-xl font-bold text-[#3d6c58] mb-2">
                   {rooster.breed}

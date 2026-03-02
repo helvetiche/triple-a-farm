@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart3 } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BarChart3 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -10,32 +16,32 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell
-} from "recharts"
+  Cell,
+} from "recharts";
 
 interface BarChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-    color?: string
-  }>
-  height?: number
+    label: string;
+    value: number;
+    color?: string;
+  }>;
+  height?: number;
 }
 
-export function SimpleBarChart({ 
-  title, 
-  description, 
-  data, 
-  height = 256 
+export function SimpleBarChart({
+  title,
+  description,
+  data,
+  height = 256,
 }: BarChartProps) {
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     name: item.label,
     value: item.value,
-    fill: item.color || '#3d6c58'
-  }))
-  
+    fill: item.color || "#3d6c58",
+  }));
+
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -47,24 +53,27 @@ export function SimpleBarChart({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <YAxis 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <YAxis
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 0
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 0,
               }}
-              labelStyle={{ color: '#1f3f2c', fontWeight: 'bold' }}
+              labelStyle={{ color: "#1f3f2c", fontWeight: "bold" }}
             />
             <Bar dataKey="value" radius={[0, 0, 0, 0]}>
               {chartData.map((entry, index) => (
@@ -75,31 +84,31 @@ export function SimpleBarChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface HorizontalBarChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-    percentage?: number
-    color?: string
-  }>
+    label: string;
+    value: number;
+    percentage?: number;
+    color?: string;
+  }>;
 }
 
-export function HorizontalBarChart({ 
-  title, 
-  description, 
-  data 
+export function HorizontalBarChart({
+  title,
+  description,
+  data,
 }: HorizontalBarChartProps) {
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     name: item.label,
     sales: item.value,
-    fill: item.color || '#3d6c58'
-  }))
-  
+    fill: item.color || "#3d6c58",
+  }));
+
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -114,29 +123,26 @@ export function HorizontalBarChart({
             margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis 
-              type="number" 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <XAxis
+              type="number"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <YAxis 
-              dataKey="name" 
-              type="category" 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <YAxis
+              dataKey="name"
+              type="category"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
               width={80}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 0
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 0,
               }}
             />
-            <Bar 
-              dataKey="sales" 
-              radius={[0, 0, 0, 0]}
-            >
+            <Bar dataKey="sales" radius={[0, 0, 0, 0]}>
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
@@ -145,5 +151,5 @@ export function HorizontalBarChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

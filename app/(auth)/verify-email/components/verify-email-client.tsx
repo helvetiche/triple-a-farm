@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function VerifyEmailClient() {
   const router = useRouter();
@@ -13,14 +13,14 @@ export function VerifyEmailClient() {
     const handleEmailVerification = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
-        const oobCode = urlParams.get('oobCode');
+        const mode = urlParams.get("mode");
+        const oobCode = urlParams.get("oobCode");
 
-        if (mode === 'verifyEmail' && oobCode) {
-          const response = await fetch('/api/auth/verify-email', {
-            method: 'POST',
+        if (mode === "verifyEmail" && oobCode) {
+          const response = await fetch("/api/auth/verify-email", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({ oobCode }),
           });
@@ -29,23 +29,22 @@ export function VerifyEmailClient() {
 
           if (!response.ok || !result?.success) {
             throw new Error(
-              result?.error?.message || 'Failed to verify email.'
+              result?.error?.message || "Failed to verify email."
             );
           }
 
-          toast.success('Email verified successfully! You can now login.');
-          router.push('/login');
+          toast.success("Email verified successfully! You can now login.");
+          router.push("/login");
           return;
         }
 
-        toast.error('Invalid or expired verification link.');
-        router.push('/login');
-        
+        toast.error("Invalid or expired verification link.");
+        router.push("/login");
       } catch (error: unknown) {
-        console.error('Email verification error:', error);
+        console.error("Email verification error:", error);
         const err = error as Error;
-        toast.error(err?.message || 'An error occurred during verification.');
-        router.push('/login');
+        toast.error(err?.message || "An error occurred during verification.");
+        router.push("/login");
       }
     };
 

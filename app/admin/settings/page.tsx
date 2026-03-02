@@ -1,27 +1,30 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { SiteHeader } from "@/components/dashboard/site-header"
-import { SettingsNav } from "@/components/dashboard/settings-nav"
+import { useState, useEffect } from "react";
+import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { SiteHeader } from "@/components/dashboard/site-header";
+import { SettingsNav } from "@/components/dashboard/settings-nav";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { User, Key, Edit3, Save, X } from "lucide-react"
-import { toast } from "sonner"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { User, Key, Edit3, Save, X } from "lucide-react";
+import { toast } from "sonner";
 import {
   SettingsNavSkeleton,
   SettingsPageHeaderSkeleton,
-  GeneralSettingsSkeleton
-} from "./components/skeleton-loading"
+  GeneralSettingsSkeleton,
+} from "./components/skeleton-loading";
 
-export const description = "Triple A Gamefarm Settings"
+export const description = "Triple A Gamefarm Settings";
 
 export default function SettingsPage() {
   const [generalData, setGeneralData] = useState({
@@ -29,24 +32,25 @@ export default function SettingsPage() {
     email: "tripleagamefarm5@gmail.com",
     phone: "+63 912 345 6789",
     address: "123 Farm Road, countryside",
-description: "Breeding championship-quality gamefowl with excellence in bloodlines, training, and customer service."
-  })
+    description:
+      "Breeding championship-quality gamefowl with excellence in bloodlines, training, and customer service.",
+  });
 
-  const [isEditingGeneral, setIsEditingGeneral] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isEditingGeneral, setIsEditingGeneral] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Simulate loading
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleGeneralSave = () => {
-    toast.success("General settings saved successfully")
-    setIsEditingGeneral(false)
-  }
+    toast.success("General settings saved successfully");
+    setIsEditingGeneral(false);
+  };
 
   const handleGeneralCancel = () => {
     // Reset to original values
@@ -55,10 +59,11 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
       email: "tripleagamefarm5@gmail.com",
       phone: "+63 912 345 6789",
       address: "123 Farm Road, countryside",
-description: "Breeding championship-quality gamefowl with excellence in bloodlines, training, and customer service."
-    })
-    setIsEditingGeneral(false)
-  }
+      description:
+        "Breeding championship-quality gamefowl with excellence in bloodlines, training, and customer service.",
+    });
+    setIsEditingGeneral(false);
+  };
 
   return (
     <div className="[--header-height:calc(--spacing(14))]">
@@ -74,8 +79,12 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
               ) : (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <h1 className="text-3xl font-bold text-[#1f3f2c]">Settings</h1>
-                    <p className="text-[#4a6741]">Manage your account and application preferences</p>
+                    <h1 className="text-3xl font-bold text-[#1f3f2c]">
+                      Settings
+                    </h1>
+                    <p className="text-[#4a6741]">
+                      Manage your account and application preferences
+                    </p>
                   </div>
                 </div>
               )}
@@ -84,11 +93,7 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Settings Navigation */}
                 <div className="lg:col-span-1">
-                  {isLoading ? (
-                    <SettingsNavSkeleton />
-                  ) : (
-                    <SettingsNav />
-                  )}
+                  {isLoading ? <SettingsNavSkeleton /> : <SettingsNav />}
                 </div>
 
                 {/* Main Content */}
@@ -97,7 +102,10 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
                   {isLoading ? (
                     <GeneralSettingsSkeleton />
                   ) : (
-                    <Card className="border-[#3d6c58]/20" style={{ borderRadius: 0 }}>
+                    <Card
+                      className="border-[#3d6c58]/20"
+                      style={{ borderRadius: 0 }}
+                    >
                       <CardHeader style={{ borderRadius: 0 }}>
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="min-w-0">
@@ -124,7 +132,11 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
                             <Button
                               variant={isEditingGeneral ? "default" : "outline"}
                               size="sm"
-                              onClick={isEditingGeneral ? handleGeneralSave : () => setIsEditingGeneral(true)}
+                              onClick={
+                                isEditingGeneral
+                                  ? handleGeneralSave
+                                  : () => setIsEditingGeneral(true)
+                              }
                               className={`flex items-center gap-2 w-full sm:w-auto ${isEditingGeneral ? "bg-[#3d6c58] hover:bg-[#4e816b]" : "border-[#3d6c58]/20"}`}
                             >
                               {isEditingGeneral ? (
@@ -142,77 +154,131 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-4" style={{ borderRadius: 0 }}>
+                      <CardContent
+                        className="space-y-4"
+                        style={{ borderRadius: 0 }}
+                      >
                         <div className="grid gap-4 md:grid-cols-2">
                           <div className="space-y-2">
-                            <Label htmlFor="farmName" className="text-[#3d6c58]">Farm Name</Label>
+                            <Label
+                              htmlFor="farmName"
+                              className="text-[#3d6c58]"
+                            >
+                              Farm Name
+                            </Label>
                             <Input
                               id="farmName"
                               value={generalData.farmName}
-                              onChange={(e) => setGeneralData({...generalData, farmName: e.target.value})}
+                              onChange={(e) =>
+                                setGeneralData({
+                                  ...generalData,
+                                  farmName: e.target.value,
+                                })
+                              }
                               className="border-[#3d6c58]/20"
                               disabled={!isEditingGeneral}
-                              style={{ 
-                                backgroundColor: !isEditingGeneral ? '#f8fafc' : 'white',
-                                borderRadius: 0 
+                              style={{
+                                backgroundColor: !isEditingGeneral
+                                  ? "#f8fafc"
+                                  : "white",
+                                borderRadius: 0,
                               }}
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="email" className="text-[#3d6c58]">Email</Label>
+                            <Label htmlFor="email" className="text-[#3d6c58]">
+                              Email
+                            </Label>
                             <Input
                               id="email"
                               type="email"
                               value={generalData.email}
-                              onChange={(e) => setGeneralData({...generalData, email: e.target.value})}
+                              onChange={(e) =>
+                                setGeneralData({
+                                  ...generalData,
+                                  email: e.target.value,
+                                })
+                              }
                               className="border-[#3d6c58]/20"
                               disabled={!isEditingGeneral}
-                              style={{ 
-                                backgroundColor: !isEditingGeneral ? '#f8fafc' : 'white',
-                                borderRadius: 0 
+                              style={{
+                                backgroundColor: !isEditingGeneral
+                                  ? "#f8fafc"
+                                  : "white",
+                                borderRadius: 0,
                               }}
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-[#3d6c58]">Phone</Label>
+                            <Label htmlFor="phone" className="text-[#3d6c58]">
+                              Phone
+                            </Label>
                             <Input
                               id="phone"
                               value={generalData.phone}
-                              onChange={(e) => setGeneralData({...generalData, phone: e.target.value})}
+                              onChange={(e) =>
+                                setGeneralData({
+                                  ...generalData,
+                                  phone: e.target.value,
+                                })
+                              }
                               className="border-[#3d6c58]/20"
                               disabled={!isEditingGeneral}
-                              style={{ 
-                                backgroundColor: !isEditingGeneral ? '#f8fafc' : 'white',
-                                borderRadius: 0 
+                              style={{
+                                backgroundColor: !isEditingGeneral
+                                  ? "#f8fafc"
+                                  : "white",
+                                borderRadius: 0,
                               }}
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="address" className="text-[#3d6c58]">Address</Label>
+                            <Label htmlFor="address" className="text-[#3d6c58]">
+                              Address
+                            </Label>
                             <Input
                               id="address"
                               value={generalData.address}
-                              onChange={(e) => setGeneralData({...generalData, address: e.target.value})}
+                              onChange={(e) =>
+                                setGeneralData({
+                                  ...generalData,
+                                  address: e.target.value,
+                                })
+                              }
                               className="border-[#3d6c58]/20"
                               disabled={!isEditingGeneral}
-                              style={{ 
-                                backgroundColor: !isEditingGeneral ? '#f8fafc' : 'white',
-                                borderRadius: 0 
+                              style={{
+                                backgroundColor: !isEditingGeneral
+                                  ? "#f8fafc"
+                                  : "white",
+                                borderRadius: 0,
                               }}
                             />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="description" className="text-[#3d6c58]">Description</Label>
+                          <Label
+                            htmlFor="description"
+                            className="text-[#3d6c58]"
+                          >
+                            Description
+                          </Label>
                           <Textarea
                             id="description"
                             value={generalData.description}
-                            onChange={(e) => setGeneralData({...generalData, description: e.target.value})}
+                            onChange={(e) =>
+                              setGeneralData({
+                                ...generalData,
+                                description: e.target.value,
+                              })
+                            }
                             className="border-[#3d6c58]/20 min-h-[100px]"
                             disabled={!isEditingGeneral}
-                            style={{ 
-                              backgroundColor: !isEditingGeneral ? '#f8fafc' : 'white',
-                              borderRadius: 0 
+                            style={{
+                              backgroundColor: !isEditingGeneral
+                                ? "#f8fafc"
+                                : "white",
+                              borderRadius: 0,
                             }}
                           />
                         </div>
@@ -226,5 +292,5 @@ description: "Breeding championship-quality gamefowl with excellence in bloodlin
         </div>
       </SidebarProvider>
     </div>
-  )
+  );
 }

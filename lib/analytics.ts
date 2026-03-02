@@ -117,7 +117,10 @@ export const getAnalyticsStats = async (
     );
   });
 
-  const currentMonthRevenue = currentMonth.reduce((sum, t) => sum + t.amount, 0);
+  const currentMonthRevenue = currentMonth.reduce(
+    (sum, t) => sum + t.amount,
+    0
+  );
 
   const lastMonthRevenue = lastMonth.reduce((sum, t) => sum + t.amount, 0);
 
@@ -135,14 +138,16 @@ export const getAnalyticsStats = async (
       : 0;
 
   // Calculate top breed from filtered transactions
-  const breedCounts = filteredTransactions.reduce((acc, t) => {
-    acc[t.breed] = (acc[t.breed] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const breedCounts = filteredTransactions.reduce(
+    (acc, t) => {
+      acc[t.breed] = (acc[t.breed] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const topBreed =
-    Object.entries(breedCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
-    "N/A";
+    Object.entries(breedCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || "N/A";
 
   // Get unique customers
   const uniqueCustomers = new Set(
@@ -253,7 +258,10 @@ export const getBreedPerformance = async (
   });
 
   // Calculate totals
-  const totalRevenue = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalRevenue = filteredTransactions.reduce(
+    (sum, t) => sum + t.amount,
+    0
+  );
 
   const breedData: BreedData[] = Array.from(breedMap.entries()).map(
     ([breed, breedTransactions]) => {
@@ -311,8 +319,9 @@ export const getHealthMetrics = async (
       const monthName = date.toLocaleDateString("en-US", { month: "short" });
 
       const total = monthRoosters.length;
-      const excellent = monthRoosters.filter((r) => r.health === "excellent")
-        .length;
+      const excellent = monthRoosters.filter(
+        (r) => r.health === "excellent"
+      ).length;
       const good = monthRoosters.filter((r) => r.health === "good").length;
       const fair = monthRoosters.filter((r) => r.health === "fair").length;
       const poor = monthRoosters.filter((r) => r.health === "poor").length;
@@ -331,8 +340,9 @@ export const getHealthMetrics = async (
       const diseaseIncidence = total > 0 ? (poor / total) * 100 : 0;
 
       // Mortality rate (deceased status)
-      const deceased = monthRoosters.filter((r) => r.status === "Deceased")
-        .length;
+      const deceased = monthRoosters.filter(
+        (r) => r.status === "Deceased"
+      ).length;
       const mortalityRate = total > 0 ? (deceased / total) * 100 : 0;
 
       // Average weight
@@ -414,4 +424,3 @@ export const getCustomerRatings = async (
     return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
 };
-

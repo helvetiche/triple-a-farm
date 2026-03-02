@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "aos/dist/aos.css";
@@ -48,37 +48,39 @@
 }
 
 :root {
-    /* Triple A Gamefarm theme - Pastel Green */
-    --color-primary-accent: #3d6c58;
-    --color-secondary-accent: #4e816b;
-    --color-background: #FFFFFF;
-    --color-card-background: #F8F8F8;
-    --color-border: #A8D5BA;
-    --color-border-dark: #8BC4A8;
-    --color-text: #3d6c58;
-    --color-text-secondary: #666666;
-    --font-primary: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-    --radius: 0.625rem;
+  /* Triple A Gamefarm theme - Pastel Green */
+  --color-primary-accent: #3d6c58;
+  --color-secondary-accent: #4e816b;
+  --color-background: #ffffff;
+  --color-card-background: #f8f8f8;
+  --color-border: #a8d5ba;
+  --color-border-dark: #8bc4a8;
+  --color-text: #3d6c58;
+  --color-text-secondary: #666666;
+  --font-primary:
+    "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Helvetica", "Arial", sans-serif;
+  --radius: 0.625rem;
 
-    /* Shadcn/ui compatibility with pastel green theme */
-    --background: #FFFFFF;
-    --foreground: oklch(0.145 0 0);
-    --card: #FFFFFF;
-    --card-foreground: oklch(0.145 0 0);
-    --popover: #FFFFFF;
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: #3d6c58;
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: #3d6c58;
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: #3d6c58;
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: #A8D5BA;
-    --input: oklch(0.922 0 0);
-    --ring: #3d6c58;
+  /* Shadcn/ui compatibility with pastel green theme */
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: #ffffff;
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #3d6c58;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: #3d6c58;
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: #3d6c58;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #a8d5ba;
+  --input: oklch(0.922 0 0);
+  --ring: #3d6c58;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -95,24 +97,24 @@
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: #A8D5BA;
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: #A8D5BA;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: #a8d5ba;
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #a8d5ba;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -190,7 +192,9 @@
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px #3d6c58, 0 0 5px #3d6c58 !important;
+  box-shadow:
+    0 0 10px #3d6c58,
+    0 0 5px #3d6c58 !important;
 }
 
 #nprogress .spinner-icon {

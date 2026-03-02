@@ -1,9 +1,15 @@
-import React from "react"
-import { Check, Edit, Eye, EyeOff, MoreHorizontal } from "lucide-react"
+import React from "react";
+import { Check, Edit, Eye, EyeOff, MoreHorizontal } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +17,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -19,20 +25,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import type { CustomerReview } from "../data/reviews"
-import { getStatusColor, renderStars } from "../utils/feedback-utils"
+import type { CustomerReview } from "../data/reviews";
+import { getStatusColor, renderStars } from "../utils/feedback-utils";
 
 type ReviewsTableProps = {
-  reviews: CustomerReview[]
-  onView: (review: CustomerReview) => void
-  onEdit: (review: CustomerReview) => void
-  onPublish: (review: CustomerReview) => void
-  onUnpublish: (review: CustomerReview) => void
-}
+  reviews: CustomerReview[];
+  onView: (review: CustomerReview) => void;
+  onEdit: (review: CustomerReview) => void;
+  onPublish: (review: CustomerReview) => void;
+  onUnpublish: (review: CustomerReview) => void;
+};
 
-export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }: ReviewsTableProps) {
+export function ReviewsTable({
+  reviews,
+  onView,
+  onEdit,
+  onPublish,
+  onUnpublish,
+}: ReviewsTableProps) {
   return (
     <Card className="border-[#3d6c58]/20" style={{ borderRadius: 0 }}>
       <CardHeader style={{ borderRadius: 0 }}>
@@ -49,8 +61,12 @@ export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="font-semibold text-[#1f3f2c] truncate">{review.customer}</div>
-                  <div className="text-sm text-[#4a6741] truncate">{review.date}</div>
+                  <div className="font-semibold text-[#1f3f2c] truncate">
+                    {review.customer}
+                  </div>
+                  <div className="text-sm text-[#4a6741] truncate">
+                    {review.date}
+                  </div>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -87,9 +103,13 @@ export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }
               <div className="mt-3 flex items-center justify-between gap-3">
                 <div className="flex items-center min-w-0">
                   {renderStars(review.rating)}
-                  <span className="ml-2 text-sm text-[#4a6741]">({review.rating})</span>
+                  <span className="ml-2 text-sm text-[#4a6741]">
+                    ({review.rating})
+                  </span>
                 </div>
-                <Badge className={getStatusColor(review.status)}>{review.status}</Badge>
+                <Badge className={getStatusColor(review.status)}>
+                  {review.status}
+                </Badge>
               </div>
 
               <div className="mt-3 text-sm text-[#1f3f2c]">
@@ -103,7 +123,10 @@ export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }
               </div>
 
               <div className="mt-4 flex flex-col gap-2">
-                <Button onClick={() => onView(review)} className="w-full bg-[#3d6c58] hover:bg-[#4e816b]">
+                <Button
+                  onClick={() => onView(review)}
+                  className="w-full bg-[#3d6c58] hover:bg-[#4e816b]"
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
@@ -141,17 +164,23 @@ export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }
                   <TableCell className="hidden sm:table-cell">
                     <div className="flex items-center">
                       {renderStars(review.rating)}
-                      <span className="ml-2 text-sm text-[#4a6741]">({review.rating})</span>
+                      <span className="ml-2 text-sm text-[#4a6741]">
+                        ({review.rating})
+                      </span>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{review.rooster}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {review.rooster}
+                  </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="max-w-xs truncate" title={review.comment}>
                       {review.comment}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusColor(review.status)}>{review.status}</Badge>
+                    <Badge className={getStatusColor(review.status)}>
+                      {review.status}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -192,5 +221,5 @@ export function ReviewsTable({ reviews, onView, onEdit, onPublish, onUnpublish }
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

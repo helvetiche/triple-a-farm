@@ -5,36 +5,37 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Handle CORS for API routes
-  if (pathname.startsWith('/api/')) {
+  if (pathname.startsWith("/api/")) {
     const response = NextResponse.next();
-    
+
     // Add CORS headers
-    response.headers.set('Access-Control-Allow-Origin', '*');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    response.headers.set('Access-Control-Max-Age', '86400');
-    
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Requested-With"
+    );
+    response.headers.set("Access-Control-Max-Age", "86400");
+
     // Add security headers
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'DENY');
-    response.headers.set('X-XSS-Protection', '1; mode=block');
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-XSS-Protection", "1; mode=block");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
     // Handle preflight requests
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       return new Response(null, { status: 200, headers: response.headers });
     }
-    
+
     return response;
   }
 
   // Public routes that don't require authentication
-  const publicRoutes = [
-    "/",
-    "/sign-up",
-    "/forgot-password",
-    "/verify-otp",
-  ];
+  const publicRoutes = ["/", "/sign-up", "/forgot-password", "/verify-otp"];
 
   // Static files and assets - these should be excluded from proxy
   const staticFilePatterns = [
@@ -63,7 +64,7 @@ export function proxy(request: NextRequest) {
   // Special handling for login page - redirect authenticated users away
   if (pathname === "/login" || pathname === "/(auth)/login") {
     const session = request.cookies.get("__session");
-    
+
     if (session) {
       // User is authenticated, redirect to admin
       return NextResponse.redirect(new URL("/admin", request.url));

@@ -45,7 +45,10 @@ export const signUp = async (
     return true;
   } catch (error: unknown) {
     console.error("Sign up error:", error);
-    const message = error instanceof Error ? error.message : "Failed to create account. Please try again.";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to create account. Please try again.";
     toast.error(message);
     return false;
   }
@@ -75,7 +78,10 @@ export const signIn = async (
     return true;
   } catch (error: unknown) {
     console.error("Sign in error:", error);
-    const message = error instanceof Error ? error.message : "Failed to sign in. Please try again.";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to sign in. Please try again.";
     toast.error(message);
     return false;
   }

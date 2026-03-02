@@ -200,10 +200,20 @@ const applyUpdateToInventoryItem = (
 
   const status = calculateInventoryStatus(updatedCurrentStock, updatedMinStock);
 
-  const price = input.price === null ? undefined : input.price ?? existing.price;
-  const description = input.description === null ? undefined : input.description ?? existing.description;
-  const expiryDate = input.expiryDate === null ? undefined : input.expiryDate ?? existing.expiryDate;
-  const locationAddress = input.locationAddress === null ? undefined : input.locationAddress ?? existing.locationAddress;
+  const price =
+    input.price === null ? undefined : (input.price ?? existing.price);
+  const description =
+    input.description === null
+      ? undefined
+      : (input.description ?? existing.description);
+  const expiryDate =
+    input.expiryDate === null
+      ? undefined
+      : (input.expiryDate ?? existing.expiryDate);
+  const locationAddress =
+    input.locationAddress === null
+      ? undefined
+      : (input.locationAddress ?? existing.locationAddress);
 
   const result: Omit<InventoryItem, "id"> = {
     name: input.name ?? existing.name,
@@ -227,7 +237,9 @@ const applyUpdateToInventoryItem = (
   return result;
 };
 
-const recalculateInventoryStats = async (locationId?: string): Promise<InventoryStats> => {
+const recalculateInventoryStats = async (
+  locationId?: string
+): Promise<InventoryStats> => {
   let query: FirebaseFirestore.Query = inventoryCollectionRef();
 
   if (locationId) {

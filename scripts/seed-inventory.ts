@@ -27,7 +27,8 @@ const inventoryTemplates = [
     unit: "sacks",
     supplier: "AgriFeeds Corp",
     price: 1250,
-    description: "High-protein pellets formulated for gamefowl conditioning and growth.",
+    description:
+      "High-protein pellets formulated for gamefowl conditioning and growth.",
   },
   {
     name: "Vitamin B Complex",
@@ -129,13 +130,16 @@ function randomizeStock(baseStock: number): number {
 async function seedInventory() {
   // Dynamic import after env is loaded
   const { adminDb } = await import("../lib/firebase");
-  const { calculateInventoryStatus, formatInventoryDisplayId } = await import("../lib/inventory-types");
+  const { calculateInventoryStatus, formatInventoryDisplayId } =
+    await import("../lib/inventory-types");
 
   console.log("Starting inventory seeding...\n");
 
   try {
-    const locationsSnapshot = await adminDb.collection(LOCATIONS_COLLECTION).get();
-    
+    const locationsSnapshot = await adminDb
+      .collection(LOCATIONS_COLLECTION)
+      .get();
+
     const locations: FarmLocation[] = locationsSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -166,10 +170,13 @@ async function seedInventory() {
       for (const template of inventoryTemplates) {
         const currentStock = randomizeStock(template.currentStock);
         const createdAt = new Date().toISOString().split("T")[0];
-        const status = calculateInventoryStatus(currentStock, template.minStock);
+        const status = calculateInventoryStatus(
+          currentStock,
+          template.minStock
+        );
 
         const docRef = inventoryRef.doc();
-        
+
         const displayId = formatInventoryDisplayId({
           id: docRef.id,
           createdAt,
@@ -195,7 +202,9 @@ async function seedInventory() {
         };
 
         await docRef.set(inventoryItem);
-        console.log(`  + ${template.name} (${currentStock} ${template.unit}) - ${status}`);
+        console.log(
+          `  + ${template.name} (${currentStock} ${template.unit}) - ${status}`
+        );
         totalCreated++;
       }
     }

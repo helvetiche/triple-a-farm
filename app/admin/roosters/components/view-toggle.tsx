@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button"
-import { Table, Grid3X3 } from "lucide-react"
-import { type ViewMode } from "../utils/settings"
+import { Button } from "@/components/ui/button";
+import { Table, Grid3X3 } from "lucide-react";
+import { type ViewMode } from "../utils/settings";
 
 interface ViewToggleProps {
-  currentView: ViewMode
-  onViewChange: (view: ViewMode) => void
+  currentView: ViewMode;
+  onViewChange: (view: ViewMode) => void;
 }
 
 export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
@@ -14,7 +14,11 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         variant={currentView === "table" ? "default" : "ghost"}
         size="sm"
         onClick={() => onViewChange("table")}
-        className={currentView === "table" ? "bg-[#3d6c58] hover:bg-[#4e816b]" : "text-[#4a6741]"}
+        className={
+          currentView === "table"
+            ? "bg-[#3d6c58] hover:bg-[#4e816b]"
+            : "text-[#4a6741]"
+        }
       >
         <Table className="h-4 w-4 " />
         <span className="hidden sm:inline">Table</span>
@@ -23,11 +27,15 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         variant={currentView === "cards" ? "default" : "ghost"}
         size="sm"
         onClick={() => onViewChange("cards")}
-        className={currentView === "cards" ? "bg-[#3d6c58] hover:bg-[#4e816b]" : "text-[#4a6741]"}
+        className={
+          currentView === "cards"
+            ? "bg-[#3d6c58] hover:bg-[#4e816b]"
+            : "text-[#4a6741]"
+        }
       >
         <Grid3X3 className="h-4 w-4 " />
         <span className="hidden sm:inline">Cards</span>
       </Button>
     </div>
-  )
+  );
 }

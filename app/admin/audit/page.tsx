@@ -45,7 +45,6 @@ import { PageHeader } from "@/components/dashboard";
 import {
   Activity,
   Search,
-  Eye,
   User,
   Clock,
   FileText,
@@ -138,7 +137,7 @@ const getSeverityIcon = (severity: AuditSeverity) => {
 };
 
 export default function AuditTrailPage() {
-  const { userData } = useAuth();
+  useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -168,7 +167,8 @@ export default function AuditTrailPage() {
       if (actionFilter !== "all") params.set("action", actionFilter);
       if (entityFilter !== "all") params.set("entity", entityFilter);
       if (severityFilter !== "all") params.set("severity", severityFilter);
-      if (startDate) params.set("startDate", startDate.toISOString().split("T")[0]);
+      if (startDate)
+        params.set("startDate", startDate.toISOString().split("T")[0]);
       if (endDate) params.set("endDate", endDate.toISOString().split("T")[0]);
 
       const response = await fetch(`/api/audit?${params.toString()}`);
@@ -186,7 +186,15 @@ export default function AuditTrailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchValue, actionFilter, entityFilter, severityFilter, startDate, endDate]);
+  }, [
+    currentPage,
+    searchValue,
+    actionFilter,
+    entityFilter,
+    severityFilter,
+    startDate,
+    endDate,
+  ]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -280,9 +288,7 @@ export default function AuditTrailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.totalLogs}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Last 30 days
-                  </p>
+                  <p className="text-xs text-muted-foreground">Last 30 days</p>
                 </CardContent>
               </Card>
 
@@ -474,7 +480,9 @@ export default function AuditTrailPage() {
                   <Activity className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium">No activities found</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {searchValue || actionFilter !== "all" || entityFilter !== "all"
+                    {searchValue ||
+                    actionFilter !== "all" ||
+                    entityFilter !== "all"
                       ? "Try adjusting your filters"
                       : "Activities will appear here once they occur"}
                   </p>
@@ -497,7 +505,8 @@ export default function AuditTrailPage() {
                         const { date, time } = formatTimestamp(log.timestamp);
                         const EntityIcon = getEntityIcon(log.entity);
                         const SeverityIcon = getSeverityIcon(log.severity);
-                        const severityConfig = AUDIT_SEVERITY_CONFIG[log.severity];
+                        const severityConfig =
+                          AUDIT_SEVERITY_CONFIG[log.severity];
 
                         return (
                           <TableRow
@@ -509,7 +518,9 @@ export default function AuditTrailPage() {
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                                 <div>
-                                  <div className="font-medium text-sm">{date}</div>
+                                  <div className="font-medium text-sm">
+                                    {date}
+                                  </div>
                                   <div className="text-xs text-muted-foreground">
                                     {time}
                                   </div>
@@ -527,7 +538,8 @@ export default function AuditTrailPage() {
                                   </div>
                                   {log.entityName && (
                                     <div className="text-xs text-muted-foreground">
-                                      {AUDIT_ENTITY_LABELS[log.entity]}: {log.entityName}
+                                      {AUDIT_ENTITY_LABELS[log.entity]}:{" "}
+                                      {log.entityName}
                                     </div>
                                   )}
                                 </div>
@@ -540,7 +552,8 @@ export default function AuditTrailPage() {
                                 </div>
                                 <div>
                                   <div className="text-sm font-medium">
-                                    {log.userName || log.userEmail.split("@")[0]}
+                                    {log.userName ||
+                                      log.userEmail.split("@")[0]}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
                                     {log.userRole || "User"}
@@ -685,7 +698,9 @@ export default function AuditTrailPage() {
                           <p className="text-sm text-muted-foreground">
                             Entity Name
                           </p>
-                          <p className="font-medium">{selectedLog.entityName}</p>
+                          <p className="font-medium">
+                            {selectedLog.entityName}
+                          </p>
                         </div>
                       )}
                     </div>

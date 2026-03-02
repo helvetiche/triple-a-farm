@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AnalyticsStatsCardsSkeleton() {
   return (
@@ -16,7 +16,7 @@ export function AnalyticsStatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function RevenueChartSkeleton() {
@@ -43,7 +43,7 @@ export function RevenueChartSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function HealthMetricsSkeleton() {
@@ -56,7 +56,10 @@ export function HealthMetricsSkeleton() {
       <CardContent>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border">
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 border"
+            >
               <div className="space-y-2">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-3 w-24" />
@@ -69,7 +72,7 @@ export function HealthMetricsSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function HealthChartSkeleton() {
@@ -85,7 +88,7 @@ export function HealthChartSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function BreedPerformanceSkeleton() {
@@ -111,7 +114,7 @@ export function BreedPerformanceSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function CustomerRatingsSkeleton() {
@@ -131,7 +134,7 @@ export function CustomerRatingsSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function PageHeaderSkeleton() {
@@ -143,5 +146,5 @@ export function PageHeaderSkeleton() {
       </div>
       <Skeleton className="h-10 w-full sm:w-32" />
     </div>
-  )
+  );
 }

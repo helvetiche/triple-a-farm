@@ -1,11 +1,11 @@
-import * as XLSX from "xlsx"
-import type { Rooster } from "../../data/roosters"
+import * as XLSX from "xlsx";
+import type { Rooster } from "../../data/roosters";
 
 interface RoosterStats {
-  total: number
-  available: number
-  sold: number
-  quarantine: number
+  total: number;
+  available: number;
+  sold: number;
+  quarantine: number;
 }
 
 export const exportRoostersToExcel = (
@@ -13,7 +13,7 @@ export const exportRoostersToExcel = (
   stats?: RoosterStats,
   exportedBy?: string
 ) => {
-  const workbook = XLSX.utils.book_new()
+  const workbook = XLSX.utils.book_new();
 
   // Sheet 1: Summary Statistics
   if (stats) {
@@ -27,13 +27,15 @@ export const exportRoostersToExcel = (
       ["Available", stats.available],
       ["Sold", stats.sold],
       ["In Quarantine", stats.quarantine],
-    ]
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
   }
 
   // Sheet 2: All Roosters (sorted alphabetically by name)
-  const sortedRoosters = [...roosters].sort((a, b) => a.name.localeCompare(b.name))
+  const sortedRoosters = [...roosters].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
   const roostersData = [
     [
       "ID",
@@ -63,13 +65,14 @@ export const exportRoostersToExcel = (
       r.owner || "",
       r.description || "",
     ]),
-  ]
-  const roostersSheet = XLSX.utils.aoa_to_sheet(roostersData)
-  XLSX.utils.book_append_sheet(workbook, roostersSheet, "All Roosters")
+  ];
+  const roostersSheet = XLSX.utils.aoa_to_sheet(roostersData);
+  XLSX.utils.book_append_sheet(workbook, roostersSheet, "All Roosters");
 
   // Sheet 3: Available Roosters (sorted alphabetically by name)
-  const availableRoosters = roosters.filter((r) => r.status === "Available")
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const availableRoosters = roosters
+    .filter((r) => r.status === "Available")
+    .sort((a, b) => a.name.localeCompare(b.name));
   if (availableRoosters.length > 0) {
     const availableData = [
       ["ID", "Name", "Breed", "Age", "Weight", "Price", "Health", "Location"],
@@ -83,16 +86,17 @@ export const exportRoostersToExcel = (
         r.health.charAt(0).toUpperCase() + r.health.slice(1),
         r.location,
       ]),
-    ]
-    const availableSheet = XLSX.utils.aoa_to_sheet(availableData)
-    XLSX.utils.book_append_sheet(workbook, availableSheet, "Available")
+    ];
+    const availableSheet = XLSX.utils.aoa_to_sheet(availableData);
+    XLSX.utils.book_append_sheet(workbook, availableSheet, "Available");
   }
 
   // Sheet 4: By Status (excluding Available since we already have a dedicated sheet, sorted alphabetically by name)
-  const statusGroups = ["Sold", "Reserved", "Quarantine", "Deceased"]
+  const statusGroups = ["Sold", "Reserved", "Quarantine", "Deceased"];
   statusGroups.forEach((status) => {
-    const statusRoosters = roosters.filter((r) => r.status === status)
-      .sort((a, b) => a.name.localeCompare(b.name))
+    const statusRoosters = roosters
+      .filter((r) => r.status === status)
+      .sort((a, b) => a.name.localeCompare(b.name));
     if (statusRoosters.length > 0) {
       const statusData = [
         ["ID", "Name", "Breed", "Age", "Weight", "Price", "Health"],
@@ -105,17 +109,16 @@ export const exportRoostersToExcel = (
           r.price,
           r.health.charAt(0).toUpperCase() + r.health.slice(1),
         ]),
-      ]
-      const statusSheet = XLSX.utils.aoa_to_sheet(statusData)
-      XLSX.utils.book_append_sheet(workbook, statusSheet, status)
+      ];
+      const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
+      XLSX.utils.book_append_sheet(workbook, statusSheet, status);
     }
-  })
+  });
 
   // Generate filename
-  const dateStr = new Date().toISOString().split("T")[0]
-  const filename = `roosters_inventory_${dateStr}.xlsx`
+  const dateStr = new Date().toISOString().split("T")[0];
+  const filename = `roosters_inventory_${dateStr}.xlsx`;
 
   // Write file
-  XLSX.writeFile(workbook, filename)
-}
-
+  XLSX.writeFile(workbook, filename);
+};

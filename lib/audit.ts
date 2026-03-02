@@ -226,7 +226,9 @@ export const getAuditStats = async (
     .where("timestamp", ">=", thirtyDaysAgo.toISOString())
     .get();
 
-  const logs = snapshot.docs.map((doc) => doc.data() as Omit<AuditLogEntry, "id">);
+  const logs = snapshot.docs.map(
+    (doc) => doc.data() as Omit<AuditLogEntry, "id">
+  );
 
   const byAction: Record<string, number> = {};
   const byEntity: Record<string, number> = {};

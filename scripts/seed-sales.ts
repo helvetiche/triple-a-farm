@@ -78,13 +78,29 @@ function randomElement<T>(arr: T[]): T {
 }
 
 function randomPhoneNumber(): string {
-  const prefix = ["0917", "0918", "0919", "0920", "0921", "0927", "0928", "0929", "0939", "0949"];
-  const number = Math.floor(Math.random() * 10000000).toString().padStart(7, "0");
+  const prefix = [
+    "0917",
+    "0918",
+    "0919",
+    "0920",
+    "0921",
+    "0927",
+    "0928",
+    "0929",
+    "0939",
+    "0949",
+  ];
+  const number = Math.floor(Math.random() * 10000000)
+    .toString()
+    .padStart(7, "0");
   return `${randomElement(prefix)}-${number.slice(0, 3)}-${number.slice(3)}`;
 }
 
 function randomPrice(): number {
-  const basePrices = [5000, 7500, 10000, 12500, 15000, 17500, 20000, 25000, 30000, 35000, 40000, 50000];
+  const basePrices = [
+    5000, 7500, 10000, 12500, 15000, 17500, 20000, 25000, 30000, 35000, 40000,
+    50000,
+  ];
   return randomElement(basePrices);
 }
 
@@ -126,10 +142,15 @@ async function seedSales() {
     const existingSnapshot = await salesRef.limit(1).get();
     if (!existingSnapshot.empty) {
       console.log("Sales transactions already exist.");
-      console.log("Do you want to add more? The script will add 50 new transactions.\n");
+      console.log(
+        "Do you want to add more? The script will add 50 new transactions.\n"
+      );
     }
 
-    const transactions: Array<{ docRef: FirebaseFirestore.DocumentReference; data: TransactionData }> = [];
+    const transactions: Array<{
+      docRef: FirebaseFirestore.DocumentReference;
+      data: TransactionData;
+    }> = [];
     const numTransactions = 50;
 
     console.log(`Generating ${numTransactions} sales transactions...\n`);
@@ -165,18 +186,18 @@ async function seedSales() {
     for (let i = 0; i < transactions.length; i += batchSize) {
       const batch = adminDb.batch();
       const chunk = transactions.slice(i, i + batchSize);
-      
+
       for (const { docRef, data } of chunk) {
         batch.set(docRef, data);
       }
-      
+
       await batch.commit();
     }
 
     // Display summary
     console.log("Sales transactions created:\n");
     console.log("-".repeat(60));
-    
+
     const byBreed: Record<string, number> = {};
     const byPayment: Record<string, number> = {};
     let totalRevenue = 0;
@@ -205,8 +226,9 @@ async function seedSales() {
     console.log(`Total Transactions: ${transactions.length}`);
     console.log(`Total Revenue: ₱${totalRevenue.toLocaleString()}`);
     console.log(`Total Commissions: ₱${totalCommission.toLocaleString()}`);
-    console.log(`Average Sale: ₱${Math.round(totalRevenue / transactions.length).toLocaleString()}`);
-
+    console.log(
+      `Average Sale: ₱${Math.round(totalRevenue / transactions.length).toLocaleString()}`
+    );
   } catch (error) {
     console.error("Error seeding sales:", error);
     throw error;

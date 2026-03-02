@@ -1,19 +1,11 @@
-"use client"
+"use client";
 
-import {
-  ChevronsUpDown,
-  LogOut,
-  Settings,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { logout } from "@/lib/client-auth"
+import { ChevronsUpDown, LogOut, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { logout } from "@/lib/client-auth";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,36 +13,36 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-  const router = useRouter()
+  const { isMobile } = useSidebar();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
-      await logout()
-      router.push("/")
+      await logout();
+      router.push("/");
     } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to logout. Please try again.")
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again.");
     }
-  }
+  };
 
   return (
     <SidebarMenu>
@@ -106,5 +98,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

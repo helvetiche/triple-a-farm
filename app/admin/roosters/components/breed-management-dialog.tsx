@@ -30,13 +30,16 @@ interface BreedManagementDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDialogProps) {
+export function BreedManagementDialog({
+  open,
+  onOpenChange,
+}: BreedManagementDialogProps) {
   const [breeds, setBreeds] = useState<RoosterBreed[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingBreed, setEditingBreed] = useState<RoosterBreed | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -50,7 +53,7 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
     try {
       const response = await fetch("/api/roosters/breeds");
       const result = await response.json();
-      
+
       if (result.success) {
         setBreeds(result.data || []);
       } else {
@@ -83,39 +86,42 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
   };
 
   const handleAddCharacteristic = () => {
-    if (newCharacteristic.trim() && !formData.characteristics.includes(newCharacteristic.trim())) {
-      setFormData(prev => ({
+    if (
+      newCharacteristic.trim() &&
+      !formData.characteristics.includes(newCharacteristic.trim())
+    ) {
+      setFormData((prev) => ({
         ...prev,
-        characteristics: [...prev.characteristics, newCharacteristic.trim()]
+        characteristics: [...prev.characteristics, newCharacteristic.trim()],
       }));
       setNewCharacteristic("");
     }
   };
 
   const handleRemoveCharacteristic = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      characteristics: prev.characteristics.filter((_, i) => i !== index)
+      characteristics: prev.characteristics.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast.error("Breed name is required");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const url = editingBreed 
+      const url = editingBreed
         ? `/api/roosters/breeds`
         : `/api/roosters/breeds`;
-      
+
       const method = editingBreed ? "PUT" : "POST";
-      const payload = editingBreed 
+      const payload = editingBreed
         ? { id: editingBreed.id, ...formData }
         : formData;
 
@@ -131,7 +137,9 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
 
       if (result.success) {
         toast.success(
-          editingBreed ? "Breed updated successfully" : "Breed created successfully"
+          editingBreed
+            ? "Breed updated successfully"
+            : "Breed created successfully"
         );
         resetForm();
         fetchBreeds();
@@ -158,7 +166,11 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
   };
 
   const handleDelete = async (breed: RoosterBreed) => {
-    if (!confirm(`Are you sure you want to delete "${breed.name}"? This action cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${breed.name}"? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
@@ -205,7 +217,12 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
                       placeholder="Enter breed name"
                       required
                     />
@@ -215,7 +232,12 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                     <Input
                       id="origin"
                       value={formData.origin}
-                      onChange={(e) => setFormData(prev => ({ ...prev, origin: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          origin: e.target.value,
+                        }))
+                      }
                       placeholder="Enter origin (e.g., USA, Philippines)"
                     />
                   </div>
@@ -226,7 +248,12 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     placeholder="Enter breed description"
                     rows={3}
                   />
@@ -239,7 +266,10 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                       value={newCharacteristic}
                       onChange={(e) => setNewCharacteristic(e.target.value)}
                       placeholder="Add characteristic"
-                      onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddCharacteristic())}
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), handleAddCharacteristic())
+                      }
                     />
                     <Button
                       type="button"
@@ -253,7 +283,11 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                   {formData.characteristics.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.characteristics.map((char, index) => (
-                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
                           {char}
                           <X
                             className="w-3 h-3 cursor-pointer"
@@ -267,14 +301,12 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
 
                 <div className="flex gap-2">
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {isSubmitting && (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    )}
                     {editingBreed ? "Update Breed" : "Add Breed"}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={resetForm}
-                  >
+                  <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
                 </div>
@@ -317,17 +349,24 @@ export function BreedManagementDialog({ open, onOpenChange }: BreedManagementDia
                         )}
                       </div>
                       {breed.description && (
-                        <p className="text-sm text-gray-600 mb-2">{breed.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {breed.description}
+                        </p>
                       )}
-                      {breed.characteristics && breed.characteristics.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {breed.characteristics.map((char, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {char}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
+                      {breed.characteristics &&
+                        breed.characteristics.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {breed.characteristics.map((char, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {char}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                     </div>
                     <div className="flex gap-2">
                       <Button

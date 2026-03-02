@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { jsonError, jsonSuccess } from "@/lib/auth";
 import { adminDb } from "@/lib/firebase";
 
@@ -30,6 +29,10 @@ export async function GET() {
     return jsonSuccess(locations, { status: 200 });
   } catch (error: unknown) {
     console.error("GET /api/public/locations error:", error);
-    return jsonError("LOCATIONS_FETCH_FAILED", "Failed to load locations.", 500);
+    return jsonError(
+      "LOCATIONS_FETCH_FAILED",
+      "Failed to load locations.",
+      500
+    );
   }
 }

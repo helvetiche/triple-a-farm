@@ -50,16 +50,26 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Extract results or provide fallbacks for failed operations
-    const stats = results[0].status === 'fulfilled' ? results[0].value : null;
-    const monthlyTrends = results[1].status === 'fulfilled' ? results[1].value : [];
-    const breedPerformance = results[2].status === 'fulfilled' ? results[2].value : [];
-    const healthMetrics = results[3].status === 'fulfilled' ? results[3].value : null;
-    const customerRatings = results[4].status === 'fulfilled' ? results[4].value : [];
+    const stats = results[0].status === "fulfilled" ? results[0].value : null;
+    const monthlyTrends =
+      results[1].status === "fulfilled" ? results[1].value : [];
+    const breedPerformance =
+      results[2].status === "fulfilled" ? results[2].value : [];
+    const healthMetrics =
+      results[3].status === "fulfilled" ? results[3].value : null;
+    const customerRatings =
+      results[4].status === "fulfilled" ? results[4].value : [];
 
     // Log any failures for debugging
     results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        const names = ['stats', 'monthlyTrends', 'breedPerformance', 'healthMetrics', 'customerRatings'];
+      if (result.status === "rejected") {
+        const names = [
+          "stats",
+          "monthlyTrends",
+          "breedPerformance",
+          "healthMetrics",
+          "customerRatings",
+        ];
         console.error(`Analytics ${names[index]} failed:`, result.reason);
       }
     });
@@ -97,4 +107,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

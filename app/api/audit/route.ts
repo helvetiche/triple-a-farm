@@ -1,7 +1,11 @@
 import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getAuditLogs, type GetAuditLogsOptions } from "@/lib/audit";
-import type { AuditAction, AuditEntity, AuditSeverity } from "@/lib/audit-types";
+import type {
+  AuditAction,
+  AuditEntity,
+  AuditSeverity,
+} from "@/lib/audit-types";
 
 export async function GET(request: NextRequest) {
   try {

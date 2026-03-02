@@ -1,36 +1,51 @@
-"use client"
+"use client";
 
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { SiteHeader } from "@/components/dashboard/site-header"
+import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { SiteHeader } from "@/components/dashboard/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { EnhancedDropzone } from "@/components/ui/enhanced-dropzone"
-import { ArrowLeft, Upload, Bird, X } from "lucide-react"
-import Link from "next/link"
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { toastCRUD } from "../utils/toast"
-import { getRoosterBreeds, getRoosterLocationsWithIds, roosterStatuses, healthStatuses, type LocationOption } from "../../data/roosters"
-import Image from "next/image"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { EnhancedDropzone } from "@/components/ui/enhanced-dropzone";
+import { ArrowLeft, Upload, Bird, X } from "lucide-react";
+import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toastCRUD } from "../utils/toast";
+import {
+  getRoosterBreeds,
+  getRoosterLocationsWithIds,
+  roosterStatuses,
+  healthStatuses,
+  type LocationOption,
+} from "../../data/roosters";
+import Image from "next/image";
 
-export const description = "Add New Rooster"
+export const description = "Add New Rooster";
 
 export default function AddRoosterPage() {
-  const router = useRouter()
+  const router = useRouter();
   // State for dynamic breeds and locations
-  const [breeds, setBreeds] = useState<string[]>([])
-  const [locations, setLocations] = useState<LocationOption[]>([])
-  const [isLoadingBreeds, setIsLoadingBreeds] = useState(true)
-  const [isLoadingLocations, setIsLoadingLocations] = useState(true)
-  
+  const [breeds, setBreeds] = useState<string[]>([]);
+  const [locations, setLocations] = useState<LocationOption[]>([]);
+  const [isLoadingBreeds, setIsLoadingBreeds] = useState(true);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(true);
+
   // State for form fields
   const [formData, setFormData] = useState({
     id: "",
@@ -45,43 +60,45 @@ export default function AddRoosterPage() {
     status: "",
     health: "",
     owner: "",
-  })
-  const [vaccinations, setVaccinations] = useState<Array<{ name: string; date: string }>>([])
-  const [imageFiles, setImageFiles] = useState<File[]>([])
-  const [images, setImages] = useState<string[]>([])
-  const [isSaving, setIsSaving] = useState(false)
+  });
+  const [vaccinations, setVaccinations] = useState<
+    Array<{ name: string; date: string }>
+  >([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [images, setImages] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Fetch breeds and locations on component mount
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const breedsList = await getRoosterBreeds()
-        setBreeds(breedsList)
+        const breedsList = await getRoosterBreeds();
+        setBreeds(breedsList);
       } catch (error) {
-        console.error('Error fetching breeds:', error)
+        console.error("Error fetching breeds:", error);
       } finally {
-        setIsLoadingBreeds(false)
+        setIsLoadingBreeds(false);
       }
-    }
+    };
 
     const fetchLocations = async () => {
       try {
-        const locationsList = await getRoosterLocationsWithIds()
-        setLocations(locationsList)
+        const locationsList = await getRoosterLocationsWithIds();
+        setLocations(locationsList);
       } catch (error) {
-        console.error('Error fetching locations:', error)
+        console.error("Error fetching locations:", error);
       } finally {
-        setIsLoadingLocations(false)
+        setIsLoadingLocations(false);
       }
-    }
+    };
 
-    fetchBreeds()
-    fetchLocations()
-  }, [])
+    fetchBreeds();
+    fetchLocations();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleAddVaccination = () => {
     setVaccinations((prev) => [...prev, { name: "", date: "" }]);
@@ -91,7 +108,11 @@ export default function AddRoosterPage() {
     setVaccinations((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleVaccinationChange = (index: number, field: "name" | "date", value: string) => {
+  const handleVaccinationChange = (
+    index: number,
+    field: "name" | "date",
+    value: string
+  ) => {
     setVaccinations((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
@@ -112,43 +133,45 @@ export default function AddRoosterPage() {
       !formData.status ||
       !formData.health
     ) {
-      toastCRUD.validationError("required fields")
-      return
+      toastCRUD.validationError("required fields");
+      return;
     }
 
     if (imageFiles.length === 0) {
-      toastCRUD.validationError("images")
-      return
+      toastCRUD.validationError("images");
+      return;
     }
 
-    setIsSaving(true)
+    setIsSaving(true);
 
     try {
       // Upload images first
       const uploadPromises = imageFiles.map(async (file) => {
-        const formData = new FormData()
-        formData.append('image', file)
+        const formData = new FormData();
+        formData.append("image", file);
 
-        const response = await fetch('/api/roosters/upload-image', {
-          method: 'POST',
+        const response = await fetch("/api/roosters/upload-image", {
+          method: "POST",
           body: formData,
-        })
+        });
 
         if (!response.ok) {
-          throw new Error('Failed to upload image')
+          throw new Error("Failed to upload image");
         }
 
-        const result = await response.json()
-        return result.data.url
-      })
+        const result = await response.json();
+        return result.data.url;
+      });
 
-      const uploadedUrls = await Promise.all(uploadPromises)
-      setImages(uploadedUrls)
+      const uploadedUrls = await Promise.all(uploadPromises);
+      setImages(uploadedUrls);
 
-      const dateAdded = new Date().toISOString().split("T")[0]
+      const dateAdded = new Date().toISOString().split("T")[0];
 
       // Filter out empty vaccinations
-      const validVaccinations = vaccinations.filter(v => v.name.trim() && v.date.trim());
+      const validVaccinations = vaccinations.filter(
+        (v) => v.name.trim() && v.date.trim()
+      );
 
       const roosterData = {
         id: formData.id,
@@ -158,7 +181,12 @@ export default function AddRoosterPage() {
         age: formData.age,
         weight: formData.weight,
         price: formData.price,
-        status: formData.status as "Available" | "Sold" | "Reserved" | "Quarantine" | "Deceased",
+        status: formData.status as
+          | "Available"
+          | "Sold"
+          | "Reserved"
+          | "Quarantine"
+          | "Deceased",
         health: formData.health as "excellent" | "good" | "fair" | "poor",
         images: uploadedUrls,
         dateAdded: dateAdded,
@@ -167,9 +195,10 @@ export default function AddRoosterPage() {
         location: formData.location,
         locationAddress: formData.locationAddress || undefined,
         owner: formData.owner || undefined,
-        vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
+        vaccinations:
+          validVaccinations.length > 0 ? validVaccinations : undefined,
         image: uploadedUrls[0] || undefined,
-      }
+      };
 
       const response = await fetch("/api/roosters", {
         method: "POST",
@@ -177,23 +206,23 @@ export default function AddRoosterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(roosterData),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        toastCRUD.roosterAdded(formData.breed)
-        router.push("/admin/roosters")
+        toastCRUD.roosterAdded(formData.breed);
+        router.push("/admin/roosters");
       } else {
-        toastCRUD.createError("rooster", result.error?.message)
+        toastCRUD.createError("rooster", result.error?.message);
       }
     } catch (error) {
-      toastCRUD.networkError()
-      console.error("Error creating rooster:", error)
+      toastCRUD.networkError();
+      console.error("Error creating rooster:", error);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <div className="[--header-height:calc(--spacing(14))]">
@@ -213,8 +242,12 @@ export default function AddRoosterPage() {
                     </Link>
                   </Button>
                   <div>
-                    <h1 className="text-3xl font-bold text-[#1f3f2c]">Add New Rooster</h1>
-                    <p className="text-[#4a6741]">Create a profile for a new rooster</p>
+                    <h1 className="text-3xl font-bold text-[#1f3f2c]">
+                      Add New Rooster
+                    </h1>
+                    <p className="text-[#4a6741]">
+                      Create a profile for a new rooster
+                    </p>
                   </div>
                 </div>
               </div>
@@ -223,30 +256,44 @@ export default function AddRoosterPage() {
                 {/* Main Form */}
                 <Card className="border-[#3d6c58]/20 lg:col-span-2">
                   <CardHeader>
-                    <CardTitle className="text-[#1f3f2c]">Rooster Information</CardTitle>
-                    <CardDescription>Fill in the details about the rooster</CardDescription>
+                    <CardTitle className="text-[#1f3f2c]">
+                      Rooster Information
+                    </CardTitle>
+                    <CardDescription>
+                      Fill in the details about the rooster
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Basic Information */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-[#1f3f2c]">Basic Information</h3>
+                      <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                        Basic Information
+                      </h3>
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="id">Rooster ID</Label>
-                          <Input 
-                            id="id" 
+                          <Input
+                            id="id"
                             value={formData.id}
-                            onChange={(e) => handleInputChange("id", e.target.value)}
-                            placeholder="TR-001" 
-                            className="border-[#3d6c58]/20 text-black" 
+                            onChange={(e) =>
+                              handleInputChange("id", e.target.value)
+                            }
+                            placeholder="TR-001"
+                            className="border-[#3d6c58]/20 text-black"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="breed">Breed</Label>
-                          <Select value={formData.breed} onValueChange={(value) => {
-                            handleInputChange("breed", value);
-                            handleInputChange("breedId", value.toLowerCase().replace(/\s+/g, '-'));
-                          }}>
+                          <Select
+                            value={formData.breed}
+                            onValueChange={(value) => {
+                              handleInputChange("breed", value);
+                              handleInputChange(
+                                "breedId",
+                                value.toLowerCase().replace(/\s+/g, "-")
+                              );
+                            }}
+                          >
                             <SelectTrigger className="border-[#3d6c58]/20">
                               <SelectValue placeholder="Select breed" />
                             </SelectTrigger>
@@ -267,14 +314,28 @@ export default function AddRoosterPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="location">Location</Label>
-                          <Select value={formData.locationId} onValueChange={(value) => {
-                            const selectedLocation = locations.find(loc => loc.locationId === value);
-                            if (selectedLocation) {
-                              handleInputChange("locationId", selectedLocation.locationId);
-                              handleInputChange("location", selectedLocation.name);
-                              handleInputChange("locationAddress", selectedLocation.address || "");
-                            }
-                          }}>
+                          <Select
+                            value={formData.locationId}
+                            onValueChange={(value) => {
+                              const selectedLocation = locations.find(
+                                (loc) => loc.locationId === value
+                              );
+                              if (selectedLocation) {
+                                handleInputChange(
+                                  "locationId",
+                                  selectedLocation.locationId
+                                );
+                                handleInputChange(
+                                  "location",
+                                  selectedLocation.name
+                                );
+                                handleInputChange(
+                                  "locationAddress",
+                                  selectedLocation.address || ""
+                                );
+                              }
+                            }}
+                          >
                             <SelectTrigger className="border-[#3d6c58]/20">
                               <SelectValue placeholder="Select location" />
                             </SelectTrigger>
@@ -289,7 +350,10 @@ export default function AddRoosterPage() {
                                 </SelectItem>
                               ) : (
                                 locations.map((location) => (
-                                  <SelectItem key={location.locationId} value={location.locationId}>
+                                  <SelectItem
+                                    key={location.locationId}
+                                    value={location.locationId}
+                                  >
                                     {location.name}
                                   </SelectItem>
                                 ))
@@ -299,33 +363,45 @@ export default function AddRoosterPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="age">Age</Label>
-                          <Input 
-                            id="age" 
+                          <Input
+                            id="age"
                             value={formData.age}
-                            onChange={(e) => handleInputChange("age", e.target.value)}
-                            placeholder="18 months" 
-                            className="border-[#3d6c58]/20 text-black" 
+                            onChange={(e) =>
+                              handleInputChange("age", e.target.value)
+                            }
+                            placeholder="18 months"
+                            className="border-[#3d6c58]/20 text-black"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="weight">Weight</Label>
-                          <Input 
-                            id="weight" 
+                          <Input
+                            id="weight"
                             value={formData.weight}
-                            onChange={(e) => handleInputChange("weight", e.target.value)}
-                            placeholder="4.5 kg" 
-                            className="border-[#3d6c58]/20 text-black" 
+                            onChange={(e) =>
+                              handleInputChange("weight", e.target.value)
+                            }
+                            placeholder="4.5 kg"
+                            className="border-[#3d6c58]/20 text-black"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="status">Status</Label>
-                          <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                          <Select
+                            value={formData.status}
+                            onValueChange={(value) =>
+                              handleInputChange("status", value)
+                            }
+                          >
                             <SelectTrigger className="border-[#3d6c58]/20">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
                               {roosterStatuses.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
+                                <SelectItem
+                                  key={status.value}
+                                  value={status.value}
+                                >
                                   {status.label}
                                 </SelectItem>
                               ))}
@@ -334,13 +410,21 @@ export default function AddRoosterPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="health">Health Status</Label>
-                          <Select value={formData.health} onValueChange={(value) => handleInputChange("health", value)}>
+                          <Select
+                            value={formData.health}
+                            onValueChange={(value) =>
+                              handleInputChange("health", value)
+                            }
+                          >
                             <SelectTrigger className="border-[#3d6c58]/20">
                               <SelectValue placeholder="Select health status" />
                             </SelectTrigger>
                             <SelectContent>
                               {healthStatuses.map((health) => (
-                                <SelectItem key={health.value} value={health.value}>
+                                <SelectItem
+                                  key={health.value}
+                                  value={health.value}
+                                >
                                   {health.label}
                                 </SelectItem>
                               ))}
@@ -350,30 +434,35 @@ export default function AddRoosterPage() {
                       </div>
                     </div>
 
-
                     {/* Pricing */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-[#1f3f2c]">Pricing</h3>
+                      <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                        Pricing
+                      </h3>
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="price">Selling Price (₱)</Label>
-                          <Input 
-                            id="price" 
-                            type="number" 
+                          <Input
+                            id="price"
+                            type="number"
                             value={formData.price}
-                            onChange={(e) => handleInputChange("price", e.target.value)}
-                            placeholder="15000" 
-                            className="border-[#3d6c58]/20 text-black" 
+                            onChange={(e) =>
+                              handleInputChange("price", e.target.value)
+                            }
+                            placeholder="15000"
+                            className="border-[#3d6c58]/20 text-black"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="owner">Owner (if sold)</Label>
-                          <Input 
-                            id="owner" 
+                          <Input
+                            id="owner"
                             value={formData.owner}
-                            onChange={(e) => handleInputChange("owner", e.target.value)}
-                            placeholder="Owner name" 
-                            className="border-[#3d6c58]/20 text-black" 
+                            onChange={(e) =>
+                              handleInputChange("owner", e.target.value)
+                            }
+                            placeholder="Owner name"
+                            className="border-[#3d6c58]/20 text-black"
                           />
                         </div>
                       </div>
@@ -397,7 +486,8 @@ export default function AddRoosterPage() {
                       </div>
                       {vaccinations.length === 0 ? (
                         <p className="text-sm text-[#4a6741]">
-                          No vaccination records yet. Click &quot;Add Vaccination&quot; to add one.
+                          No vaccination records yet. Click &quot;Add
+                          Vaccination&quot; to add one.
                         </p>
                       ) : (
                         <div className="space-y-3">
@@ -408,21 +498,31 @@ export default function AddRoosterPage() {
                             >
                               <div className="flex-1 grid gap-2 md:grid-cols-2">
                                 <div className="space-y-1">
-                                  <Label htmlFor={`vax-name-${index}`} className="text-xs">
+                                  <Label
+                                    htmlFor={`vax-name-${index}`}
+                                    className="text-xs"
+                                  >
                                     Vaccine Name
                                   </Label>
                                   <Input
                                     id={`vax-name-${index}`}
                                     value={vaccination.name}
                                     onChange={(e) =>
-                                      handleVaccinationChange(index, "name", e.target.value)
+                                      handleVaccinationChange(
+                                        index,
+                                        "name",
+                                        e.target.value
+                                      )
                                     }
                                     placeholder="e.g., Newcastle Disease"
                                     className="border-[#3d6c58]/20 text-black"
                                   />
                                 </div>
                                 <div className="space-y-1">
-                                  <Label htmlFor={`vax-date-${index}`} className="text-xs">
+                                  <Label
+                                    htmlFor={`vax-date-${index}`}
+                                    className="text-xs"
+                                  >
                                     Date Administered
                                   </Label>
                                   <Input
@@ -430,7 +530,11 @@ export default function AddRoosterPage() {
                                     type="date"
                                     value={vaccination.date}
                                     onChange={(e) =>
-                                      handleVaccinationChange(index, "date", e.target.value)
+                                      handleVaccinationChange(
+                                        index,
+                                        "date",
+                                        e.target.value
+                                      )
                                     }
                                     className="border-[#3d6c58]/20 text-black"
                                   />
@@ -450,7 +554,6 @@ export default function AddRoosterPage() {
                         </div>
                       )}
                     </div>
-
                   </CardContent>
                 </Card>
 
@@ -459,8 +562,12 @@ export default function AddRoosterPage() {
                   {/* Image Upload */}
                   <Card className="border-[#3d6c58]/20">
                     <CardHeader>
-                      <CardTitle className="text-[#1f3f2c]">Rooster Photos</CardTitle>
-                      <CardDescription>Upload images for the sales display</CardDescription>
+                      <CardTitle className="text-[#1f3f2c]">
+                        Rooster Photos
+                      </CardTitle>
+                      <CardDescription>
+                        Upload images for the sales display
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <EnhancedDropzone
@@ -503,7 +610,7 @@ export default function AddRoosterPage() {
                   {/* Actions */}
                   <Card className="border-[#3d6c58]/20">
                     <CardContent className="pt-6 space-y-3">
-                      <Button 
+                      <Button
                         className="w-full bg-[#3d6c58] hover:bg-[#4e816b]"
                         onClick={handleSave}
                         disabled={isSaving}
@@ -517,8 +624,8 @@ export default function AddRoosterPage() {
                           "Save Rooster Profile"
                         )}
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="w-full text-[#4a6741]"
                         asChild
                       >
@@ -533,5 +640,5 @@ export default function AddRoosterPage() {
         </div>
       </SidebarProvider>
     </div>
-  )
+  );
 }

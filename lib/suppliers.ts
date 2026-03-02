@@ -19,14 +19,12 @@ export async function getAllSuppliers(): Promise<Supplier[]> {
       itemsSupplied: data.itemsSupplied || 0,
       totalOrders: data.totalOrders || 0,
       notes: data.notes,
-      createdAt:
-        data.createdAt?._seconds
-          ? new Date(data.createdAt._seconds * 1000).toISOString()
-          : data.createdAt,
-      updatedAt:
-        data.updatedAt?._seconds
-          ? new Date(data.updatedAt._seconds * 1000).toISOString()
-          : data.updatedAt,
+      createdAt: data.createdAt?._seconds
+        ? new Date(data.createdAt._seconds * 1000).toISOString()
+        : data.createdAt,
+      updatedAt: data.updatedAt?._seconds
+        ? new Date(data.updatedAt._seconds * 1000).toISOString()
+        : data.updatedAt,
     } as Supplier;
   });
 }
@@ -50,14 +48,12 @@ export async function getSupplierById(id: string): Promise<Supplier | null> {
     itemsSupplied: data.itemsSupplied || 0,
     totalOrders: data.totalOrders || 0,
     notes: data.notes,
-    createdAt:
-      data.createdAt?._seconds
-        ? new Date(data.createdAt._seconds * 1000).toISOString()
-        : data.createdAt,
-    updatedAt:
-      data.updatedAt?._seconds
-        ? new Date(data.updatedAt._seconds * 1000).toISOString()
-        : data.updatedAt,
+    createdAt: data.createdAt?._seconds
+      ? new Date(data.createdAt._seconds * 1000).toISOString()
+      : data.createdAt,
+    updatedAt: data.updatedAt?._seconds
+      ? new Date(data.updatedAt._seconds * 1000).toISOString()
+      : data.updatedAt,
   } as Supplier;
 }
 
@@ -177,7 +173,9 @@ export async function getSupplierStats(): Promise<SupplierStats> {
 }
 
 // Helper function to update supplier counts when inventory changes
-export async function updateSupplierCounts(supplierName: string): Promise<void> {
+export async function updateSupplierCounts(
+  supplierName: string
+): Promise<void> {
   const suppliersRef = adminDb.collection(SUPPLIERS_COLLECTION);
   const snapshot = await suppliersRef.where("name", "==", supplierName).get();
 
@@ -215,7 +213,9 @@ export async function updateSupplierCounts(supplierName: string): Promise<void> 
   });
 
   // Update supplier document
-  const supplierDocRef = adminDb.collection(SUPPLIERS_COLLECTION).doc(supplierId);
+  const supplierDocRef = adminDb
+    .collection(SUPPLIERS_COLLECTION)
+    .doc(supplierId);
   await supplierDocRef.update({
     itemsSupplied,
     totalOrders,

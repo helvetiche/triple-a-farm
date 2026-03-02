@@ -1,22 +1,22 @@
-import type { Rooster } from "../data/roosters"
+import type { Rooster } from "../data/roosters";
 
 interface Activity {
-  action: string
-  detail: string
-  time: string
-  icon: string
+  action: string;
+  detail: string;
+  time: string;
+  icon: string;
 }
 
 interface DashboardStats {
-  total: number
-  available: number
-  sold: number
-  reserved: number
-  quarantine: number
-  totalValue: number
-  availableValue: number
-  averagePrice: number
-  topBreed: string
+  total: number;
+  available: number;
+  sold: number;
+  reserved: number;
+  quarantine: number;
+  totalValue: number;
+  availableValue: number;
+  averagePrice: number;
+  topBreed: string;
 }
 
 export const exportDashboardToExcel = async (
@@ -27,12 +27,12 @@ export const exportDashboardToExcel = async (
   exportedBy?: string
 ) => {
   // Dynamic import to ensure this only runs on client
-  if (typeof window === 'undefined') {
-    throw new Error('Export can only be performed in the browser')
+  if (typeof window === "undefined") {
+    throw new Error("Export can only be performed in the browser");
   }
 
-  const XLSX = await import('xlsx')
-  const workbook = XLSX.utils.book_new()
+  const XLSX = await import("xlsx");
+  const workbook = XLSX.utils.book_new();
 
   // Sheet 1: Dashboard Summary
   const summaryData = [
@@ -50,17 +50,17 @@ export const exportDashboardToExcel = async (
     ["Available Stock Value", `₱${stats.availableValue.toLocaleString()}`],
     ["Average Price", `₱${Math.round(stats.averagePrice).toLocaleString()}`],
     ["Top Breed", stats.topBreed],
-  ]
+  ];
 
   if (dateRange) {
     summaryData.splice(4, 0, [
       "Date Range",
       `${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`,
-    ])
+    ]);
   }
 
-  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-  XLSX.utils.book_append_sheet(workbook, summarySheet, "Dashboard Summary")
+  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(workbook, summarySheet, "Dashboard Summary");
 
   // Sheet 2: Rooster Inventory
   const roosterData = [
@@ -74,9 +74,9 @@ export const exportDashboardToExcel = async (
       rooster.price,
       rooster.dateAdded,
     ]),
-  ]
-  const roosterSheet = XLSX.utils.aoa_to_sheet(roosterData)
-  XLSX.utils.book_append_sheet(workbook, roosterSheet, "Rooster Inventory")
+  ];
+  const roosterSheet = XLSX.utils.aoa_to_sheet(roosterData);
+  XLSX.utils.book_append_sheet(workbook, roosterSheet, "Rooster Inventory");
 
   // Sheet 3: Recent Activity
   if (activities.length > 0) {
@@ -87,15 +87,15 @@ export const exportDashboardToExcel = async (
         activity.detail,
         activity.time,
       ]),
-    ]
-    const activitySheet = XLSX.utils.aoa_to_sheet(activityData)
-    XLSX.utils.book_append_sheet(workbook, activitySheet, "Recent Activity")
+    ];
+    const activitySheet = XLSX.utils.aoa_to_sheet(activityData);
+    XLSX.utils.book_append_sheet(workbook, activitySheet, "Recent Activity");
   }
 
   // Generate filename with date
-  const dateStr = new Date().toISOString().split("T")[0]
-  const filename = `dashboard_report_${dateStr}.xlsx`
+  const dateStr = new Date().toISOString().split("T")[0];
+  const filename = `dashboard_report_${dateStr}.xlsx`;
 
   // Write file
-  XLSX.writeFile(workbook, filename)
-}
+  XLSX.writeFile(workbook, filename);
+};

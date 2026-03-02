@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from "@/components/ui/spinner";
 
 export function RoosterGallerySkeleton() {
   return (
@@ -17,12 +17,12 @@ export function RoosterGallerySkeleton() {
           </div>
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center">
         <Spinner className="w-8 h-8 text-gray-400" />
       </div>
-      
+
       {/* Footer Skeleton */}
       <div className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6">

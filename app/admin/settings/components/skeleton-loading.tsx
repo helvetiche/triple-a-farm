@@ -1,6 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 export function StatsCardsSkeleton() {
   return (
@@ -18,7 +24,7 @@ export function StatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function FiltersSkeleton() {
@@ -40,7 +46,7 @@ export function FiltersSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function TableSkeleton() {
@@ -71,7 +77,7 @@ export function TableSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function CardsSkeleton() {
@@ -91,7 +97,7 @@ export function CardsSkeleton() {
           <CardContent className="space-y-4">
             {/* Image */}
             <Skeleton className="aspect-square w-full rounded-none" />
-            
+
             {/* Info */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -124,7 +130,7 @@ export function CardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function PageHeaderSkeleton() {
@@ -136,7 +142,7 @@ export function PageHeaderSkeleton() {
       </div>
       <Skeleton className="h-10 w-full sm:w-32" />
     </div>
-  )
+  );
 }
 
 // Settings-specific skeleton components
@@ -146,8 +152,8 @@ export function SettingsNavSkeleton() {
       {/* Navigation Items Skeleton */}
       <nav className="space-y-2">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="group relative block p-4 bg-white border transition-all duration-200"
             style={{ borderRadius: 0 }}
           >
@@ -167,7 +173,7 @@ export function SettingsNavSkeleton() {
         ))}
       </nav>
     </div>
-  )
+  );
 }
 
 export function SettingsPageHeaderSkeleton() {
@@ -178,7 +184,7 @@ export function SettingsPageHeaderSkeleton() {
         <Skeleton className="h-4 w-64" />
       </div>
     </div>
-  )
+  );
 }
 
 export function GeneralSettingsSkeleton() {
@@ -214,7 +220,7 @@ export function GeneralSettingsSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function PasswordSettingsSkeleton() {
@@ -244,7 +250,7 @@ export function PasswordSettingsSkeleton() {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function SecurityTipsSkeleton() {
@@ -272,5 +278,5 @@ export function SecurityTipsSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

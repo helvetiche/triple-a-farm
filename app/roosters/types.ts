@@ -1,4 +1,4 @@
-import type { Rooster } from '@/app/admin/data/roosters';
+import type { Rooster } from "@/app/admin/data/roosters";
 
 export interface RoosterStats {
   total: number;
@@ -13,9 +13,9 @@ export interface RoosterGalleryProps {
   query: string;
   statusFilter: string;
   sortBy: string;
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
   onQueryChange: (value: string) => void;
   onStatusFilterChange: (value: string) => void;
   onSortByChange: (value: string) => void;
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  onViewModeChange: (mode: "grid" | "list") => void;
 }

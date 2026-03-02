@@ -1,14 +1,18 @@
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search, Filter } from "lucide-react"
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, Filter } from "lucide-react";
 
 interface RoosterFiltersProps {
-  searchValue: string
-  onSearchChange: (value: string) => void
-  onFilterClick: () => void
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  onFilterClick: () => void;
 }
 
-export function RoosterFilters({ searchValue, onSearchChange, onFilterClick }: RoosterFiltersProps) {
+export function RoosterFilters({
+  searchValue,
+  onSearchChange,
+  onFilterClick,
+}: RoosterFiltersProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
       <div className="relative w-full sm:flex-1 sm:max-w-sm">
@@ -29,5 +33,5 @@ export function RoosterFilters({ searchValue, onSearchChange, onFilterClick }: R
         Filters
       </Button>
     </div>
-  )
+  );
 }

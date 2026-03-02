@@ -18,17 +18,17 @@ interface LoginRequestBody {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     // Validate request body
-    const validation = validateRequestBody<LoginRequestBody>(
-      body,
-      ['email', 'password']
-    );
-    
+    const validation = validateRequestBody<LoginRequestBody>(body, [
+      "email",
+      "password",
+    ]);
+
     if (!validation.isValid) {
-      return jsonError("BAD_REQUEST", validation.errors.join(', '), 400);
+      return jsonError("BAD_REQUEST", validation.errors.join(", "), 400);
     }
-    
+
     const { email, password } = validation.data!;
 
     const apiKey = process.env.NEXT_PRIVATE_FIREBASE_WEB_API_KEY;
@@ -70,25 +70,33 @@ export async function POST(request: Request) {
         error: idpData?.error,
         message: idpData?.error?.message,
       });
-      
+
       // More specific error handling
       if (idpData?.error?.message === "INVALID_PASSWORD") {
         return jsonError("INVALID_CREDENTIALS", "Invalid password.", 401);
       }
-      
+
       if (idpData?.error?.message === "EMAIL_NOT_FOUND") {
         return jsonError("INVALID_CREDENTIALS", "Email not found.", 401);
       }
-      
+
       if (idpData?.error?.message === "USER_DISABLED") {
         return jsonError("ACCOUNT_DISABLED", "Account has been disabled.", 403);
       }
-      
+
       if (idpData?.error?.message === "TOO_MANY_ATTEMPTS_TRY_LATER") {
-        return jsonError("RATE_LIMITED", "Too many failed attempts. Please try again later.", 429);
+        return jsonError(
+          "RATE_LIMITED",
+          "Too many failed attempts. Please try again later.",
+          429
+        );
       }
 
-      return jsonError("AUTH_LOGIN_FAILED", "Failed to sign in. Please try again.", 401);
+      return jsonError(
+        "AUTH_LOGIN_FAILED",
+        "Failed to sign in. Please try again.",
+        401
+      );
     }
 
     const decodedIdToken = await adminAuth.verifyIdToken(idpData.idToken);
@@ -108,16 +116,13 @@ export async function POST(request: Request) {
     // Update user record with retry logic
     try {
       await withTimeout(
-        adminDb
-          .collection("users")
-          .doc(decodedClaims.uid)
-          .set(
-            {
-              emailVerified: true,
-              lastLogin: new Date(),
-            },
-            { merge: true }
-          ),
+        adminDb.collection("users").doc(decodedClaims.uid).set(
+          {
+            emailVerified: true,
+            lastLogin: new Date(),
+          },
+          { merge: true }
+        ),
         5000,
         "User record update timed out"
       );
@@ -127,8 +132,11 @@ export async function POST(request: Request) {
     }
 
     await setSessionCookie(sessionCookie);
-    
-    console.log("[LOGIN] Successfully created session for:", decodedClaims.email);
+
+    console.log(
+      "[LOGIN] Successfully created session for:",
+      decodedClaims.email
+    );
 
     logAuditEvent(
       {
@@ -158,20 +166,24 @@ export async function POST(request: Request) {
     // More specific error handling
     if (err?.message === "Authentication request timed out") {
       console.error("[LOGIN] Authentication timeout:", error);
-      return jsonError("TIMEOUT", "Authentication request timed out. Please try again.", 408);
+      return jsonError(
+        "TIMEOUT",
+        "Authentication request timed out. Please try again.",
+        408
+      );
     }
-    
+
     if (err?.message === "User record update timed out") {
       console.error("[LOGIN] User update timeout:", error);
       // Continue with login since session was created successfully
     }
-    
+
     console.error("[LOGIN] Unexpected login error:", {
       message: err?.message,
       stack: err?.stack,
       name: err?.name,
     });
-    
+
     return jsonError(
       "AUTH_LOGIN_FAILED",
       "An unexpected error occurred during login.",

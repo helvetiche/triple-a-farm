@@ -35,7 +35,12 @@ type AuditEntity =
 type AuditSeverity = "info" | "warning" | "critical";
 
 const users = [
-  { uid: "tripleagamefarm5", email: "tripleagamefarm5@gmail.com", name: "Triple A Gamefarm", role: "admin" },
+  {
+    uid: "tripleagamefarm5",
+    email: "tripleagamefarm5@gmail.com",
+    name: "Triple A Gamefarm",
+    role: "admin",
+  },
 ];
 
 const inventoryItems = [
@@ -64,11 +69,29 @@ const roosterNames = [
   "Glory",
 ];
 
-const breeds = ["Kelso", "Hatch", "Roundhead", "Sweater", "Albany", "Asil", "Lemon", "Grey"];
+const breeds = [
+  "Kelso",
+  "Hatch",
+  "Roundhead",
+  "Sweater",
+  "Albany",
+  "Asil",
+  "Lemon",
+  "Grey",
+];
 
-const supplierNames = ["AgriFeeds Corp", "VetMed Supply", "Farm Supply Co", "CleanPro Solutions"];
+const supplierNames = [
+  "AgriFeeds Corp",
+  "VetMed Supply",
+  "Farm Supply Co",
+  "CleanPro Solutions",
+];
 
-const locations = ["Paltok Angat TRIPLE A GF", "Plaridel TRIPLE A GF", "Sta Maria Triple A Farm"];
+const locations = [
+  "Paltok Angat TRIPLE A GF",
+  "Plaridel TRIPLE A GF",
+  "Sta Maria Triple A Farm",
+];
 
 function randomElement<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -157,7 +180,11 @@ function generateAuditEntries(count: number): AuditEntry[] {
           description: `Consumed inventory: ${item}`,
           details: {
             changes: [
-              { field: "currentStock", oldValue: oldStock, newValue: oldStock - consumed },
+              {
+                field: "currentStock",
+                oldValue: oldStock,
+                newValue: oldStock - consumed,
+              },
             ],
             metadata: { reason: "Used in Operations", amount: consumed },
           },
@@ -202,7 +229,10 @@ function generateAuditEntries(count: number): AuditEntry[] {
           entityName: rooster,
           description: `Created sale transaction for: ${rooster}`,
           details: {
-            metadata: { amount, paymentMethod: randomElement(["cash", "gcash", "bank_transfer"]) },
+            metadata: {
+              amount,
+              paymentMethod: randomElement(["cash", "gcash", "bank_transfer"]),
+            },
           },
         };
       },
@@ -234,7 +264,11 @@ function generateAuditEntries(count: number): AuditEntry[] {
           description: `Updated supplier: ${supplier}`,
           details: {
             changes: [
-              { field: "phone", oldValue: "0917-123-4567", newValue: "0918-765-4321" },
+              {
+                field: "phone",
+                oldValue: "0917-123-4567",
+                newValue: "0918-765-4321",
+              },
             ],
           },
         };
@@ -245,7 +279,10 @@ function generateAuditEntries(count: number): AuditEntry[] {
           entity: "inventory" as AuditEntity,
           description: `Exported inventory data`,
           details: {
-            metadata: { format: "xlsx", records: Math.floor(Math.random() * 100) + 20 },
+            metadata: {
+              format: "xlsx",
+              records: Math.floor(Math.random() * 100) + 20,
+            },
           },
         };
       },

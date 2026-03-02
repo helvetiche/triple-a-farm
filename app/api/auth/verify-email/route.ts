@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     return jsonSuccess(
       {
         verified: true,
-        message: "Email verification is handled client-side via Firebase Auth action links.",
+        message:
+          "Email verification is handled client-side via Firebase Auth action links.",
       },
       { status: 200 }
     );
@@ -29,5 +30,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-

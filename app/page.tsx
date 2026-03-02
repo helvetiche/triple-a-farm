@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import AOS from 'aos';
-import { Toaster } from 'sonner';
-import { Bird } from 'lucide-react';
-import { Hero } from '@/components/landing/hero';
-import { Ratings } from '@/components/landing/ratings';
-import { RoosterPreview } from '@/components/landing/rooster-preview';
-import { Footer } from '@/components/landing/footer';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useEffect } from "react";
+import AOS from "aos";
+import { Toaster } from "sonner";
+import { Bird } from "lucide-react";
+import { Hero } from "@/components/landing/hero";
+import { Ratings } from "@/components/landing/ratings";
+import { RoosterPreview } from "@/components/landing/rooster-preview";
+import { Footer } from "@/components/landing/footer";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   useEffect(() => {
     AOS.init({
       duration: 800,
-      easing: 'ease-in-out',
+      easing: "ease-in-out",
       once: true,
       delay: 0,
-      disable: 'mobile', // Disable on mobile and use CSS animation instead
-      startEvent: 'DOMContentLoaded',
+      disable: "mobile", // Disable on mobile and use CSS animation instead
+      startEvent: "DOMContentLoaded",
       offset: 50,
       mirror: false,
     });

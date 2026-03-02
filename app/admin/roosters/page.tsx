@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/dashboard/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Pagination } from "@/components/ui/pagination";
 import { useState, useEffect } from "react";
 
@@ -44,9 +43,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   getRoosterStats,
   filterRoosters,
-  roosterBreeds,
-  roosterStatuses,
-  healthStatuses,
   type Rooster,
 } from "../data/roosters";
 
@@ -58,7 +54,7 @@ export const description = "Rooster Inventory Management";
 export default function RoostersPage() {
   // Auth
   const { userData } = useAuth();
-  
+
   // State and settings
   const [searchValue, setSearchValue] = useState("");
   const [roosters, setRoosters] = useState<Rooster[]>([]);
@@ -80,7 +76,7 @@ export default function RoostersPage() {
     description: "",
     onConfirm: () => {},
   });
-  const { viewMode, setViewMode, isLoading } = useRoosterSettings();
+  const { viewMode, setViewMode } = useRoosterSettings();
 
   // Fetch roosters from API
   const fetchRoosters = async () => {
@@ -211,7 +207,7 @@ export default function RoostersPage() {
                       className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                       onClick={() => {
                         try {
-                          const exportedBy = userData 
+                          const exportedBy = userData
                             ? `${userData.firstName} ${userData.lastName} (${userData.email})`
                             : "Unknown";
                           exportRoostersToExcel(roosters, stats, exportedBy);

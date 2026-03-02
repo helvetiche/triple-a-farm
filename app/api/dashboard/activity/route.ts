@@ -24,10 +24,12 @@ const formatTimeAgo = (date: Date): string => {
   const diffDays = Math.floor(diffMs / 86400000);
 
   if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
-  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+  if (diffMins < 60)
+    return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
+  if (diffHours < 24)
+    return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
   if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
-  
+
   const weeks = Math.floor(diffDays / 7);
   return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
 };
@@ -42,7 +44,11 @@ export async function GET(request: NextRequest) {
 
     const canRead = hasRequiredRole(sessionUser.roles, ["admin", "staff"]);
     if (!canRead) {
-      return jsonError("FORBIDDEN", "You do not have permission to view activity.", 403);
+      return jsonError(
+        "FORBIDDEN",
+        "You do not have permission to view activity.",
+        403
+      );
     }
 
     const activities: Activity[] = [];
@@ -121,7 +127,9 @@ export async function GET(request: NextRequest) {
       );
 
       if (lowStockItems.length > 0) {
-        const criticalCount = lowStockItems.filter((item) => item.status === "critical").length;
+        const criticalCount = lowStockItems.filter(
+          (item) => item.status === "critical"
+        ).length;
         const lowCount = lowStockItems.length - criticalCount;
 
         let alertText = "";
@@ -136,7 +144,9 @@ export async function GET(request: NextRequest) {
 
         const mostRecentAlert = lowStockItems
           .map((item) => {
-            const lastRestocked = item.lastRestocked ? new Date(item.lastRestocked) : new Date();
+            const lastRestocked = item.lastRestocked
+              ? new Date(item.lastRestocked)
+              : new Date();
             return {
               item,
               timestamp: lastRestocked.getTime(),
@@ -159,7 +169,9 @@ export async function GET(request: NextRequest) {
     // Get health check info (roosters in quarantine)
     try {
       const roosters = await getRoosters(sessionUser);
-      const quarantineCount = roosters.filter((r) => r.status === "Quarantine").length;
+      const quarantineCount = roosters.filter(
+        (r) => r.status === "Quarantine"
+      ).length;
 
       if (quarantineCount > 0) {
         activities.push({
@@ -197,7 +209,11 @@ export async function GET(request: NextRequest) {
       }
 
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to view activity.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to view activity.",
+          403
+        );
       }
     }
 
@@ -205,4 +221,3 @@ export async function GET(request: NextRequest) {
     return jsonError("ACTIVITY_FETCH_FAILED", "Failed to load activity.", 500);
   }
 }
-

@@ -1,25 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Bell, Check, X, Package, PhilippinePeso, Star, AlertTriangle } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Bell,
+  Check,
+  X,
+  Package,
+  PhilippinePeso,
+  Star,
+  AlertTriangle,
+} from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Notification {
-  id: string
-  type: "inventory" | "sales" | "feedback" | "health"
-  title: string
-  description: string
-  time: string
-  read: boolean
+  id: string;
+  type: "inventory" | "sales" | "feedback" | "health";
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
 }
 
 const iconMap = {
@@ -27,59 +35,69 @@ const iconMap = {
   sales: PhilippinePeso,
   feedback: Star,
   health: AlertTriangle,
-}
+};
 
 export function NotificationPanel() {
-  const [notificationsList, setNotificationsList] = useState<Notification[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const unreadCount = notificationsList.filter(n => !n.read).length
+  const [notificationsList, setNotificationsList] = useState<Notification[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const unreadCount = notificationsList.filter((n) => !n.read).length;
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch("/api/notifications")
-        const result = await response.json()
-        
+        setIsLoading(true);
+        const response = await fetch("/api/notifications");
+        const result = await response.json();
+
         if (result.success && result.data) {
-          setNotificationsList(result.data.map((n: { id: string; title: string; message: string; type: string; timestamp: string }) => ({
-            ...n,
-            read: false,
-          })))
+          setNotificationsList(
+            result.data.map(
+              (n: {
+                id: string;
+                title: string;
+                message: string;
+                type: string;
+                timestamp: string;
+              }) => ({
+                ...n,
+                read: false,
+              })
+            )
+          );
         }
       } catch (error) {
-        console.error("Error fetching notifications:", error)
+        console.error("Error fetching notifications:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchNotifications()
-    
+    fetchNotifications();
+
     // Refresh notifications every 5 minutes
-    const interval = setInterval(fetchNotifications, 5 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [])
+    const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const markAsRead = (id: string) => {
-    setNotificationsList(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, read: true }
-          : notification
+    setNotificationsList((prev) =>
+      prev.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
       )
-    )
-  }
+    );
+  };
 
   const markAllAsRead = () => {
-    setNotificationsList(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
-    )
-  }
+    setNotificationsList((prev) =>
+      prev.map((notification) => ({ ...notification, read: true }))
+    );
+  };
 
   const clearNotification = (id: string) => {
-    setNotificationsList(prev => prev.filter(n => n.id !== id))
-  }
+    setNotificationsList((prev) => prev.filter((n) => n.id !== id));
+  };
 
   return (
     <DropdownMenu>
@@ -93,11 +111,19 @@ export function NotificationPanel() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[calc(100vw-1.5rem)] sm:w-[400px] p-4">
+      <DropdownMenuContent
+        align="end"
+        className="w-[calc(100vw-1.5rem)] sm:w-[400px] p-4"
+      >
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-[#1f3f2c]">Notifications</h3>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-7 px-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={markAllAsRead}
+              className="text-xs h-7 px-2"
+            >
               Mark all as read
             </Button>
           )}
@@ -107,7 +133,9 @@ export function NotificationPanel() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-8">
               <Bell className="h-8 w-8 text-muted-foreground mb-2 animate-pulse" />
-              <p className="text-sm text-muted-foreground">Loading notifications...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading notifications...
+              </p>
             </div>
           ) : notificationsList.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8">
@@ -117,20 +145,26 @@ export function NotificationPanel() {
           ) : (
             <div className="space-y-2">
               {notificationsList.map((notification) => {
-                const Icon = iconMap[notification.type]
+                const Icon = iconMap[notification.type];
                 return (
-                  <div 
-                    key={notification.id} 
-                    className={`relative p-3 border ${!notification.read ? 'border-[#3d6c58]/50 bg-[#3d6c58]/5' : 'border-border bg-background'}`}
+                  <div
+                    key={notification.id}
+                    className={`relative p-3 border ${!notification.read ? "border-[#3d6c58]/50 bg-[#3d6c58]/5" : "border-border bg-background"}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3 flex-1">
-                        <div className={`p-1.5 mt-0.5 ${!notification.read ? 'bg-[#3d6c58]/20' : 'bg-muted'} rounded-none`}>
+                        <div
+                          className={`p-1.5 mt-0.5 ${!notification.read ? "bg-[#3d6c58]/20" : "bg-muted"} rounded-none`}
+                        >
                           <Icon className="h-3.5 w-3.5 text-[#3d6c58]" />
                         </div>
                         <div className="space-y-1 flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-[#1f3f2c] truncate">{notification.title}</h4>
-                          <p className="text-xs text-muted-foreground">{notification.time}</p>
+                          <h4 className="text-sm font-medium text-[#1f3f2c] truncate">
+                            {notification.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {notification.time}
+                          </p>
                           <p className="text-sm text-muted-foreground leading-relaxed">
                             {notification.description}
                           </p>
@@ -158,12 +192,12 @@ export function NotificationPanel() {
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           )}
         </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

@@ -25,14 +25,21 @@ export async function GET() {
         status: (data.status as Rooster["status"]) || "Available",
         health: (data.health as Rooster["health"]) || "good",
         images: Array.isArray(data.images) ? (data.images as string[]) : [],
-        dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+        dateAdded:
+          (data.dateAdded as string) || new Date().toISOString().split("T")[0],
         description: (data.description as string) || "",
         locationId: (data.locationId as string) || "",
         location: (data.location as string) || "",
         locationAddress: (data.locationAddress as string) || undefined,
         owner: data.owner as string | undefined,
         image: data.image as string | undefined,
-        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Array<{ name: string; date: string; nextDue?: string }>) : undefined,
+        vaccinations: Array.isArray(data.vaccinations)
+          ? (data.vaccinations as Array<{
+              name: string;
+              date: string;
+              nextDue?: string;
+            }>)
+          : undefined,
       };
 
       return rooster;
@@ -41,10 +48,6 @@ export async function GET() {
     return jsonSuccess(roosters, { status: 200 });
   } catch (error: unknown) {
     console.error("GET /api/public/roosters error:", error);
-    return jsonError(
-      "ROOSTERS_LIST_FAILED",
-      "Failed to load roosters.",
-      500
-    );
+    return jsonError("ROOSTERS_LIST_FAILED", "Failed to load roosters.", 500);
   }
 }

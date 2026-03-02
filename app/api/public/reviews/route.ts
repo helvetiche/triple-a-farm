@@ -21,7 +21,8 @@ const reviewsCollectionRef = () => adminDb.collection(REVIEWS_COLLECTION);
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customer, rating, rooster, comment, customerId, transactionId } = body;
+    const { customer, rating, rooster, comment, customerId, transactionId } =
+      body;
 
     // Validation
     if (!customer || !rating || !rooster || !comment) {
@@ -33,11 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (rating < 1 || rating > 5) {
-      return jsonError(
-        "INVALID_RATING",
-        "Rating must be between 1 and 5",
-        400
-      );
+      return jsonError("INVALID_RATING", "Rating must be between 1 and 5", 400);
     }
 
     // Create new review with pending status (requires admin approval)
@@ -47,24 +44,17 @@ export async function POST(request: NextRequest) {
       rooster,
       comment,
       status: "pending",
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       customerId,
       transactionId,
       createdAt: new Date().toISOString(),
     };
 
     const docRef = await reviewsCollectionRef().add(newReview);
-    
-    return jsonSuccess(
-      { id: docRef.id, ...newReview },
-      { status: 201 }
-    );
+
+    return jsonSuccess({ id: docRef.id, ...newReview }, { status: 201 });
   } catch (error: unknown) {
     console.error("POST /api/public/reviews error:", error);
-    return jsonError(
-      "REVIEW_CREATE_FAILED",
-      "Failed to create review.",
-      500
-    );
+    return jsonError("REVIEW_CREATE_FAILED", "Failed to create review.", 500);
   }
 }

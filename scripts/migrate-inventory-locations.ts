@@ -15,7 +15,10 @@ async function migrateInventoryLocations() {
     const locationsRef = adminDb.collection(LOCATIONS_COLLECTION);
     const inventoryRef = adminDb.collection(INVENTORY_COLLECTION);
 
-    const locationsSnapshot = await locationsRef.orderBy("name", "asc").limit(1).get();
+    const locationsSnapshot = await locationsRef
+      .orderBy("name", "asc")
+      .limit(1)
+      .get();
 
     if (locationsSnapshot.empty) {
       console.log("No farm locations found. Creating a default location...");
@@ -30,7 +33,9 @@ async function migrateInventoryLocations() {
       };
 
       await locationsRef.doc(defaultLocation.locationId).set(defaultLocation);
-      console.log(`Created default location: ${defaultLocation.name} (ID: ${defaultLocation.locationId})`);
+      console.log(
+        `Created default location: ${defaultLocation.name} (ID: ${defaultLocation.locationId})`
+      );
 
       await assignLocationToInventory(
         inventoryRef,
@@ -45,7 +50,9 @@ async function migrateInventoryLocations() {
       const locationName = locationData.name || "Main Farm";
       const locationAddress = locationData.address || "";
 
-      console.log(`Using existing location: ${locationName} (ID: ${locationId})`);
+      console.log(
+        `Using existing location: ${locationName} (ID: ${locationId})`
+      );
 
       await assignLocationToInventory(
         inventoryRef,

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { RoosterStats } from '@/app/roosters/types';
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { RoosterStats } from "@/app/roosters/types";
 
 interface RoosterGalleryHeaderProps {
   stats: RoosterStats;
 }
 
-export function RoosterGalleryHeader({ stats }: RoosterGalleryHeaderProps) {
+export function RoosterGalleryHeader({}: RoosterGalleryHeaderProps) {
   return (
     <div className="border-b border-[#3d6c58]/20 bg-[#3d6c58] sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
@@ -25,7 +25,9 @@ export function RoosterGalleryHeader({ stats }: RoosterGalleryHeaderProps) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-medium text-white mb-1">Rooster Gallery</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-medium text-white mb-1">
+              Rooster Gallery
+            </h1>
             <p className="text-xs sm:text-sm text-white/80">
               Premium Gamefowl Collection
             </p>

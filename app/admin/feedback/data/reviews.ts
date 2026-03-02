@@ -1,14 +1,14 @@
-export type ReviewStatus = "published" | "pending" | "hidden"
+export type ReviewStatus = "published" | "pending" | "hidden";
 
 export type CustomerReview = {
-  id: string
-  date: string
-  customer: string
-  rating: number
-  rooster: string
-  comment: string
-  status: ReviewStatus
-}
+  id: string;
+  date: string;
+  customer: string;
+  rating: number;
+  rooster: string;
+  comment: string;
+  status: ReviewStatus;
+};
 
 export const customerReviews: CustomerReview[] = [
   {
@@ -61,4 +61,4 @@ export const customerReviews: CustomerReview[] = [
       "Fantastic bird! Exactly as described. Great customer service and fast delivery.",
     status: "published",
   },
-]
+];

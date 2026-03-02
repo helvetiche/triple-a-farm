@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,26 +8,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePicker } from "@/components/ui/date-picker"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Plus } from "lucide-react"
-import type { InventoryItem } from "@/lib/inventory-types"
-import { toastCRUD } from "../utils/toast"
-import { Spinner } from "@/components/ui/spinner"
-import type { FarmLocation } from "./location-switcher"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Plus } from "lucide-react";
+import type { InventoryItem } from "@/lib/inventory-types";
+import { toastCRUD } from "../utils/toast";
+import { Spinner } from "@/components/ui/spinner";
+import type { FarmLocation } from "./location-switcher";
 
 interface InventoryAddDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onItemAdded: (item: InventoryItem) => void
-  selectedLocation?: FarmLocation | null
-  locations?: FarmLocation[]
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onItemAdded: (item: InventoryItem) => void;
+  selectedLocation?: FarmLocation | null;
+  locations?: FarmLocation[];
 }
 
 export function InventoryAddDialog({
@@ -37,7 +43,7 @@ export function InventoryAddDialog({
   selectedLocation,
   locations = [],
 }: InventoryAddDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -51,41 +57,53 @@ export function InventoryAddDialog({
     lastRestocked: new Date(),
     expiryDate: undefined as Date | undefined,
     locationId: "",
-  })
+  });
 
   useEffect(() => {
     if (selectedLocation && open) {
-      setFormData(prev => ({ ...prev, locationId: selectedLocation.locationId }))
+      setFormData((prev) => ({
+        ...prev,
+        locationId: selectedLocation.locationId,
+      }));
     }
-  }, [selectedLocation, open])
+  }, [selectedLocation, open]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleDateChange = (field: string, date: Date | undefined) => {
-    setFormData(prev => ({ ...prev, [field]: date }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: date }));
+  };
 
   const handleSubmit = async () => {
     // Validation
-    if (!formData.name || !formData.category || !formData.currentStock || !formData.minStock || !formData.unit || !formData.supplier) {
-      toastCRUD.validationError("Please fill in all required fields")
-      return
+    if (
+      !formData.name ||
+      !formData.category ||
+      !formData.currentStock ||
+      !formData.minStock ||
+      !formData.unit ||
+      !formData.supplier
+    ) {
+      toastCRUD.validationError("Please fill in all required fields");
+      return;
     }
 
     if (!formData.locationId) {
-      toastCRUD.validationError("Please select a farm location")
-      return
+      toastCRUD.validationError("Please select a farm location");
+      return;
     }
 
-    const selectedLoc = locations.find(loc => loc.locationId === formData.locationId)
+    const selectedLoc = locations.find(
+      (loc) => loc.locationId === formData.locationId
+    );
     if (!selectedLoc) {
-      toastCRUD.validationError("Invalid location selected")
-      return
+      toastCRUD.validationError("Invalid location selected");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/inventory", {
@@ -102,29 +120,34 @@ export function InventoryAddDialog({
           supplier: formData.supplier,
           price: formData.price ? parseFloat(formData.price) : undefined,
           description: formData.description || undefined,
-          lastRestocked: formData.lastRestocked?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-          expiryDate: formData.expiryDate?.toISOString().split('T')[0],
+          lastRestocked:
+            formData.lastRestocked?.toISOString().split("T")[0] ||
+            new Date().toISOString().split("T")[0],
+          expiryDate: formData.expiryDate?.toISOString().split("T")[0],
           locationId: selectedLoc.locationId,
           locationName: selectedLoc.name,
           locationAddress: selectedLoc.address,
         }),
-      })
+      });
 
-      const json = await response.json()
+      const json = await response.json();
 
       if (!response.ok || !json?.success) {
         if (response.status === 401 || response.status === 403) {
-          toastCRUD.permissionError()
+          toastCRUD.permissionError();
         } else {
-          toastCRUD.createError("Inventory item", json?.error?.message || "Failed to add item")
+          toastCRUD.createError(
+            "Inventory item",
+            json?.error?.message || "Failed to add item"
+          );
         }
-        return
+        return;
       }
 
-      const newItem = json.data as InventoryItem
-      onItemAdded(newItem)
-      toastCRUD.itemAdded(newItem.name)
-      
+      const newItem = json.data as InventoryItem;
+      onItemAdded(newItem);
+      toastCRUD.itemAdded(newItem.name);
+
       // Reset form
       setFormData({
         id: "",
@@ -139,16 +162,19 @@ export function InventoryAddDialog({
         lastRestocked: new Date(),
         expiryDate: undefined,
         locationId: selectedLocation?.locationId || "",
-      })
-      
-      onOpenChange(false)
+      });
+
+      onOpenChange(false);
     } catch (error) {
-      console.error("Failed to add inventory item:", error)
-      toastCRUD.createError("Inventory item", "Failed to add item. Please try again.")
+      console.error("Failed to add inventory item:", error);
+      toastCRUD.createError(
+        "Inventory item",
+        "Failed to add item. Please try again."
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,8 +183,12 @@ export function InventoryAddDialog({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div>
-                <DialogTitle className="text-xl">Add New Inventory Item</DialogTitle>
-                <DialogDescription>Add a new item to your inventory tracking system</DialogDescription>
+                <DialogTitle className="text-xl">
+                  Add New Inventory Item
+                </DialogTitle>
+                <DialogDescription>
+                  Add a new item to your inventory tracking system
+                </DialogDescription>
               </div>
             </div>
           </div>
@@ -168,7 +198,9 @@ export function InventoryAddDialog({
           <div className="space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#1f3f2c]">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                Basic Information
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="flex items-center gap-1">
@@ -188,7 +220,9 @@ export function InventoryAddDialog({
                   </Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => handleInputChange("category", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("category", value)
+                    }
                     required
                   >
                     <SelectTrigger>
@@ -210,7 +244,9 @@ export function InventoryAddDialog({
                   id="description"
                   placeholder="Enter item description"
                   value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   rows={3}
                 />
               </div>
@@ -218,10 +254,15 @@ export function InventoryAddDialog({
 
             {/* Stock Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#1f3f2c]">Stock Information</h3>
+              <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                Stock Information
+              </h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="currentStock" className="flex items-center gap-1">
+                  <Label
+                    htmlFor="currentStock"
+                    className="flex items-center gap-1"
+                  >
                     Current Stock <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -229,7 +270,9 @@ export function InventoryAddDialog({
                     type="number"
                     placeholder="0"
                     value={formData.currentStock}
-                    onChange={(e) => handleInputChange("currentStock", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("currentStock", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -242,7 +285,9 @@ export function InventoryAddDialog({
                     type="number"
                     placeholder="0"
                     value={formData.minStock}
-                    onChange={(e) => handleInputChange("minStock", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("minStock", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -250,7 +295,10 @@ export function InventoryAddDialog({
                   <Label htmlFor="unit" className="flex items-center gap-1">
                     Unit <span className="text-red-500">*</span>
                   </Label>
-                  <Select value={formData.unit} onValueChange={(value) => handleInputChange("unit", value)}>
+                  <Select
+                    value={formData.unit}
+                    onValueChange={(value) => handleInputChange("unit", value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select unit" />
                     </SelectTrigger>
@@ -270,7 +318,9 @@ export function InventoryAddDialog({
 
             {/* Supplier and Pricing */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#1f3f2c]">Supplier & Pricing</h3>
+              <h3 className="text-lg font-semibold text-[#1f3f2c]">
+                Supplier & Pricing
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="supplier" className="flex items-center gap-1">
@@ -280,7 +330,9 @@ export function InventoryAddDialog({
                     id="supplier"
                     placeholder="Enter supplier name"
                     value={formData.supplier}
-                    onChange={(e) => handleInputChange("supplier", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("supplier", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -302,18 +354,25 @@ export function InventoryAddDialog({
                 </Label>
                 <Select
                   value={formData.locationId}
-                  onValueChange={(value) => handleInputChange("locationId", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("locationId", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select farm location" />
                   </SelectTrigger>
                   <SelectContent>
                     {locations.map((location) => (
-                      <SelectItem key={location.locationId} value={location.locationId}>
+                      <SelectItem
+                        key={location.locationId}
+                        value={location.locationId}
+                      >
                         <div className="flex flex-col">
                           <span>{location.name}</span>
                           {location.address && (
-                            <span className="text-xs text-gray-500">{location.address}</span>
+                            <span className="text-xs text-gray-500">
+                              {location.address}
+                            </span>
                           )}
                         </div>
                       </SelectItem>
@@ -331,33 +390,34 @@ export function InventoryAddDialog({
                   <DatePicker
                     label="Last Restocked"
                     value={formData.lastRestocked}
-                    onChange={(date: Date | undefined) => handleDateChange("lastRestocked", date)}
+                    onChange={(date: Date | undefined) =>
+                      handleDateChange("lastRestocked", date)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <DatePicker
                     label="Expiry Date (Optional)"
                     value={formData.expiryDate}
-                    onChange={(date: Date | undefined) => handleDateChange("expiryDate", date)}
+                    onChange={(date: Date | undefined) =>
+                      handleDateChange("expiryDate", date)
+                    }
                   />
                 </div>
               </div>
             </div>
           </div>
         </ScrollArea>
-        
+
         <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner />
@@ -373,5 +433,5 @@ export function InventoryAddDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

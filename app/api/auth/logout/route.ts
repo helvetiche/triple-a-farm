@@ -25,7 +25,10 @@ export async function POST(request: Request) {
         };
         await adminAuth.revokeRefreshTokens(decoded.sub as string);
       } catch (error) {
-        console.warn("Failed to verify/revoke session cookie during logout:", error);
+        console.warn(
+          "Failed to verify/revoke session cookie during logout:",
+          error
+        );
       }
     }
 
@@ -37,7 +40,9 @@ export async function POST(request: Request) {
           uid: userInfo.uid,
           email: userInfo.email,
           roles: [],
-          claims: { uid: userInfo.uid } as import("firebase-admin/auth").DecodedIdToken,
+          claims: {
+            uid: userInfo.uid,
+          } as import("firebase-admin/auth").DecodedIdToken,
         },
         {
           action: "logout",
@@ -55,5 +60,3 @@ export async function POST(request: Request) {
     return jsonError("AUTH_LOGOUT_FAILED", "Failed to logout.", 500);
   }
 }
-
-

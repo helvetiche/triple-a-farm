@@ -1,26 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { History, TrendingUp, TrendingDown, User, Calendar } from "lucide-react"
-import type { InventoryItem } from "@/lib/inventory-types"
-import { formatInventoryDisplayId } from "@/lib/inventory-types"
-import type { InventoryActivity } from "@/lib/inventory-types"
-import { toastCRUD } from "../utils/toast"
-import { Spinner } from "@/components/ui/spinner"
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  History,
+  TrendingUp,
+  TrendingDown,
+  User,
+  Calendar,
+} from "lucide-react";
+import type { InventoryItem } from "@/lib/inventory-types";
+import { formatInventoryDisplayId } from "@/lib/inventory-types";
+import type { InventoryActivity } from "@/lib/inventory-types";
+import { toastCRUD } from "../utils/toast";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ActivityLogDialogProps {
-  item: InventoryItem | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  item: InventoryItem | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function ActivityLogDialog({
@@ -28,53 +34,53 @@ export function ActivityLogDialog({
   open,
   onOpenChange,
 }: ActivityLogDialogProps) {
-  const [activities, setActivities] = useState<InventoryActivity[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [activities, setActivities] = useState<InventoryActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open && item) {
-      loadActivities()
+      loadActivities();
     }
-  }, [open, item])
+  }, [open, item]);
 
   const loadActivities = async () => {
-    if (!item) return
+    if (!item) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await fetch(`/api/inventory/${item.id}/activity`)
-      const json = await response.json()
+      const response = await fetch(`/api/inventory/${item.id}/activity`);
+      const json = await response.json();
 
       if (!response.ok || !json?.success) {
         if (response.status === 401 || response.status === 403) {
-          toastCRUD.permissionError()
+          toastCRUD.permissionError();
         } else {
-          toastCRUD.loadError("activity logs")
+          toastCRUD.loadError("activity logs");
         }
-        return
+        return;
       }
 
-      setActivities(json.data)
+      setActivities(json.data);
     } catch (error) {
-      console.error("Failed to load activity logs:", error)
-      toastCRUD.networkError()
+      console.error("Failed to load activity logs:", error);
+      toastCRUD.networkError();
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const formatDate = (isoString: string) => {
-    const date = new Date(isoString)
+    const date = new Date(isoString);
     return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
-  if (!item) return null
+  if (!item) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,7 +101,9 @@ export function ActivityLogDialog({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Spinner />
-              <span className="ml-2 text-gray-600">Loading activity logs...</span>
+              <span className="ml-2 text-gray-600">
+                Loading activity logs...
+              </span>
             </div>
           ) : activities.length === 0 ? (
             <div className="text-center py-12">
@@ -107,7 +115,7 @@ export function ActivityLogDialog({
             </div>
           ) : (
             <div className="space-y-4">
-              {activities.map((activity, index) => (
+              {activities.map((activity) => (
                 <div
                   key={activity.id}
                   className="border border-gray-200 rounded-none p-4 hover:bg-gray-50 transition-colors"
@@ -142,7 +150,9 @@ export function ActivityLogDialog({
                                 : "bg-red-100 text-red-800"
                             }
                           >
-                            {activity.type === "restock" ? "Restocked" : "Consumed"}
+                            {activity.type === "restock"
+                              ? "Restocked"
+                              : "Consumed"}
                           </Badge>
                           <span className="font-semibold text-[#1f3f2c]">
                             {activity.type === "restock" ? "+" : "-"}
@@ -166,9 +176,12 @@ export function ActivityLogDialog({
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-500 mb-1">Stock Change</div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Stock Change
+                      </div>
                       <div className="text-sm font-medium text-gray-700">
-                        {activity.previousStock} → {activity.newStock} {activity.unit}
+                        {activity.previousStock} → {activity.newStock}{" "}
+                        {activity.unit}
                       </div>
                     </div>
                   </div>
@@ -179,5 +192,5 @@ export function ActivityLogDialog({
         </ScrollArea>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

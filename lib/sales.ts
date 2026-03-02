@@ -1,7 +1,11 @@
 import { adminDb } from "@/lib/firebase";
 import type { SessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
-import type { SalesTransaction, SalesStats, RevenueTrend } from "@/app/admin/sales/types";
+import type {
+  SalesTransaction,
+  SalesStats,
+  RevenueTrend,
+} from "@/app/admin/sales/types";
 import { logAuditEvent } from "@/lib/audit";
 
 type SalesAction = "read" | "create" | "update" | "delete" | "readStats";
@@ -69,7 +73,8 @@ export const getSalesTransactions = async (
     const data = doc.data() as Omit<SalesTransaction, "id">;
 
     // Format transactionId if it doesn't exist
-    const transactionId = data.transactionId || formatSalesTransactionId(doc.id, data.date);
+    const transactionId =
+      data.transactionId || formatSalesTransactionId(doc.id, data.date);
 
     return {
       id: doc.id,
@@ -94,7 +99,8 @@ export const getSalesTransactionById = async (
   const data = doc.data() as Omit<SalesTransaction, "id">;
 
   // Format transactionId if it doesn't exist
-  const transactionId = data.transactionId || formatSalesTransactionId(doc.id, data.date);
+  const transactionId =
+    data.transactionId || formatSalesTransactionId(doc.id, data.date);
 
   return {
     id: doc.id,
@@ -109,11 +115,11 @@ export const formatSalesTransactionId = (
 ): string => {
   // Get first 4 characters of document ID (uppercase)
   const idPart = documentId.slice(0, 4).toUpperCase();
-  
+
   // Extract month and day from date (YYYY-MM-DD format)
-  const [year, month, day] = date.split("-");
+  const [, month, day] = date.split("-");
   const datePart = `${month}${day}`;
-  
+
   return `#${idPart}-${datePart}`;
 };
 
@@ -146,9 +152,11 @@ export const createSalesTransaction = async (
   };
 
   // Remove undefined values before saving to Firestore
-  const removeUndefined = (obj: Record<string, unknown>): Record<string, unknown> => {
+  const removeUndefined = (
+    obj: Record<string, unknown>
+  ): Record<string, unknown> => {
     return Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v !== undefined)
+      Object.entries(obj).filter(([, v]) => v !== undefined)
     );
   };
 
@@ -209,9 +217,11 @@ export const updateSalesTransaction = async (
     };
 
     // Remove undefined values before saving to Firestore
-    const removeUndefined = (obj: Record<string, unknown>): Record<string, unknown> => {
+    const removeUndefined = (
+      obj: Record<string, unknown>
+    ): Record<string, unknown> => {
       return Object.fromEntries(
-        Object.entries(obj).filter(([_, v]) => v !== undefined)
+        Object.entries(obj).filter(([, v]) => v !== undefined)
       );
     };
 
@@ -318,7 +328,10 @@ export const getSalesStats = async (
     );
   });
 
-  const currentMonthRevenue = currentMonth.reduce((sum, t) => sum + t.amount, 0);
+  const currentMonthRevenue = currentMonth.reduce(
+    (sum, t) => sum + t.amount,
+    0
+  );
 
   const lastMonthRevenue = lastMonth.reduce((sum, t) => sum + t.amount, 0);
 
@@ -328,10 +341,13 @@ export const getSalesStats = async (
       : 0;
 
   // Find top breed
-  const breedCounts = transactions.reduce((acc, t) => {
-    acc[t.breed] = (acc[t.breed] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const breedCounts = transactions.reduce(
+    (acc, t) => {
+      acc[t.breed] = (acc[t.breed] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const topBreed =
     Object.entries(breedCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || "";
@@ -373,4 +389,3 @@ export const getRevenueTrend = async (
 
   return trends;
 };
-

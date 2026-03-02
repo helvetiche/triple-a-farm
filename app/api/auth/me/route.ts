@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getSessionUser, jsonError, jsonSuccess, SESSION_COOKIE_NAME } from "@/lib/auth";
+import {
+  getSessionUser,
+  jsonError,
+  jsonSuccess,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -36,12 +41,6 @@ export async function GET() {
       stack: err?.stack,
       name: err?.name,
     });
-    return jsonError(
-      "SESSION_INVALID",
-      "Failed to verify session.",
-      401
-    );
+    return jsonError("SESSION_INVALID", "Failed to verify session.", 401);
   }
 }
-
-

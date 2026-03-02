@@ -129,4 +129,3 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     );
   }
 }
-

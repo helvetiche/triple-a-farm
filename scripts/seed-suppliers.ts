@@ -78,7 +78,9 @@ async function seedSuppliers() {
       console.log(`✅ Added supplier: ${supplier.name} (ID: ${docRef.id})`);
     }
 
-    console.log(`\n🎉 Successfully seeded ${initialSuppliers.length} suppliers!`);
+    console.log(
+      `\n🎉 Successfully seeded ${initialSuppliers.length} suppliers!`
+    );
   } catch (error) {
     console.error("❌ Error seeding suppliers:", error);
     throw error;

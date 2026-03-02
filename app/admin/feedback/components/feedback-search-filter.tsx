@@ -1,14 +1,14 @@
-import React from "react"
-import { Filter, Search } from "lucide-react"
+import React from "react";
+import { Filter, Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 type FeedbackSearchFilterProps = {
-  searchValue: string
-  onSearchValueChange: (value: string) => void
-}
+  searchValue: string;
+  onSearchValueChange: (value: string) => void;
+};
 
 export function FeedbackSearchFilter({
   searchValue,
@@ -30,12 +30,15 @@ export function FeedbackSearchFilter({
               className="pl-10 border-[#3d6c58]/20"
             />
           </div>
-          <Button variant="outline" className="border-[#3d6c58]/20 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            className="border-[#3d6c58]/20 w-full sm:w-auto"
+          >
             <Filter className="w-4 h-4 " />
             Filter
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

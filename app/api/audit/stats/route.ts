@@ -24,10 +24,6 @@ export async function GET() {
     }
 
     console.error("GET /api/audit/stats error:", error);
-    return jsonError(
-      "AUDIT_STATS_FAILED",
-      "Failed to load audit stats.",
-      500
-    );
+    return jsonError("AUDIT_STATS_FAILED", "Failed to load audit stats.", 500);
   }
 }

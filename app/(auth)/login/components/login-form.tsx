@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { signIn, getCurrentUserData } from "@/lib/client-auth";
 import { Loader2 } from "lucide-react";
@@ -58,7 +55,9 @@ export function LoginForm({
         router.push("/admin");
         router.refresh();
       } else {
-        toast.error("Login successful but session not established. Please try again.");
+        toast.error(
+          "Login successful but session not established. Please try again."
+        );
       }
     }
 

@@ -1,10 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { X, ChevronLeft, ChevronRight, Calendar, Weight, Heart, DollarSign, User, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { Rooster } from '@/app/admin/data/roosters';
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Weight,
+  Heart,
+  User,
+  MapPin,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { Rooster } from "@/app/admin/data/roosters";
 
 interface Location {
   locationId?: string;
@@ -18,7 +27,10 @@ interface RoosterDetailModalProps {
   onClose: () => void;
 }
 
-export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps) {
+export function RoosterDetailModal({
+  rooster,
+  onClose,
+}: RoosterDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [locations, setLocations] = useState<Location[]>([]);
 
@@ -45,17 +57,19 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
     }
     // Look up from locations by name (most reliable match)
     if (rooster.location) {
-      const location = locations.find(loc => 
-        loc.name === rooster.location || 
-        loc.name.toLowerCase() === rooster.location.toLowerCase()
+      const location = locations.find(
+        (loc) =>
+          loc.name === rooster.location ||
+          loc.name.toLowerCase() === rooster.location.toLowerCase()
       );
       if (location?.address) return location.address;
     }
     // Fallback: try to match by locationId
     if (rooster.locationId) {
-      const location = locations.find(loc => 
-        (loc.locationId && loc.locationId === rooster.locationId) || 
-        (loc.id && loc.id === rooster.locationId)
+      const location = locations.find(
+        (loc) =>
+          (loc.locationId && loc.locationId === rooster.locationId) ||
+          (loc.id && loc.id === rooster.locationId)
       );
       if (location?.address) return location.address;
     }
@@ -64,9 +78,10 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
 
   if (!rooster) return null;
 
-  const images = rooster.images && rooster.images.length > 0 
-    ? rooster.images 
-    : [rooster.image || '/images/roosters/rooster-sample.jpg'];
+  const images =
+    rooster.images && rooster.images.length > 0
+      ? rooster.images
+      : [rooster.image || "/images/roosters/rooster-sample.jpg"];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -83,7 +98,7 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
       onClick={handleBackdropClick}
     >
@@ -144,9 +159,9 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
                     className={`relative w-12 h-12 overflow-hidden border-2 transition-all ${
-                      idx === currentImageIndex 
-                        ? 'border-white scale-110' 
-                        : 'border-transparent opacity-60 hover:opacity-100'
+                      idx === currentImageIndex
+                        ? "border-white scale-110"
+                        : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
                     <Image
@@ -170,14 +185,22 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
                 {rooster.breed}
               </h2>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-gray-500 font-mono">ID: {rooster.id}</p>
-                <span className={`inline-block text-xs font-medium px-3 py-1 ${
-                  rooster.status === 'Available' ? 'bg-green-100 text-green-800' :
-                  rooster.status === 'Sold' ? 'bg-gray-100 text-gray-800' :
-                  rooster.status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
-                  rooster.status === 'Quarantine' ? 'bg-orange-100 text-orange-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
+                <p className="text-sm text-gray-500 font-mono">
+                  ID: {rooster.id}
+                </p>
+                <span
+                  className={`inline-block text-xs font-medium px-3 py-1 ${
+                    rooster.status === "Available"
+                      ? "bg-green-100 text-green-800"
+                      : rooster.status === "Sold"
+                        ? "bg-gray-100 text-gray-800"
+                        : rooster.status === "Reserved"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : rooster.status === "Quarantine"
+                            ? "bg-orange-100 text-orange-800"
+                            : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {rooster.status}
                 </span>
               </div>
@@ -187,7 +210,9 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
             <div className="bg-[#3d6c58]/10 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600 text-sm">Price</span>
-                <span className="text-3xl font-bold text-[#3d6c58]">₱{rooster.price}</span>
+                <span className="text-3xl font-bold text-[#3d6c58]">
+                  ₱{rooster.price}
+                </span>
               </div>
             </div>
 
@@ -214,7 +239,9 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
                   <Heart className="w-4 h-4" />
                   <span>Health</span>
                 </div>
-                <p className="text-gray-900 font-medium capitalize">{rooster.health}</p>
+                <p className="text-gray-900 font-medium capitalize">
+                  {rooster.health}
+                </p>
               </div>
 
               <div className="space-y-1">
@@ -234,7 +261,9 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
                 </div>
                 <p className="text-gray-900 font-medium">{rooster.location}</p>
                 {getLocationAddress(rooster) && (
-                  <p className="text-gray-600 text-sm">{getLocationAddress(rooster)}</p>
+                  <p className="text-gray-600 text-sm">
+                    {getLocationAddress(rooster)}
+                  </p>
                 )}
               </div>
             </div>
@@ -252,9 +281,8 @@ export function RoosterDetailModal({ rooster, onClose }: RoosterDetailModalProps
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-4">
-         
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full border-[#3d6c58] text-[#3d6c58] hover:bg-[#3d6c58]/10"
                 onClick={onClose}
               >

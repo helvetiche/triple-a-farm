@@ -1,11 +1,11 @@
-export type ViewMode = "table" | "cards"
+export type ViewMode = "table" | "cards";
 
 export interface RoosterSettings {
-  viewMode: ViewMode
-  itemsPerPage: number
-  showImages: boolean
-  sortBy: "id" | "breed" | "age" | "price"
-  sortOrder: "asc" | "desc"
+  viewMode: ViewMode;
+  itemsPerPage: number;
+  showImages: boolean;
+  sortBy: "id" | "breed" | "age" | "price";
+  sortOrder: "asc" | "desc";
 }
 
 const DEFAULT_SETTINGS: RoosterSettings = {
@@ -14,29 +14,29 @@ const DEFAULT_SETTINGS: RoosterSettings = {
   showImages: true,
   sortBy: "id",
   sortOrder: "asc",
-}
+};
 
-const SETTINGS_KEY = "triple-a-rooster-settings"
+const SETTINGS_KEY = "triple-a-rooster-settings";
 
 /**
  * Get user settings from localStorage
  */
 export function getRoosterSettings(): RoosterSettings {
   if (typeof window === "undefined") {
-    return DEFAULT_SETTINGS
+    return DEFAULT_SETTINGS;
   }
 
   try {
-    const saved = localStorage.getItem(SETTINGS_KEY)
+    const saved = localStorage.getItem(SETTINGS_KEY);
     if (!saved) {
-      return DEFAULT_SETTINGS
+      return DEFAULT_SETTINGS;
     }
 
-    const parsed = JSON.parse(saved)
-    return { ...DEFAULT_SETTINGS, ...parsed }
+    const parsed = JSON.parse(saved);
+    return { ...DEFAULT_SETTINGS, ...parsed };
   } catch (error) {
-    console.warn("Failed to load rooster settings:", error)
-    return DEFAULT_SETTINGS
+    console.warn("Failed to load rooster settings:", error);
+    return DEFAULT_SETTINGS;
   }
 }
 
@@ -45,15 +45,15 @@ export function getRoosterSettings(): RoosterSettings {
  */
 export function saveRoosterSettings(settings: Partial<RoosterSettings>): void {
   if (typeof window === "undefined") {
-    return
+    return;
   }
 
   try {
-    const currentSettings = getRoosterSettings()
-    const updatedSettings = { ...currentSettings, ...settings }
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings))
+    const currentSettings = getRoosterSettings();
+    const updatedSettings = { ...currentSettings, ...settings };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings));
   } catch (error) {
-    console.warn("Failed to save rooster settings:", error)
+    console.warn("Failed to save rooster settings:", error);
   }
 }
 
@@ -62,13 +62,13 @@ export function saveRoosterSettings(settings: Partial<RoosterSettings>): void {
  */
 export function resetRoosterSettings(): void {
   if (typeof window === "undefined") {
-    return
+    return;
   }
 
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
   } catch (error) {
-    console.warn("Failed to reset rooster settings:", error)
+    console.warn("Failed to reset rooster settings:", error);
   }
 }
 
@@ -78,7 +78,7 @@ export function resetRoosterSettings(): void {
 export function getSetting<K extends keyof RoosterSettings>(
   key: K
 ): RoosterSettings[K] {
-  return getRoosterSettings()[key]
+  return getRoosterSettings()[key];
 }
 
 /**
@@ -88,5 +88,5 @@ export function updateSetting<K extends keyof RoosterSettings>(
   key: K,
   value: RoosterSettings[K]
 ): void {
-  saveRoosterSettings({ [key]: value })
+  saveRoosterSettings({ [key]: value });
 }

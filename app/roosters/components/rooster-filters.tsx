@@ -1,46 +1,48 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Search, Grid, List } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import type { RoosterGalleryProps } from '@/app/roosters/types';
+} from "@/components/ui/select";
+import type { RoosterGalleryProps } from "@/app/roosters/types";
 
-interface RoosterFiltersProps extends Omit<RoosterGalleryProps, 'roosters' | 'isLoading' | 'viewMode' | 'onViewModeChange'> {
+interface RoosterFiltersProps extends Omit<
+  RoosterGalleryProps,
+  "roosters" | "isLoading" | "viewMode" | "onViewModeChange"
+> {
   filteredCount: number;
   totalCount: number;
 }
 
 // Available breeds from our database
 const AVAILABLE_BREEDS = [
-  { breedId: 'BR001', name: 'Lemon' },
-  { breedId: 'BR002', name: 'Golden Boy' },
-  { breedId: 'BR003', name: 'Sweater' },
+  { breedId: "BR001", name: "Lemon" },
+  { breedId: "BR002", name: "Golden Boy" },
+  { breedId: "BR003", name: "Sweater" },
 ];
 
 // Health status options
 const HEALTH_STATUS = [
-  { value: 'all', label: 'All Health' },
-  { value: 'excellent', label: 'Excellent' },
-  { value: 'good', label: 'Good' },
-  { value: 'fair', label: 'Fair' },
-  { value: 'poor', label: 'Poor' },
+  { value: "all", label: "All Health" },
+  { value: "excellent", label: "Excellent" },
+  { value: "good", label: "Good" },
+  { value: "fair", label: "Fair" },
+  { value: "poor", label: "Poor" },
 ];
 
 // Price range options
 const PRICE_RANGES = [
-  { value: 'all', label: 'All Prices' },
-  { value: '0-10000', label: 'Under ₱10,000' },
-  { value: '10000-15000', label: '₱10,000 - ₱15,000' },
-  { value: '15000-20000', label: '₱15,000 - ₱20,000' },
-  { value: '20000+', label: 'Over ₱20,000' },
+  { value: "all", label: "All Prices" },
+  { value: "0-10000", label: "Under ₱10,000" },
+  { value: "10000-15000", label: "₱10,000 - ₱15,000" },
+  { value: "15000-20000", label: "₱15,000 - ₱20,000" },
+  { value: "20000+", label: "Over ₱20,000" },
 ];
 
 export function RoosterFilters({
@@ -53,9 +55,9 @@ export function RoosterFilters({
   onStatusFilterChange,
   onSortByChange,
 }: RoosterFiltersProps) {
-  const [breedFilter, setBreedFilter] = useState('all');
-  const [healthFilter, setHealthFilter] = useState('all');
-  const [priceFilter, setPriceFilter] = useState('all');
+  const [breedFilter, setBreedFilter] = useState("all");
+  const [healthFilter, setHealthFilter] = useState("all");
+  const [priceFilter, setPriceFilter] = useState("all");
 
   // Pass filter changes to parent (you'll need to update the parent component to handle these)
   const handleBreedFilterChange = (value: string) => {
@@ -164,35 +166,46 @@ export function RoosterFilters({
               <SelectItem value="date-oldest">Date (Oldest First)</SelectItem>
               <SelectItem value="age-youngest">Age (Youngest First)</SelectItem>
               <SelectItem value="age-oldest">Age (Oldest First)</SelectItem>
-              <SelectItem value="weight-lightest">Weight (Lightest First)</SelectItem>
-              <SelectItem value="weight-heaviest">Weight (Heaviest First)</SelectItem>
+              <SelectItem value="weight-lightest">
+                Weight (Lightest First)
+              </SelectItem>
+              <SelectItem value="weight-heaviest">
+                Weight (Heaviest First)
+              </SelectItem>
             </SelectContent>
           </Select>
 
           {/* Results Count */}
           <div className="text-sm text-gray-600">
-            Showing <span className="font-medium text-gray-900">{filteredCount}</span> of{' '}
-            <span className="font-medium text-gray-900">{totalCount}</span> roosters
+            Showing{" "}
+            <span className="font-medium text-gray-900">{filteredCount}</span>{" "}
+            of <span className="font-medium text-gray-900">{totalCount}</span>{" "}
+            roosters
           </div>
         </div>
 
         {/* Active Filters Display */}
-        {(breedFilter !== 'all' || healthFilter !== 'all' || priceFilter !== 'all') && (
+        {(breedFilter !== "all" ||
+          healthFilter !== "all" ||
+          priceFilter !== "all") && (
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-sm text-gray-500">Active filters:</span>
-            {breedFilter !== 'all' && (
+            {breedFilter !== "all" && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                {AVAILABLE_BREEDS.find(b => b.breedId === breedFilter)?.name || breedFilter}
+                {AVAILABLE_BREEDS.find((b) => b.breedId === breedFilter)
+                  ?.name || breedFilter}
               </span>
             )}
-            {healthFilter !== 'all' && (
+            {healthFilter !== "all" && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                {HEALTH_STATUS.find(h => h.value === healthFilter)?.label || healthFilter}
+                {HEALTH_STATUS.find((h) => h.value === healthFilter)?.label ||
+                  healthFilter}
               </span>
             )}
-            {priceFilter !== 'all' && (
+            {priceFilter !== "all" && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                {PRICE_RANGES.find(p => p.value === priceFilter)?.label || priceFilter}
+                {PRICE_RANGES.find((p) => p.value === priceFilter)?.label ||
+                  priceFilter}
               </span>
             )}
           </div>
@@ -201,7 +214,10 @@ export function RoosterFilters({
         {/* Search Info */}
         {query && (
           <div className="text-sm text-gray-500">
-            Search: <span className="font-medium text-gray-700">&quot;{query}&quot;</span>
+            Search:{" "}
+            <span className="font-medium text-gray-700">
+              &quot;{query}&quot;
+            </span>
           </div>
         )}
       </div>

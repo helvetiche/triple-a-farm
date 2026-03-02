@@ -1,8 +1,8 @@
-'use client';
-import { ChevronLeft } from "lucide-react"
-import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/components/forgot-password"
-import Image from "next/image"
-import Link from "next/link"
+"use client";
+import { ChevronLeft } from "lucide-react";
+import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/components/forgot-password";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
   return (
@@ -11,13 +11,13 @@ export default function ForgotPasswordPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" className="flex items-center gap-2 font-medium">
             <div className="flex size-6 items-center justify-center">
-              <Image 
-                  src="/images/logo-png.png" 
-                  alt="Triple A Gamefarm Logo" 
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 object-contain"
-                  />
+              <Image
+                src="/images/logo-png.png"
+                alt="Triple A Gamefarm Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
             </div>
             Triple A Gamefarm
           </Link>
@@ -25,12 +25,15 @@ export default function ForgotPasswordPage() {
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="mb-4">
-              <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-green-600 transition-colors duration-200">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-green-600 transition-colors duration-200"
+              >
                 <ChevronLeft className="h-4 w-4" />
                 Back to main page
               </Link>
             </div>
-              <ForgotPasswordForm />
+            <ForgotPasswordForm />
           </div>
         </div>
       </div>
@@ -43,5 +46,5 @@ export default function ForgotPasswordPage() {
         <div className="absolute inset-0 bg-green-100/30"></div>
       </div>
     </div>
-  )
+  );
 }

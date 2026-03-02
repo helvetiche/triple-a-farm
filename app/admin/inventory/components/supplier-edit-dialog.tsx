@@ -104,9 +104,7 @@ export function SupplierEditDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Edit Supplier</DialogTitle>
-            <DialogDescription>
-              Update supplier information
-            </DialogDescription>
+            <DialogDescription>Update supplier information</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
@@ -207,7 +205,9 @@ export function SupplierEditDialog({
               className="bg-[#3d6c58] hover:bg-[#4e816b]"
               disabled={isSubmitting}
             >
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Save Changes
             </Button>
           </DialogFooter>

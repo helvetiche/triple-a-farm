@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronDownIcon } from "lucide-react"
+import * as React from "react";
+import { ChevronDownIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 interface DatePickerProps {
-  id?: string
-  label: string
-  value?: Date
-  onChange?: (date: Date | undefined) => void
-  placeholder?: string
-  disabled?: boolean
-  required?: boolean
-  className?: string
+  id?: string;
+  label: string;
+  value?: Date;
+  onChange?: (date: Date | undefined) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
 }
 
 export function DatePicker({
@@ -33,28 +33,28 @@ export function DatePicker({
   required = false,
   className = "w-48",
 }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<Date | undefined>(value)
+  const [open, setOpen] = React.useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(value);
 
   // Handle external value changes
   React.useEffect(() => {
-    setDate(value)
-  }, [value])
+    setDate(value);
+  }, [value]);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    setDate(selectedDate)
-    onChange?.(selectedDate)
-    setOpen(false)
-  }
+    setDate(selectedDate);
+    onChange?.(selectedDate);
+    setOpen(false);
+  };
 
   const formatDate = (date: Date | undefined) => {
-    if (!date) return placeholder
+    if (!date) return placeholder;
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -86,5 +86,5 @@ export function DatePicker({
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

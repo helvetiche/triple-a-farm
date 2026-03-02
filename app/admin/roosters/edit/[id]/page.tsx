@@ -69,7 +69,9 @@ export default function EditRoosterPage() {
     description: "",
     owner: "",
   });
-  const [vaccinations, setVaccinations] = useState<Array<{ name: string; date: string }>>([]);
+  const [vaccinations, setVaccinations] = useState<
+    Array<{ name: string; date: string }>
+  >([]);
   const [images, setImages] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,28 +127,28 @@ export default function EditRoosterPage() {
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const breedsList = await getRoosterBreeds()
-        setBreeds(breedsList)
+        const breedsList = await getRoosterBreeds();
+        setBreeds(breedsList);
       } catch (error) {
-        console.error('Error fetching breeds:', error)
+        console.error("Error fetching breeds:", error);
       } finally {
-        setIsLoadingBreeds(false)
+        setIsLoadingBreeds(false);
       }
-    }
+    };
 
     const fetchLocations = async () => {
       try {
-        const locationsList = await getRoosterLocationsWithIds()
-        setLocations(locationsList)
+        const locationsList = await getRoosterLocationsWithIds();
+        setLocations(locationsList);
       } catch (error) {
-        console.error('Error fetching locations:', error)
+        console.error("Error fetching locations:", error);
       } finally {
-        setIsLoadingLocations(false)
+        setIsLoadingLocations(false);
       }
-    }
+    };
 
-    fetchBreeds()
-    fetchLocations()
+    fetchBreeds();
+    fetchLocations();
   }, []);
 
   const handleInputChange = (field: string, value: string) => {
@@ -212,7 +214,11 @@ export default function EditRoosterPage() {
     setVaccinations((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleVaccinationChange = (index: number, field: "name" | "date", value: string) => {
+  const handleVaccinationChange = (
+    index: number,
+    field: "name" | "date",
+    value: string
+  ) => {
     setVaccinations((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
@@ -238,7 +244,9 @@ export default function EditRoosterPage() {
 
     try {
       // Filter out empty vaccinations
-      const validVaccinations = vaccinations.filter(v => v.name.trim() && v.date.trim());
+      const validVaccinations = vaccinations.filter(
+        (v) => v.name.trim() && v.date.trim()
+      );
 
       const roosterData = {
         name: formData.name || formData.breed,
@@ -259,7 +267,8 @@ export default function EditRoosterPage() {
         location: formData.location || "Main Farm",
         locationAddress: formData.locationAddress || undefined,
         owner: formData.owner.trim() || undefined,
-        vaccinations: validVaccinations.length > 0 ? validVaccinations : undefined,
+        vaccinations:
+          validVaccinations.length > 0 ? validVaccinations : undefined,
         image: images[0] || undefined,
       };
 
@@ -423,11 +432,22 @@ export default function EditRoosterPage() {
                               <Select
                                 value={formData.locationId}
                                 onValueChange={(value) => {
-                                  const selectedLocation = locations.find(loc => loc.locationId === value);
+                                  const selectedLocation = locations.find(
+                                    (loc) => loc.locationId === value
+                                  );
                                   if (selectedLocation) {
-                                    handleInputChange("locationId", selectedLocation.locationId);
-                                    handleInputChange("location", selectedLocation.name);
-                                    handleInputChange("locationAddress", selectedLocation.address || "");
+                                    handleInputChange(
+                                      "locationId",
+                                      selectedLocation.locationId
+                                    );
+                                    handleInputChange(
+                                      "location",
+                                      selectedLocation.name
+                                    );
+                                    handleInputChange(
+                                      "locationAddress",
+                                      selectedLocation.address || ""
+                                    );
                                   }
                                 }}
                               >
@@ -445,7 +465,10 @@ export default function EditRoosterPage() {
                                     </SelectItem>
                                   ) : (
                                     locations.map((location) => (
-                                      <SelectItem key={location.locationId} value={location.locationId}>
+                                      <SelectItem
+                                        key={location.locationId}
+                                        value={location.locationId}
+                                      >
                                         {location.name}
                                       </SelectItem>
                                     ))
@@ -600,7 +623,8 @@ export default function EditRoosterPage() {
                       </div>
                       {vaccinations.length === 0 ? (
                         <p className="text-sm text-[#4a6741]">
-                          No vaccination records yet. Click &quot;Add Vaccination&quot; to add one.
+                          No vaccination records yet. Click &quot;Add
+                          Vaccination&quot; to add one.
                         </p>
                       ) : (
                         <div className="space-y-3">
@@ -611,21 +635,31 @@ export default function EditRoosterPage() {
                             >
                               <div className="flex-1 grid gap-2 md:grid-cols-2">
                                 <div className="space-y-1">
-                                  <Label htmlFor={`vax-name-${index}`} className="text-xs">
+                                  <Label
+                                    htmlFor={`vax-name-${index}`}
+                                    className="text-xs"
+                                  >
                                     Vaccine Name
                                   </Label>
                                   <Input
                                     id={`vax-name-${index}`}
                                     value={vaccination.name}
                                     onChange={(e) =>
-                                      handleVaccinationChange(index, "name", e.target.value)
+                                      handleVaccinationChange(
+                                        index,
+                                        "name",
+                                        e.target.value
+                                      )
                                     }
                                     placeholder="e.g., Newcastle Disease"
                                     className="border-[#3d6c58]/20 text-black"
                                   />
                                 </div>
                                 <div className="space-y-1">
-                                  <Label htmlFor={`vax-date-${index}`} className="text-xs">
+                                  <Label
+                                    htmlFor={`vax-date-${index}`}
+                                    className="text-xs"
+                                  >
                                     Date Administered
                                   </Label>
                                   <Input
@@ -633,7 +667,11 @@ export default function EditRoosterPage() {
                                     type="date"
                                     value={vaccination.date}
                                     onChange={(e) =>
-                                      handleVaccinationChange(index, "date", e.target.value)
+                                      handleVaccinationChange(
+                                        index,
+                                        "date",
+                                        e.target.value
+                                      )
                                     }
                                     className="border-[#3d6c58]/20 text-black"
                                   />

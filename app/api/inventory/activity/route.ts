@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam) : 100;
 
-    const activities = await getInventoryActivity(sessionUser, undefined, limit);
+    const activities = await getInventoryActivity(
+      sessionUser,
+      undefined,
+      limit
+    );
 
     return jsonSuccess(activities, { status: 200 });
   } catch (error: unknown) {

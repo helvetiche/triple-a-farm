@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function StatsCardsSkeleton() {
   return (
@@ -17,7 +17,7 @@ export function StatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function FiltersSkeleton() {
@@ -39,7 +39,7 @@ export function FiltersSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function TableSkeleton() {
@@ -70,7 +70,7 @@ export function TableSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function CardsSkeleton() {
@@ -90,7 +90,7 @@ export function CardsSkeleton() {
           <CardContent className="space-y-4">
             {/* Image */}
             <Skeleton className="aspect-square w-full rounded-none" />
-            
+
             {/* Info */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -123,7 +123,7 @@ export function CardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function PageHeaderSkeleton() {
@@ -135,5 +135,5 @@ export function PageHeaderSkeleton() {
       </div>
       <Skeleton className="h-10 w-full sm:w-32" />
     </div>
-  )
+  );
 }

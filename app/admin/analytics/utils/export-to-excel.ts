@@ -4,14 +4,14 @@ import type {
   BreedData,
   HealthMetrics,
   CustomerRating,
-} from "../data/mock-data"
+} from "../data/mock-data";
 
 interface AnalyticsData {
-  stats: AnalyticsStats
-  monthlyTrends: MonthlyData[]
-  breedPerformance: BreedData[]
-  healthMetrics: HealthMetrics[]
-  customerRatings: CustomerRating[]
+  stats: AnalyticsStats;
+  monthlyTrends: MonthlyData[];
+  breedPerformance: BreedData[];
+  healthMetrics: HealthMetrics[];
+  customerRatings: CustomerRating[];
 }
 
 export const exportAnalyticsToExcel = async (
@@ -20,12 +20,12 @@ export const exportAnalyticsToExcel = async (
   exportedBy?: string
 ) => {
   // Dynamic import to ensure this only runs on client
-  if (typeof window === 'undefined') {
-    throw new Error('Export can only be performed in the browser')
+  if (typeof window === "undefined") {
+    throw new Error("Export can only be performed in the browser");
   }
 
-  const XLSX = await import('xlsx')
-  const workbook = XLSX.utils.book_new()
+  const XLSX = await import("xlsx");
+  const workbook = XLSX.utils.book_new();
 
   // Sheet 1: Summary Statistics
   const summaryData = [
@@ -38,22 +38,31 @@ export const exportAnalyticsToExcel = async (
     ["Total Sales", data.stats.totalSales],
     ["Average Sale", `₱${Math.round(data.stats.averageSale).toLocaleString()}`],
     ["Top Breed", data.stats.topBreed],
-    ["Monthly Growth", `${data.stats.monthlyGrowth >= 0 ? "+" : ""}${data.stats.monthlyGrowth.toFixed(1)}%`],
-    ["Yearly Growth", `${data.stats.yearlyGrowth >= 0 ? "+" : ""}${data.stats.yearlyGrowth.toFixed(1)}%`],
-    ["Monthly Sales Growth", `${data.stats.monthlySalesGrowth >= 0 ? "+" : ""}${data.stats.monthlySalesGrowth.toFixed(1)}%`],
+    [
+      "Monthly Growth",
+      `${data.stats.monthlyGrowth >= 0 ? "+" : ""}${data.stats.monthlyGrowth.toFixed(1)}%`,
+    ],
+    [
+      "Yearly Growth",
+      `${data.stats.yearlyGrowth >= 0 ? "+" : ""}${data.stats.yearlyGrowth.toFixed(1)}%`,
+    ],
+    [
+      "Monthly Sales Growth",
+      `${data.stats.monthlySalesGrowth >= 0 ? "+" : ""}${data.stats.monthlySalesGrowth.toFixed(1)}%`,
+    ],
     ["Total Customers", data.stats.totalCustomers],
     ["Active Roosters", data.stats.activeRoosters],
-  ]
+  ];
 
   if (dateRange) {
     summaryData.splice(3, 0, [
       "Date Range",
       `${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`,
-    ])
+    ]);
   }
 
-  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-  XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
+  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
 
   // Sheet 2: Monthly Trends
   if (data.monthlyTrends.length > 0) {
@@ -66,9 +75,9 @@ export const exportAnalyticsToExcel = async (
         item.profit,
         item.customers,
       ]),
-    ]
-    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyData)
-    XLSX.utils.book_append_sheet(workbook, monthlySheet, "Monthly Trends")
+    ];
+    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyData);
+    XLSX.utils.book_append_sheet(workbook, monthlySheet, "Monthly Trends");
   }
 
   // Sheet 3: Breed Performance
@@ -81,9 +90,9 @@ export const exportAnalyticsToExcel = async (
         item.revenue,
         item.percentage.toFixed(2),
       ]),
-    ]
-    const breedSheet = XLSX.utils.aoa_to_sheet(breedData)
-    XLSX.utils.book_append_sheet(workbook, breedSheet, "Breed Performance")
+    ];
+    const breedSheet = XLSX.utils.aoa_to_sheet(breedData);
+    XLSX.utils.book_append_sheet(workbook, breedSheet, "Breed Performance");
   }
 
   // Sheet 4: Health Metrics
@@ -105,9 +114,9 @@ export const exportAnalyticsToExcel = async (
         item.mortalityRate,
         item.averageWeight,
       ]),
-    ]
-    const healthSheet = XLSX.utils.aoa_to_sheet(healthData)
-    XLSX.utils.book_append_sheet(workbook, healthSheet, "Health Metrics")
+    ];
+    const healthSheet = XLSX.utils.aoa_to_sheet(healthData);
+    XLSX.utils.book_append_sheet(workbook, healthSheet, "Health Metrics");
   }
 
   // Sheet 5: Customer Ratings
@@ -120,18 +129,17 @@ export const exportAnalyticsToExcel = async (
         item.customerId,
         item.transactionId,
       ]),
-    ]
-    const ratingsSheet = XLSX.utils.aoa_to_sheet(ratingsData)
-    XLSX.utils.book_append_sheet(workbook, ratingsSheet, "Customer Ratings")
+    ];
+    const ratingsSheet = XLSX.utils.aoa_to_sheet(ratingsData);
+    XLSX.utils.book_append_sheet(workbook, ratingsSheet, "Customer Ratings");
   }
 
   // Generate filename with date range if available
   const dateStr = dateRange
     ? `${dateRange.startDate.toISOString().split("T")[0]}_to_${dateRange.endDate.toISOString().split("T")[0]}`
-    : new Date().toISOString().split("T")[0]
-  const filename = `analytics_report_${dateStr}.xlsx`
+    : new Date().toISOString().split("T")[0];
+  const filename = `analytics_report_${dateStr}.xlsx`;
 
   // Write file
-  XLSX.writeFile(workbook, filename)
-}
-
+  XLSX.writeFile(workbook, filename);
+};

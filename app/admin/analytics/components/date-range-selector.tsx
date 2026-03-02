@@ -1,50 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { DateRange } from "../data/mock-data"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { DateRange } from "../data/mock-data";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface DateRangeSelectorProps {
-  onDateRangeChange: (dateRange: DateRange) => void
-  initialDateRange?: DateRange
+  onDateRangeChange: (dateRange: DateRange) => void;
+  initialDateRange?: DateRange;
 }
 
 export function DateRangeSelector({
   onDateRangeChange,
-  initialDateRange
+  initialDateRange,
 }: DateRangeSelectorProps) {
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
-    from: initialDateRange?.startDate || new Date(new Date().setMonth(new Date().getMonth() - 1)),
-    to: initialDateRange?.endDate || new Date()
-  })
-
-  const _handleSelect = (range: { from?: Date; to?: Date } | undefined) => {
-    if (range?.from && range?.to) {
-      const newRange = { from: range.from, to: range.to }
-      setDateRange(newRange)
-      onDateRangeChange({
-        startDate: range.from,
-        endDate: range.to
-      })
-    }
-  }
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from:
+      initialDateRange?.startDate ||
+      new Date(new Date().setMonth(new Date().getMonth() - 1)),
+    to: initialDateRange?.endDate || new Date(),
+  });
 
   const handlePresetChange = (days: number) => {
-    const to = new Date()
-    const from = new Date()
-    from.setDate(from.getDate() - days)
-    const newRange = { from, to }
-    setDateRange(newRange)
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - days);
+    const newRange = { from, to };
+    setDateRange(newRange);
     onDateRangeChange({
       startDate: from,
-      endDate: to
-    })
-  }
+      endDate: to,
+    });
+  };
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -52,7 +50,7 @@ export function DateRangeSelector({
         <CalendarIcon className="w-4 h-4 text-[#3d6c58]" />
         <span className="text-sm font-medium text-[#1f3f2c]">Date Range:</span>
       </div>
-      
+
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -65,16 +63,17 @@ export function DateRangeSelector({
             <CalendarIcon className="mr-2 h-4 w-4" />
             <span className="min-w-0 flex-1 truncate">
               {dateRange.from ? (
-              dateRange.to ? (
-                <>
-                  {format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
-                </>
+                dateRange.to ? (
+                  <>
+                    {format(dateRange.from, "LLL dd, y")} -{" "}
+                    {format(dateRange.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(dateRange.from, "LLL dd, y")
+                )
               ) : (
-                format(dateRange.from, "LLL dd, y")
-              )
-            ) : (
-              <span>Pick a date range</span>
-            )}
+                <span>Pick a date range</span>
+              )}
             </span>
           </Button>
         </PopoverTrigger>
@@ -118,7 +117,7 @@ export function DateRangeSelector({
                 Last 6 Months
               </Button>
             </div>
-            
+
             {/* Calendar Range Picker */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="min-w-0">
@@ -130,18 +129,21 @@ export function DateRangeSelector({
                   selected={dateRange.from}
                   onSelect={(date) => {
                     if (date && (!dateRange.to || date <= dateRange.to)) {
-                      const newRange = { from: date, to: dateRange.to }
-                      setDateRange(newRange)
+                      const newRange = { from: date, to: dateRange.to };
+                      setDateRange(newRange);
                       if (newRange.to) {
                         onDateRangeChange({
                           startDate: date,
-                          endDate: newRange.to
-                        })
+                          endDate: newRange.to,
+                        });
                       }
                     }
                   }}
                   className="border"
-                  disabled={(date) => date > new Date() || (dateRange.to ? date > dateRange.to : false)}
+                  disabled={(date) =>
+                    date > new Date() ||
+                    (dateRange.to ? date > dateRange.to : false)
+                  }
                 />
               </div>
               <div className="min-w-0">
@@ -153,18 +155,21 @@ export function DateRangeSelector({
                   selected={dateRange.to}
                   onSelect={(date) => {
                     if (date && (!dateRange.from || date >= dateRange.from)) {
-                      const newRange = { from: dateRange.from, to: date }
-                      setDateRange(newRange)
+                      const newRange = { from: dateRange.from, to: date };
+                      setDateRange(newRange);
                       if (newRange.from) {
                         onDateRangeChange({
                           startDate: newRange.from,
-                          endDate: date
-                        })
+                          endDate: date,
+                        });
                       }
                     }
                   }}
                   className="border"
-                  disabled={(date) => date > new Date() || (dateRange.from ? date < dateRange.from : false)}
+                  disabled={(date) =>
+                    date > new Date() ||
+                    (dateRange.from ? date < dateRange.from : false)
+                  }
                 />
               </div>
             </div>
@@ -172,5 +177,5 @@ export function DateRangeSelector({
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

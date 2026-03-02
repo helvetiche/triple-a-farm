@@ -98,11 +98,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("POST /api/roosters/upload-image error:", error);
-    return jsonError(
-      "IMAGE_UPLOAD_FAILED",
-      "Failed to upload image.",
-      500
-    );
+    return jsonError("IMAGE_UPLOAD_FAILED", "Failed to upload image.", 500);
   }
 }
-

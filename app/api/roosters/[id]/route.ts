@@ -102,11 +102,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     console.error("PATCH /api/roosters/[id] error:", error);
-    return jsonError(
-      "ROOSTER_UPDATE_FAILED",
-      "Failed to update rooster.",
-      500
-    );
+    return jsonError("ROOSTER_UPDATE_FAILED", "Failed to update rooster.", 500);
   }
 }
 
@@ -138,11 +134,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     }
 
     console.error("DELETE /api/roosters/[id] error:", error);
-    return jsonError(
-      "ROOSTER_DELETE_FAILED",
-      "Failed to delete rooster.",
-      500
-    );
+    return jsonError("ROOSTER_DELETE_FAILED", "Failed to delete rooster.", 500);
   }
 }
-

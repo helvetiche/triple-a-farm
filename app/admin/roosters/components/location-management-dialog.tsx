@@ -26,11 +26,16 @@ interface LocationManagementDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function LocationManagementDialog({ open, onOpenChange }: LocationManagementDialogProps) {
+export function LocationManagementDialog({
+  open,
+  onOpenChange,
+}: LocationManagementDialogProps) {
   const [locations, setLocations] = useState<FarmLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<FarmLocation | null>(null);
+  const [editingLocation, setEditingLocation] = useState<FarmLocation | null>(
+    null
+  );
   const [showAddForm, setShowAddForm] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -103,7 +108,9 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
 
       if (result.success) {
         toast.success(
-          editingLocation ? "Location updated successfully" : "Location created successfully"
+          editingLocation
+            ? "Location updated successfully"
+            : "Location created successfully"
         );
         resetForm();
         fetchLocations();
@@ -128,14 +135,21 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
   };
 
   const handleDelete = async (location: FarmLocation) => {
-    if (!confirm(`Are you sure you want to delete "${location.name}"? This action cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${location.name}"? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/roosters/locations?id=${location.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/roosters/locations?id=${location.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const result = await response.json();
 
@@ -157,7 +171,8 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
         <DialogHeader>
           <DialogTitle>Farm Location Management</DialogTitle>
           <DialogDescription>
-            Manage farm locations. Add, edit, or remove locations from the system.
+            Manage farm locations. Add, edit, or remove locations from the
+            system.
           </DialogDescription>
         </DialogHeader>
 
@@ -174,7 +189,9 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
                     placeholder="Enter location name"
                     required
                   />
@@ -185,21 +202,24 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
                   <Input
                     id="address"
                     value={formData.address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: e.target.value,
+                      }))
+                    }
                     placeholder="Enter address (optional)"
                   />
                 </div>
 
                 <div className="flex gap-2">
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {isSubmitting && (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    )}
                     {editingLocation ? "Update Location" : "Add Location"}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={resetForm}
-                  >
+                  <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
                 </div>
@@ -239,7 +259,9 @@ export function LocationManagementDialog({ open, onOpenChange }: LocationManagem
                         <h4 className="font-semibold">{location.name}</h4>
                       </div>
                       {location.address && (
-                        <p className="text-sm text-gray-600">{location.address}</p>
+                        <p className="text-sm text-gray-600">
+                          {location.address}
+                        </p>
                       )}
                     </div>
                     <div className="flex gap-2">

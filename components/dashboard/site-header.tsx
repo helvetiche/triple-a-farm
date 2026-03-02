@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { SidebarIcon } from "lucide-react"
+import { SidebarIcon } from "lucide-react";
 
-import { NotificationPanel } from "@/components/dashboard/notification-panel"
-import { DynamicBreadcrumb } from "@/components/dashboard/dynamic-breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useSidebar } from "@/components/ui/sidebar"
+import { NotificationPanel } from "@/components/dashboard/notification-panel";
+import { DynamicBreadcrumb } from "@/components/dashboard/dynamic-breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export function SiteHeader() {
-  const { toggleSidebar, state } = useSidebar()
+  const { toggleSidebar } = useSidebar();
 
   return (
     <header className="bg-background sticky top-0 z-50 w-full border-b border-[#3d6c58]/20">
@@ -25,7 +25,10 @@ export function SiteHeader() {
               <SidebarIcon className="h-4 w-4" />
             </Button>
           </div>
-          <Separator orientation="vertical" className="h-4 mr-1 hidden sm:block" />
+          <Separator
+            orientation="vertical"
+            className="h-4 mr-1 hidden sm:block"
+          />
           <div className="min-w-0 flex-1">
             <DynamicBreadcrumb />
           </div>
@@ -39,5 +42,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

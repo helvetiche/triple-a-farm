@@ -29,11 +29,7 @@ export async function GET() {
     }
 
     console.error("GET /api/roosters error:", error);
-    return jsonError(
-      "ROOSTERS_LIST_FAILED",
-      "Failed to load roosters.",
-      500
-    );
+    return jsonError("ROOSTERS_LIST_FAILED", "Failed to load roosters.", 500);
   }
 }
 
@@ -101,11 +97,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("POST /api/roosters error:", error);
-    return jsonError(
-      "ROOSTER_CREATE_FAILED",
-      "Failed to create rooster.",
-      500
-    );
+    return jsonError("ROOSTER_CREATE_FAILED", "Failed to create rooster.", 500);
   }
 }
-

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Upload, X, File, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { toast } from 'sonner';
+import { useState, useCallback } from "react";
+import { Upload, X, File, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 interface EnhancedDropzoneProps {
   value: File[];
@@ -20,7 +20,7 @@ interface EnhancedDropzoneProps {
 interface UploadProgress {
   file: File;
   progress: number;
-  status: 'pending' | 'uploading' | 'success' | 'error';
+  status: "pending" | "uploading" | "success" | "error";
   url?: string;
   error?: string;
 }
@@ -36,7 +36,9 @@ export function EnhancedDropzone({
   className = "",
 }: EnhancedDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map());
+  const [uploadProgress, setUploadProgress] = useState<
+    Map<string, UploadProgress>
+  >(new Map());
   const [isUploading, setIsUploading] = useState(false);
 
   const validateFile = (file: File): string | null => {
@@ -46,16 +48,16 @@ export function EnhancedDropzone({
     }
 
     // Check file type
-    const acceptedTypes = accept.split(',').map(type => type.trim());
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    const acceptedTypes = accept.split(",").map((type) => type.trim());
+    const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
     const mimeType = file.type;
 
-    const isAccepted = acceptedTypes.some(acceptedType => {
-      if (acceptedType.startsWith('.')) {
+    const isAccepted = acceptedTypes.some((acceptedType) => {
+      if (acceptedType.startsWith(".")) {
         return fileExtension === acceptedType;
       }
-      if (acceptedType.includes('*')) {
-        const baseType = acceptedType.split('*')[0];
+      if (acceptedType.includes("*")) {
+        const baseType = acceptedType.split("*")[0];
         return mimeType.startsWith(baseType);
       }
       return mimeType === acceptedType;
@@ -68,70 +70,85 @@ export function EnhancedDropzone({
     return null;
   };
 
-  const handleFiles = useCallback((files: FileList) => {
-    const validFiles: File[] = [];
-    const errors: string[] = [];
+  const handleFiles = useCallback(
+    (files: FileList) => {
+      const validFiles: File[] = [];
+      const errors: string[] = [];
 
-    Array.from(files).forEach(file => {
-      const error = validateFile(file);
-      if (error) {
-        errors.push(`${file.name}: ${error}`);
-      } else {
-        validFiles.push(file);
-      }
-    });
-
-    if (errors.length > 0) {
-      toast.error('Some files were rejected', {
-        description: errors.join('\n'),
+      Array.from(files).forEach((file) => {
+        const error = validateFile(file);
+        if (error) {
+          errors.push(`${file.name}: ${error}`);
+        } else {
+          validFiles.push(file);
+        }
       });
-    }
 
-    if (validFiles.length > 0) {
-      const newFiles = multiple ? [...value, ...validFiles] : [validFiles[0]];
-      const limitedFiles = newFiles.slice(0, maxFiles);
-      
-      if (limitedFiles.length < newFiles.length) {
-        toast.warning('File limit exceeded', {
-          description: `Only ${maxFiles} files allowed. First ${maxFiles} files kept.`,
+      if (errors.length > 0) {
+        toast.error("Some files were rejected", {
+          description: errors.join("\n"),
         });
       }
 
-      onValueChange(limitedFiles);
-    }
-  }, [value, onValueChange, multiple, maxFiles, maxSize, accept]);
+      if (validFiles.length > 0) {
+        const newFiles = multiple ? [...value, ...validFiles] : [validFiles[0]];
+        const limitedFiles = newFiles.slice(0, maxFiles);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (disabled || isUploading) return;
-    
-    handleFiles(e.dataTransfer.files);
-  }, [handleFiles, disabled, isUploading]);
+        if (limitedFiles.length < newFiles.length) {
+          toast.warning("File limit exceeded", {
+            description: `Only ${maxFiles} files allowed. First ${maxFiles} files kept.`,
+          });
+        }
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled && !isUploading) {
-      setIsDragging(true);
-    }
-  }, [disabled, isUploading]);
+        onValueChange(limitedFiles);
+      }
+    },
+    [value, onValueChange, multiple, maxFiles, maxSize, accept]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      if (disabled || isUploading) return;
+
+      handleFiles(e.dataTransfer.files);
+    },
+    [handleFiles, disabled, isUploading]
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!disabled && !isUploading) {
+        setIsDragging(true);
+      }
+    },
+    [disabled, isUploading]
+  );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   }, []);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && !disabled && !isUploading) {
-      handleFiles(e.target.files);
-    }
-  }, [handleFiles, disabled, isUploading]);
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && !disabled && !isUploading) {
+        handleFiles(e.target.files);
+      }
+    },
+    [handleFiles, disabled, isUploading]
+  );
 
-  const removeFile = useCallback((index: number) => {
-    const newFiles = value.filter((_, i) => i !== index);
-    onValueChange(newFiles);
-  }, [value, onValueChange]);
+  const removeFile = useCallback(
+    (index: number) => {
+      const newFiles = value.filter((_, i) => i !== index);
+      onValueChange(newFiles);
+    },
+    [value, onValueChange]
+  );
 
   const uploadFiles = async () => {
     if (value.length === 0) return;
@@ -140,11 +157,11 @@ export function EnhancedDropzone({
     const progressMap = new Map<string, UploadProgress>();
 
     // Initialize progress for all files
-    value.forEach(file => {
+    value.forEach((file) => {
       progressMap.set(file.name, {
         file,
         progress: 0,
-        status: 'pending',
+        status: "pending",
       });
     });
     setUploadProgress(progressMap);
@@ -152,11 +169,11 @@ export function EnhancedDropzone({
     try {
       const uploadPromises = value.map(async (file, index) => {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append("image", file);
 
         // Update progress to uploading
         const currentProgress = progressMap.get(file.name)!;
-        currentProgress.status = 'uploading';
+        currentProgress.status = "uploading";
         setUploadProgress(new Map(progressMap));
 
         // Simulate progress updates
@@ -169,8 +186,8 @@ export function EnhancedDropzone({
         }, 200);
 
         try {
-          const response = await fetch('/api/roosters/upload-image', {
-            method: 'POST',
+          const response = await fetch("/api/roosters/upload-image", {
+            method: "POST",
             body: formData,
           });
 
@@ -179,15 +196,16 @@ export function EnhancedDropzone({
           if (response.ok) {
             const result = await response.json();
             currentProgress.progress = 100;
-            currentProgress.status = 'success';
+            currentProgress.status = "success";
             currentProgress.url = result.data.url;
           } else {
-            throw new Error('Upload failed');
+            throw new Error("Upload failed");
           }
         } catch (error) {
           clearInterval(progressInterval);
-          currentProgress.status = 'error';
-          currentProgress.error = error instanceof Error ? error.message : 'Unknown error';
+          currentProgress.status = "error";
+          currentProgress.error =
+            error instanceof Error ? error.message : "Unknown error";
         }
 
         setUploadProgress(new Map(progressMap));
@@ -197,18 +215,20 @@ export function EnhancedDropzone({
       await Promise.all(uploadPromises);
 
       // Check if all uploads were successful
-      const failedUploads = Array.from(progressMap.values()).filter(p => p.status === 'error');
-      
+      const failedUploads = Array.from(progressMap.values()).filter(
+        (p) => p.status === "error"
+      );
+
       if (failedUploads.length === 0) {
-        toast.success('All files uploaded successfully!');
+        toast.success("All files uploaded successfully!");
       } else {
-        toast.error('Some uploads failed', {
+        toast.error("Some uploads failed", {
           description: `${failedUploads.length} files failed to upload`,
         });
       }
     } catch (error) {
-      toast.error('Upload failed', {
-        description: 'An unexpected error occurred during upload',
+      toast.error("Upload failed", {
+        description: "An unexpected error occurred during upload",
       });
     } finally {
       setIsUploading(false);
@@ -216,18 +236,18 @@ export function EnhancedDropzone({
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       return <ImageIcon className="w-4 h-4" />;
     }
     return <File className="w-4 h-4" />;
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -236,13 +256,17 @@ export function EnhancedDropzone({
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
           isDragging
-            ? 'border-[#3d6c58] bg-[#3d6c58]/5'
-            : 'border-gray-300 hover:border-gray-400'
-        } ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            ? "border-[#3d6c58] bg-[#3d6c58]/5"
+            : "border-gray-300 hover:border-gray-400"
+        } ${disabled || isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => !disabled && !isUploading && document.getElementById('file-upload')?.click()}
+        onClick={() =>
+          !disabled &&
+          !isUploading &&
+          document.getElementById("file-upload")?.click()
+        }
       >
         <input
           type="file"
@@ -255,7 +279,9 @@ export function EnhancedDropzone({
         />
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <p className="text-lg font-medium text-gray-900 mb-2">
-          {isUploading ? 'Uploading files...' : 'Drop files here or click to browse'}
+          {isUploading
+            ? "Uploading files..."
+            : "Drop files here or click to browse"}
         </p>
         <p className="text-sm text-gray-500 mb-4">
           {accept} • Max {maxSize}MB per file • Up to {maxFiles} files
@@ -267,7 +293,7 @@ export function EnhancedDropzone({
           className="border-[#3d6c58] text-[#3d6c58] hover:bg-[#3d6c58] hover:text-white"
           onClick={(e) => {
             e.stopPropagation();
-            document.getElementById('file-upload')?.click();
+            document.getElementById("file-upload")?.click();
           }}
         >
           {isUploading ? (
@@ -276,7 +302,7 @@ export function EnhancedDropzone({
               Uploading...
             </>
           ) : (
-            'Select Files'
+            "Select Files"
           )}
         </Button>
       </div>
@@ -298,7 +324,7 @@ export function EnhancedDropzone({
               </Button>
             )}
           </div>
-          
+
           {value.map((file, index) => {
             const progress = uploadProgress.get(file.name);
             return (
@@ -306,9 +332,7 @@ export function EnhancedDropzone({
                 key={`${file.name}-${index}`}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
               >
-                <div className="flex-shrink-0">
-                  {getFileIcon(file)}
-                </div>
+                <div className="flex-shrink-0">{getFileIcon(file)}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-gray-900 truncate">
@@ -330,18 +354,23 @@ export function EnhancedDropzone({
                       )}
                     </div>
                   </div>
-                  
+
                   {progress && (
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
-                        <span className={`capitalize ${
-                          progress.status === 'success' ? 'text-green-600' :
-                          progress.status === 'error' ? 'text-red-600' :
-                          progress.status === 'uploading' ? 'text-blue-600' :
-                          'text-gray-500'
-                        }`}>
+                        <span
+                          className={`capitalize ${
+                            progress.status === "success"
+                              ? "text-green-600"
+                              : progress.status === "error"
+                                ? "text-red-600"
+                                : progress.status === "uploading"
+                                  ? "text-blue-600"
+                                  : "text-gray-500"
+                          }`}
+                        >
                           {progress.status}
-                          {progress.status === 'error' && progress.error && (
+                          {progress.status === "error" && progress.error && (
                             <span className="ml-1">({progress.error})</span>
                           )}
                         </span>
@@ -352,10 +381,13 @@ export function EnhancedDropzone({
                       <Progress
                         value={progress.progress}
                         className={`h-1 ${
-                          progress.status === 'success' ? 'bg-green-500' :
-                          progress.status === 'error' ? 'bg-red-500' :
-                          progress.status === 'uploading' ? 'bg-blue-500' :
-                          'bg-gray-300'
+                          progress.status === "success"
+                            ? "bg-green-500"
+                            : progress.status === "error"
+                              ? "bg-red-500"
+                              : progress.status === "uploading"
+                                ? "bg-blue-500"
+                                : "bg-gray-300"
                         }`}
                       />
                     </div>

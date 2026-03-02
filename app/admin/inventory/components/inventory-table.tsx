@@ -1,34 +1,40 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { 
+} from "@/components/ui/table";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Eye, Edit, Plus, Minus, History } from "lucide-react"
-import type { InventoryItem } from "@/lib/inventory-types"
-import { formatInventoryDisplayId } from "@/lib/inventory-types"
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Eye, Edit, Plus, Minus, History } from "lucide-react";
+import type { InventoryItem } from "@/lib/inventory-types";
+import { formatInventoryDisplayId } from "@/lib/inventory-types";
 
 interface InventoryTableProps {
-  items: InventoryItem[]
-  onViewDetails: (id: string) => void
-  onEdit: (id: string) => void
-  onRestock: (id: string) => void
-  onConsume: (id: string) => void
-  onViewActivity: (id: string) => void
+  items: InventoryItem[];
+  onViewDetails: (id: string) => void;
+  onEdit: (id: string) => void;
+  onRestock: (id: string) => void;
+  onConsume: (id: string) => void;
+  onViewActivity: (id: string) => void;
 }
 
 export function InventoryTable({
@@ -41,24 +47,21 @@ export function InventoryTable({
 }: InventoryTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "adequate": return "bg-green-100 text-green-800"
-      case "low": return "bg-yellow-100 text-yellow-800"
-      case "critical": return "bg-red-100 text-red-800"
-      default: return "bg-gray-100 text-gray-800"
+      case "adequate":
+        return "bg-green-100 text-green-800";
+      case "low":
+        return "bg-yellow-100 text-yellow-800";
+      case "critical":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStockProgress = (current: number, min: number) => {
-    const percentage = (current / min) * 100
-    return Math.min(percentage, 100)
-  }
-
-  const getProgressColor = (current: number, min: number) => {
-    const percentage = (current / min) * 100
-    if (percentage >= 100) return "bg-green-500"
-    if (percentage >= 50) return "bg-yellow-500"
-    return "bg-red-500"
-  }
+    const percentage = (current / min) * 100;
+    return Math.min(percentage, 100);
+  };
 
   if (items.length === 0) {
     return (
@@ -73,7 +76,7 @@ export function InventoryTable({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -85,11 +88,19 @@ export function InventoryTable({
       <CardContent>
         <div className="space-y-3 sm:hidden">
           {items.map((item) => (
-            <div key={item.id} className="border border-[#3d6c58]/20 bg-white p-4" style={{ borderRadius: 0 }}>
+            <div
+              key={item.id}
+              className="border border-[#3d6c58]/20 bg-white p-4"
+              style={{ borderRadius: 0 }}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="font-semibold text-[#1f3f2c] truncate">{item.name}</div>
-                  <div className="text-sm text-[#4a6741] truncate">{formatInventoryDisplayId(item)} • {item.category}</div>
+                  <div className="font-semibold text-[#1f3f2c] truncate">
+                    {item.name}
+                  </div>
+                  <div className="text-sm text-[#4a6741] truncate">
+                    {formatInventoryDisplayId(item)} • {item.category}
+                  </div>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -128,7 +139,9 @@ export function InventoryTable({
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <div className="text-[#4a6741]">Supplier</div>
-                  <div className="text-[#1f3f2c] font-medium truncate">{item.supplier}</div>
+                  <div className="text-[#1f3f2c] font-medium truncate">
+                    {item.supplier}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[#4a6741]">Status</div>
@@ -154,25 +167,44 @@ export function InventoryTable({
               </div>
 
               <div className="mt-4 flex flex-col gap-2">
-                <Button onClick={() => onViewDetails(item.id)} className="w-full bg-[#3d6c58] hover:bg-[#4e816b]">
+                <Button
+                  onClick={() => onViewDetails(item.id)}
+                  className="w-full bg-[#3d6c58] hover:bg-[#4e816b]"
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
-                <Button variant="outline" onClick={() => onEdit(item.id)} className="w-full border-[#3d6c58]/20">
+                <Button
+                  variant="outline"
+                  onClick={() => onEdit(item.id)}
+                  className="w-full border-[#3d6c58]/20"
+                >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
                 </Button>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" onClick={() => onRestock(item.id)} className="w-full border-[#3d6c58]/20">
+                  <Button
+                    variant="outline"
+                    onClick={() => onRestock(item.id)}
+                    className="w-full border-[#3d6c58]/20"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Restock
                   </Button>
-                  <Button variant="outline" onClick={() => onConsume(item.id)} className="w-full border-[#3d6c58]/20">
+                  <Button
+                    variant="outline"
+                    onClick={() => onConsume(item.id)}
+                    className="w-full border-[#3d6c58]/20"
+                  >
                     <Minus className="w-4 h-4 mr-2" />
                     Consume
                   </Button>
                 </div>
-                <Button variant="outline" onClick={() => onViewActivity(item.id)} className="w-full border-[#3d6c58]/20">
+                <Button
+                  variant="outline"
+                  onClick={() => onViewActivity(item.id)}
+                  className="w-full border-[#3d6c58]/20"
+                >
                   <History className="w-4 h-4 mr-2" />
                   Activity Log
                 </Button>
@@ -197,23 +229,31 @@ export function InventoryTable({
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{formatInventoryDisplayId(item)}</TableCell>
+                  <TableCell className="font-medium">
+                    {formatInventoryDisplayId(item)}
+                  </TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">{item.currentStock} / {item.minStock} {item.unit}</span>
+                        <span className="text-sm">
+                          {item.currentStock} / {item.minStock} {item.unit}
+                        </span>
                       </div>
-                      <Progress 
-                        value={getStockProgress(item.currentStock, item.minStock)} 
+                      <Progress
+                        value={getStockProgress(
+                          item.currentStock,
+                          item.minStock
+                        )}
                         className="h-2"
                       />
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(item.status)}>
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      {item.status.charAt(0).toUpperCase() +
+                        item.status.slice(1)}
                     </Badge>
                   </TableCell>
                   <TableCell>{item.supplier}</TableCell>
@@ -226,7 +266,9 @@ export function InventoryTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => onViewDetails(item.id)}>
+                        <DropdownMenuItem
+                          onClick={() => onViewDetails(item.id)}
+                        >
                           <Eye className=" h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
@@ -244,7 +286,9 @@ export function InventoryTable({
                           Consume
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onViewActivity(item.id)}>
+                        <DropdownMenuItem
+                          onClick={() => onViewActivity(item.id)}
+                        >
                           <History className=" h-4 w-4" />
                           View Activity Log
                         </DropdownMenuItem>
@@ -258,5 +302,5 @@ export function InventoryTable({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-import * as XLSX from "xlsx"
-import type { SalesTransaction, SalesStats } from "../types"
+import * as XLSX from "xlsx";
+import type { SalesTransaction, SalesStats } from "../types";
 
 export const exportSalesToExcel = (
   transactions: SalesTransaction[],
   stats?: SalesStats,
   exportedBy?: string
 ) => {
-  const workbook = XLSX.utils.book_new()
+  const workbook = XLSX.utils.book_new();
 
   // Sheet 1: Summary Statistics
   if (stats) {
@@ -20,17 +20,20 @@ export const exportSalesToExcel = (
       ["Total Transactions", stats.totalTransactions],
       ["Pending Transactions", stats.pendingTransactions],
       ["Average Sale Amount", `₱${stats.averageSaleAmount.toLocaleString()}`],
-      ["Monthly Growth", `${stats.monthlyGrowth >= 0 ? "+" : ""}${stats.monthlyGrowth.toFixed(1)}%`],
+      [
+        "Monthly Growth",
+        `${stats.monthlyGrowth >= 0 ? "+" : ""}${stats.monthlyGrowth.toFixed(1)}%`,
+      ],
       ["Top Breed", stats.topBreed],
-    ]
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary")
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
   }
 
   // Sheet 2: Transactions (sorted alphabetically by customer name)
-  const sortedTransactions = [...transactions].sort((a, b) => 
+  const sortedTransactions = [...transactions].sort((a, b) =>
     a.customerName.localeCompare(b.customerName)
-  )
+  );
   const transactionsData = [
     [
       "Transaction ID",
@@ -62,15 +65,14 @@ export const exportSalesToExcel = (
       t.lastPaymentDate || "",
       t.notes || "",
     ]),
-  ]
-  const transactionsSheet = XLSX.utils.aoa_to_sheet(transactionsData)
-  XLSX.utils.book_append_sheet(workbook, transactionsSheet, "Transactions")
+  ];
+  const transactionsSheet = XLSX.utils.aoa_to_sheet(transactionsData);
+  XLSX.utils.book_append_sheet(workbook, transactionsSheet, "Transactions");
 
   // Generate filename
-  const dateStr = new Date().toISOString().split("T")[0]
-  const filename = `sales_transactions_${dateStr}.xlsx`
+  const dateStr = new Date().toISOString().split("T")[0];
+  const filename = `sales_transactions_${dateStr}.xlsx`;
 
   // Write file
-  XLSX.writeFile(workbook, filename)
-}
-
+  XLSX.writeFile(workbook, filename);
+};

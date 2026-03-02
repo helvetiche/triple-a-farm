@@ -24,5 +24,3 @@ export const hasRequiredRole = (
 
   return requiredRoles.some((role) => userRoles.includes(role));
 };
-
-

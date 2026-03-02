@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,30 +8,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Package, Minus } from "lucide-react"
-import type { InventoryItem } from "@/lib/inventory-types"
-import { toastCRUD } from "../utils/toast"
-import { Spinner } from "@/components/ui/spinner"
-import { formatInventoryDisplayId } from "@/lib/inventory-types"
-import { CONSUME_REASONS } from "@/lib/inventory-types"
+} from "@/components/ui/select";
+import { Package, Minus } from "lucide-react";
+import type { InventoryItem } from "@/lib/inventory-types";
+import { toastCRUD } from "../utils/toast";
+import { Spinner } from "@/components/ui/spinner";
+import { formatInventoryDisplayId } from "@/lib/inventory-types";
+import { CONSUME_REASONS } from "@/lib/inventory-types";
 
 interface ConsumeDialogProps {
-  item: InventoryItem | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConsume: (item: InventoryItem, consumeAmount: number) => void
+  item: InventoryItem | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConsume: (item: InventoryItem, consumeAmount: number) => void;
 }
 
 export function ConsumeDialog({
@@ -40,40 +40,40 @@ export function ConsumeDialog({
   onOpenChange,
   onConsume,
 }: ConsumeDialogProps) {
-  const [consumeAmount, setConsumeAmount] = useState("")
-  const [reason, setReason] = useState("")
-  const [customReason, setCustomReason] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [consumeAmount, setConsumeAmount] = useState("");
+  const [reason, setReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!item) return
+    if (!item) return;
 
-    const amount = parseInt(consumeAmount)
+    const amount = parseInt(consumeAmount);
     if (!consumeAmount || isNaN(amount) || amount <= 0) {
-      toastCRUD.validationError("Please enter a valid consume amount")
-      return
+      toastCRUD.validationError("Please enter a valid consume amount");
+      return;
     }
 
     if (amount > item.currentStock) {
       toastCRUD.validationError(
         `Cannot consume more than current stock (${item.currentStock} ${item.unit})`
-      )
-      return
+      );
+      return;
     }
 
     if (!reason) {
-      toastCRUD.validationError("Please select a reason")
-      return
+      toastCRUD.validationError("Please select a reason");
+      return;
     }
 
-    const finalReason = reason === "Other" ? customReason : reason
+    const finalReason = reason === "Other" ? customReason : reason;
 
     if (!finalReason || finalReason.trim() === "") {
-      toastCRUD.validationError("Please provide a reason")
-      return
+      toastCRUD.validationError("Please provide a reason");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/inventory/${item.id}/consume`, {
@@ -85,45 +85,48 @@ export function ConsumeDialog({
           amount,
           reason: finalReason,
         }),
-      })
+      });
 
-      const json = await response.json()
+      const json = await response.json();
 
       if (!response.ok || !json?.success) {
         if (response.status === 401 || response.status === 403) {
-          toastCRUD.permissionError()
+          toastCRUD.permissionError();
         } else {
           toastCRUD.updateError(
             "Consume",
             json?.error?.message || "Failed to consume item. Please try again."
-          )
+          );
         }
-        return
+        return;
       }
 
-      onConsume(json.data, amount)
-      toastCRUD.itemUpdated(`${item.name} consumed ${amount} units`)
+      onConsume(json.data, amount);
+      toastCRUD.itemUpdated(`${item.name} consumed ${amount} units`);
 
       // Reset form
-      setConsumeAmount("")
-      setReason("")
-      setCustomReason("")
-      onOpenChange(false)
+      setConsumeAmount("");
+      setReason("");
+      setCustomReason("");
+      onOpenChange(false);
     } catch (error) {
-      toastCRUD.updateError("Consume", "Failed to consume item. Please try again.")
+      toastCRUD.updateError(
+        "Consume",
+        "Failed to consume item. Please try again."
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleClose = () => {
-    setConsumeAmount("")
-    setReason("")
-    setCustomReason("")
-    onOpenChange(false)
-  }
+    setConsumeAmount("");
+    setReason("");
+    setCustomReason("");
+    onOpenChange(false);
+  };
 
-  if (!item) return null
+  if (!item) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -171,7 +174,10 @@ export function ConsumeDialog({
           {/* Consume Form */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="consumeAmount" className="flex items-center gap-1">
+              <Label
+                htmlFor="consumeAmount"
+                className="flex items-center gap-1"
+              >
                 Consume Amount <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -210,7 +216,10 @@ export function ConsumeDialog({
 
             {reason === "Other" && (
               <div className="space-y-2">
-                <Label htmlFor="customReason" className="flex items-center gap-1">
+                <Label
+                  htmlFor="customReason"
+                  className="flex items-center gap-1"
+                >
                   Specify Reason <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
@@ -237,7 +246,8 @@ export function ConsumeDialog({
                 >
                   <h4
                     className={`text-sm font-medium mb-2 ${
-                      item.currentStock - parseInt(consumeAmount) < item.minStock
+                      item.currentStock - parseInt(consumeAmount) <
+                      item.minStock
                         ? "text-yellow-900"
                         : "text-blue-900"
                     }`}
@@ -246,7 +256,8 @@ export function ConsumeDialog({
                   </h4>
                   <div
                     className={`text-lg font-bold ${
-                      item.currentStock - parseInt(consumeAmount) < item.minStock
+                      item.currentStock - parseInt(consumeAmount) <
+                      item.minStock
                         ? "text-yellow-900"
                         : "text-blue-900"
                     }`}
@@ -256,7 +267,8 @@ export function ConsumeDialog({
                   </div>
                   <div
                     className={`text-sm ${
-                      item.currentStock - parseInt(consumeAmount) < item.minStock
+                      item.currentStock - parseInt(consumeAmount) <
+                      item.minStock
                         ? "text-yellow-700"
                         : "text-blue-700"
                     }`}
@@ -264,7 +276,8 @@ export function ConsumeDialog({
                     -{parseInt(consumeAmount)} {item.unit} from current{" "}
                     {item.currentStock} {item.unit}
                   </div>
-                  {item.currentStock - parseInt(consumeAmount) < item.minStock && (
+                  {item.currentStock - parseInt(consumeAmount) <
+                    item.minStock && (
                     <p className="text-sm text-yellow-700 mt-2 font-medium">
                       ⚠️ Warning: Stock will be below minimum level
                     </p>
@@ -275,7 +288,11 @@ export function ConsumeDialog({
         </div>
 
         <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button
@@ -304,5 +321,5 @@ export function ConsumeDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

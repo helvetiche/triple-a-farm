@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Stats Cards Skeleton
 export function StatsCardsSkeleton() {
@@ -18,7 +18,7 @@ export function StatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 // Filters Skeleton
@@ -38,7 +38,7 @@ export function FiltersSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Table Skeleton
@@ -58,10 +58,13 @@ export function TableSkeleton() {
                 <Skeleton key={index} className="h-4 flex-1" />
               ))}
             </div>
-            
+
             {/* Table rows */}
             {Array.from({ length: 5 }).map((_, rowIndex) => (
-              <div key={rowIndex} className="flex items-center space-x-4 py-3 border-b">
+              <div
+                key={rowIndex}
+                className="flex items-center space-x-4 py-3 border-b"
+              >
                 {Array.from({ length: 6 }).map((_, colIndex) => (
                   <Skeleton key={colIndex} className="h-4 flex-1" />
                 ))}
@@ -72,7 +75,7 @@ export function TableSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Page Header Skeleton
@@ -85,7 +88,7 @@ export function PageHeaderSkeleton() {
       </div>
       <Skeleton className="h-10 w-full sm:w-32" />
     </div>
-  )
+  );
 }
 
 // Tabs Skeleton
@@ -100,14 +103,14 @@ export function TabsSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Tab content */}
       <div className="space-y-4">
         <FiltersSkeleton />
         <TableSkeleton />
       </div>
     </div>
-  )
+  );
 }
 
 // Suppliers Card Skeleton
@@ -134,7 +137,7 @@ export function SuppliersCardSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 // Alert Card Skeleton
@@ -142,7 +145,10 @@ export function AlertCardSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className="flex items-center justify-between p-4 border">
+        <div
+          key={index}
+          className="flex items-center justify-between p-4 border"
+        >
           <div className="flex items-center space-x-4">
             <Skeleton className="h-5 w-5" />
             <div>
@@ -157,5 +163,5 @@ export function AlertCardSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }

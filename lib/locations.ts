@@ -14,7 +14,9 @@ export interface FarmLocation {
 
 const LOCATIONS_COLLECTION = "farm_locations";
 
-const assertLocationPermission = async (action: "read" | "create" | "update" | "delete") => {
+const assertLocationPermission = async (
+  action: "read" | "create" | "update" | "delete"
+) => {
   const sessionUser = await getSessionUser();
 
   if (!sessionUser) {
@@ -50,10 +52,12 @@ export const getLocations = async (): Promise<string[]> => {
       .orderBy("name", "asc")
       .get();
 
-    const locations = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return data.name as string;
-    }).filter(name => name && name.trim() !== "");
+    const locations = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return data.name as string;
+      })
+      .filter((name) => name && name.trim() !== "");
 
     return locations;
   } catch (error) {
@@ -66,9 +70,7 @@ export const getLocations = async (): Promise<string[]> => {
 export const getLocationsWithDetails = async (): Promise<FarmLocation[]> => {
   await assertLocationPermission("read");
 
-  const snapshot = await locationsCollectionRef()
-    .orderBy("name", "asc")
-    .get();
+  const snapshot = await locationsCollectionRef().orderBy("name", "asc").get();
 
   return snapshot.docs.map((doc) => {
     const data = doc.data();
@@ -83,7 +85,9 @@ export const getLocationsWithDetails = async (): Promise<FarmLocation[]> => {
   });
 };
 
-export const createLocation = async (locationData: Omit<FarmLocation, "locationId" | "createdAt" | "updatedAt">): Promise<FarmLocation> => {
+export const createLocation = async (
+  locationData: Omit<FarmLocation, "locationId" | "createdAt" | "updatedAt">
+): Promise<FarmLocation> => {
   const sessionUser = await assertLocationPermission("create");
 
   const locationId = `LOC-${Date.now()}`;
@@ -115,7 +119,12 @@ export const createLocation = async (locationData: Omit<FarmLocation, "locationI
   return newLocation;
 };
 
-export const updateLocation = async (locationId: string, locationData: Partial<Omit<FarmLocation, "locationId" | "createdAt" | "updatedAt">>): Promise<FarmLocation> => {
+export const updateLocation = async (
+  locationId: string,
+  locationData: Partial<
+    Omit<FarmLocation, "locationId" | "createdAt" | "updatedAt">
+  >
+): Promise<FarmLocation> => {
   const sessionUser = await assertLocationPermission("update");
 
   const now = new Date().toISOString();
@@ -161,7 +170,10 @@ export const deleteLocation = async (locationId: string): Promise<void> => {
   const sessionUser = await assertLocationPermission("delete");
 
   // Check if location is being used by any roosters
-  const roostersSnapshot = await adminDb.collection("roosters").where("locationId", "==", locationId).get();
+  const roostersSnapshot = await adminDb
+    .collection("roosters")
+    .where("locationId", "==", locationId)
+    .get();
   if (!roostersSnapshot.empty) {
     throw new Error("Cannot delete location that is assigned to roosters");
   }
@@ -186,7 +198,9 @@ export const deleteLocation = async (locationId: string): Promise<void> => {
   });
 };
 
-export const getLocationById = async (locationId: string): Promise<FarmLocation | null> => {
+export const getLocationById = async (
+  locationId: string
+): Promise<FarmLocation | null> => {
   await assertLocationPermission("read");
 
   const doc = await locationsCollectionRef().doc(locationId).get();

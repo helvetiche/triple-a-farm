@@ -42,11 +42,7 @@ export async function GET(
     }
 
     console.error("GET /api/suppliers/[id] error:", error);
-    return jsonError(
-      "SUPPLIER_FETCH_FAILED",
-      "Failed to fetch supplier.",
-      500
-    );
+    return jsonError("SUPPLIER_FETCH_FAILED", "Failed to fetch supplier.", 500);
   }
 }
 
@@ -129,7 +125,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    
+
     const supplier = await getSupplierById(id);
     const supplierName = supplier?.name || id;
 
@@ -149,7 +145,10 @@ export async function DELETE(
       },
     });
 
-    return jsonSuccess({ message: "Supplier deleted successfully" }, { status: 200 });
+    return jsonSuccess(
+      { message: "Supplier deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {

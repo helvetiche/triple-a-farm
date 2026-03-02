@@ -14,9 +14,11 @@ export interface RoosterBreed {
 
 const BREEDS_COLLECTION = "rooster_breeds";
 
-const assertBreedPermission = async (action: "read" | "create" | "update" | "delete") => {
+const assertBreedPermission = async (
+  action: "read" | "create" | "update" | "delete"
+) => {
   const sessionUser = await getSessionUser();
-  
+
   if (!sessionUser) {
     throw new Error("UNAUTHENTICATED");
   }
@@ -46,14 +48,14 @@ const breedsCollectionRef = () => adminDb.collection(BREEDS_COLLECTION);
 
 export const getBreeds = async (): Promise<string[]> => {
   try {
-    const snapshot = await breedsCollectionRef()
-      .orderBy("name", "asc")
-      .get();
+    const snapshot = await breedsCollectionRef().orderBy("name", "asc").get();
 
-    const breeds = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return data.name as string;
-    }).filter(name => name && name.trim() !== "");
+    const breeds = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return data.name as string;
+      })
+      .filter((name) => name && name.trim() !== "");
 
     return breeds;
   } catch (error) {
@@ -61,13 +63,13 @@ export const getBreeds = async (): Promise<string[]> => {
     // Fallback to hardcoded breeds if there's an error
     return [
       "Kelso",
-      "Sweater", 
+      "Sweater",
       "Roundhead",
       "Hatch",
       "Grey",
       "Butcher",
       "Lemon",
-      "Claret"
+      "Claret",
     ];
   }
 };
@@ -75,9 +77,7 @@ export const getBreeds = async (): Promise<string[]> => {
 export const getBreedsWithDetails = async (): Promise<RoosterBreed[]> => {
   await assertBreedPermission("read");
 
-  const snapshot = await breedsCollectionRef()
-    .orderBy("name", "asc")
-    .get();
+  const snapshot = await breedsCollectionRef().orderBy("name", "asc").get();
 
   return snapshot.docs.map((doc) => {
     const data = doc.data();

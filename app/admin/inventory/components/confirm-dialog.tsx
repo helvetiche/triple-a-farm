@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -7,21 +7,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 interface ConfirmDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  description: string
-  confirmText?: string
-  cancelText?: string
-  variant?: "default" | "destructive"
-  onConfirm: () => void
-  onCancel?: () => void
-  isLoading?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: "default" | "destructive";
+  onConfirm: () => void;
+  onCancel?: () => void;
+  isLoading?: boolean;
 }
 
 export function ConfirmDialog({
@@ -37,16 +37,16 @@ export function ConfirmDialog({
   isLoading = false,
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
-    onConfirm()
+    onConfirm();
     if (!isLoading) {
-      onOpenChange(false)
+      onOpenChange(false);
     }
-  }
+  };
 
   const handleCancel = () => {
-    onCancel?.()
-    onOpenChange(false)
-  }
+    onCancel?.();
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,17 +63,13 @@ export function ConfirmDialog({
             </div>
           </div>
         </DialogHeader>
-        
+
         <DialogDescription className="text-sm text-muted-foreground mt-2">
           {description}
         </DialogDescription>
 
         <DialogFooter className="mt-6">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
             {cancelText}
           </Button>
           <Button
@@ -86,5 +82,5 @@ export function ConfirmDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

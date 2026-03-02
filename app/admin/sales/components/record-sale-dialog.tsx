@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,29 +8,35 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { CheckCircle, PhilippinePeso, Plus } from "lucide-react"
-import { SalesTransaction } from "../types"
-import { toastCRUD } from "../utils/toast"
-import { getAvailableRoosters, type Rooster } from "../../data/roosters"
-import Link from "next/link"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { CheckCircle, PhilippinePeso, Plus } from "lucide-react";
+import { SalesTransaction } from "../types";
+import { toastCRUD } from "../utils/toast";
+import { getAvailableRoosters, type Rooster } from "../../data/roosters";
+import Link from "next/link";
 
 interface RecordSaleDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSaleRecorded: (transaction: SalesTransaction) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSaleRecorded: (transaction: SalesTransaction) => void;
   prefilledData?: {
-    roosterId: string
-    breed: string
-    price: number
-    name: string
-  }
+    roosterId: string;
+    breed: string;
+    price: number;
+    name: string;
+  };
 }
 
 export function RecordSaleDialog({
@@ -39,9 +45,9 @@ export function RecordSaleDialog({
   onSaleRecorded,
   prefilledData,
 }: RecordSaleDialogProps) {
-  const [isSaving, setIsSaving] = useState(false)
-  const [roosters, setRoosters] = useState<Rooster[]>([])
-  const [isLoadingRoosters, setIsLoadingRoosters] = useState(true)
+  const [isSaving, setIsSaving] = useState(false);
+  const [roosters, setRoosters] = useState<Rooster[]>([]);
+  const [isLoadingRoosters, setIsLoadingRoosters] = useState(true);
   const [formData, setFormData] = useState({
     roosterId: "",
     breed: "",
@@ -50,119 +56,137 @@ export function RecordSaleDialog({
     amount: "",
     paymentMethod: "cash" as "cash" | "gcash" | "bank_transfer",
     notes: "",
-  })
+  });
 
   // Fetch roosters from API
   useEffect(() => {
     if (open) {
       const fetchRoosters = async () => {
         try {
-          setIsLoadingRoosters(true)
-          const response = await fetch("/api/roosters")
-          const result = await response.json()
+          setIsLoadingRoosters(true);
+          const response = await fetch("/api/roosters");
+          const result = await response.json();
           if (result.success) {
-            setRoosters(result.data || [])
+            setRoosters(result.data || []);
           }
         } catch (error) {
-          console.error("Error fetching roosters:", error)
+          console.error("Error fetching roosters:", error);
         } finally {
-          setIsLoadingRoosters(false)
+          setIsLoadingRoosters(false);
         }
-      }
-      fetchRoosters()
+      };
+      fetchRoosters();
     }
-  }, [open])
+  }, [open]);
 
   // Update form when prefilled data changes
   useEffect(() => {
     if (prefilledData) {
       // Ensure price is a valid number
-      const price = typeof prefilledData.price === 'number' ? prefilledData.price : parseFloat(String(prefilledData.price || 0))
-      const priceString = isNaN(price) || price <= 0 ? "" : price.toString()
-      
-      setFormData(prev => ({
+      const price =
+        typeof prefilledData.price === "number"
+          ? prefilledData.price
+          : parseFloat(String(prefilledData.price || 0));
+      const priceString = isNaN(price) || price <= 0 ? "" : price.toString();
+
+      setFormData((prev) => ({
         ...prev,
         roosterId: prefilledData.roosterId,
         breed: prefilledData.breed,
         amount: priceString,
-        notes: `Sale for ${prefilledData.name} (${prefilledData.breed})`
-      }))
+        notes: `Sale for ${prefilledData.name} (${prefilledData.breed})`,
+      }));
     }
-  }, [prefilledData])
+  }, [prefilledData]);
 
-  const availableRoosters = getAvailableRoosters(roosters)
+  const availableRoosters = getAvailableRoosters(roosters);
 
   const handleRoosterSelect = (roosterId: string) => {
-    const selectedRooster = availableRoosters.find(r => r.id === roosterId)
+    const selectedRooster = availableRoosters.find((r) => r.id === roosterId);
     if (selectedRooster) {
       // Ensure price is a valid number, default to empty string if invalid
-      const price = selectedRooster.price ? parseFloat(String(selectedRooster.price)) : 0
-      const priceString = isNaN(price) || price <= 0 ? "" : price.toString()
-      
-      setFormData(prev => ({
+      const price = selectedRooster.price
+        ? parseFloat(String(selectedRooster.price))
+        : 0;
+      const priceString = isNaN(price) || price <= 0 ? "" : price.toString();
+
+      setFormData((prev) => ({
         ...prev,
         roosterId: selectedRooster.id,
         breed: selectedRooster.breed,
         amount: priceString,
-        notes: `Sale for ${selectedRooster.name} (${selectedRooster.breed})`
-      }))
+        notes: `Sale for ${selectedRooster.name} (${selectedRooster.breed})`,
+      }));
     }
-  }
+  };
 
   const paymentMethods = [
     { value: "cash", label: "Cash" },
     { value: "gcash", label: "GCash" },
     { value: "bank_transfer", label: "Bank Transfer" },
-  ]
+  ];
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSave = async () => {
     // Validation
-    if (!formData.roosterId || !formData.breed || !formData.customerName || 
-        !formData.customerContact || !formData.amount) {
-      toastCRUD.validationError("Please fill in all required fields")
-      return
+    if (
+      !formData.roosterId ||
+      !formData.breed ||
+      !formData.customerName ||
+      !formData.customerContact ||
+      !formData.amount
+    ) {
+      toastCRUD.validationError("Please fill in all required fields");
+      return;
     }
 
-    const amount = parseFloat(formData.amount)
+    const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
-      toastCRUD.validationError("Please enter a valid amount")
-      return
+      toastCRUD.validationError("Please enter a valid amount");
+      return;
     }
 
     // Verify rooster is still available
-    const selectedRooster = availableRoosters.find(r => r.id === formData.roosterId)
+    const selectedRooster = availableRoosters.find(
+      (r) => r.id === formData.roosterId
+    );
     if (!selectedRooster) {
-      toastCRUD.validationError("Selected rooster is no longer available")
-      return
+      toastCRUD.validationError("Selected rooster is no longer available");
+      return;
     }
 
-    setIsSaving(true)
+    setIsSaving(true);
 
     try {
       // Update rooster status to "Sold" when sale is recorded
       try {
-        const roosterUpdateResponse = await fetch(`/api/roosters/${formData.roosterId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "Sold"
-          }),
-        })
+        const roosterUpdateResponse = await fetch(
+          `/api/roosters/${formData.roosterId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              status: "Sold",
+            }),
+          }
+        );
 
-        const roosterUpdateResult = await roosterUpdateResponse.json()
-        
+        const roosterUpdateResult = await roosterUpdateResponse.json();
+
         if (!roosterUpdateResult.success) {
-          console.error("Failed to update rooster status:", roosterUpdateResult.error)
+          console.error(
+            "Failed to update rooster status:",
+            roosterUpdateResult.error
+          );
           // Continue with sale recording even if rooster update fails
         }
       } catch (roosterError) {
-        console.error("Error updating rooster status:", roosterError)
+        console.error("Error updating rooster status:", roosterError);
         // Continue with sale recording even if rooster update fails
       }
 
@@ -183,33 +207,41 @@ export function RecordSaleDialog({
           commission: amount * 0.1,
           agentName: "Current Agent",
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || errorData.error || `HTTP ${response.status}: Failed to save sale`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message ||
+            errorData.error ||
+            `HTTP ${response.status}: Failed to save sale`
+        );
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!result.success) {
-        console.error("API Error:", result)
-        throw new Error(result.error?.message || result.error || "Failed to save sale")
+        console.error("API Error:", result);
+        throw new Error(
+          result.error?.message || result.error || "Failed to save sale"
+        );
       }
 
       if (!result.data || !result.data.id) {
-        console.error("Invalid response data:", result)
-        throw new Error("Invalid response from server - missing sale data")
+        console.error("Invalid response data:", result);
+        throw new Error("Invalid response from server - missing sale data");
       }
 
-      console.log("Sale saved successfully:", result.data.id)
+      console.log("Sale saved successfully:", result.data.id);
 
       // Wait a bit to ensure Firebase has processed the write
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-      onSaleRecorded(result.data)
-      toastCRUD.createSuccess("Sale recorded successfully - Rooster marked as Sold")
-      
+      onSaleRecorded(result.data);
+      toastCRUD.createSuccess(
+        "Sale recorded successfully - Rooster marked as Sold"
+      );
+
       // Reset form
       setFormData({
         roosterId: "",
@@ -219,16 +251,16 @@ export function RecordSaleDialog({
         amount: "",
         paymentMethod: "cash",
         notes: "",
-      })
-      
-      onOpenChange(false)
+      });
+
+      onOpenChange(false);
     } catch (error) {
-      console.error("Error recording sale:", error)
-      toastCRUD.createError("Sale", "Failed to record sale. Please try again.")
+      console.error("Error recording sale:", error);
+      toastCRUD.createError("Sale", "Failed to record sale. Please try again.");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleClose = () => {
     // Reset form
@@ -240,9 +272,9 @@ export function RecordSaleDialog({
       amount: "",
       paymentMethod: "cash",
       notes: "",
-    })
-    onOpenChange(false)
-  }
+    });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -263,15 +295,27 @@ export function RecordSaleDialog({
         <div className="space-y-6 py-4">
           {/* Rooster Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#1f3f2c]">Rooster Information</h3>
+            <h3 className="text-lg font-semibold text-[#1f3f2c]">
+              Rooster Information
+            </h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="rooster" className="flex items-center gap-1">
                   Select Rooster <span className="text-red-500">*</span>
                 </Label>
-                <Select value={formData.roosterId} onValueChange={handleRoosterSelect} disabled={isLoadingRoosters}>
+                <Select
+                  value={formData.roosterId}
+                  onValueChange={handleRoosterSelect}
+                  disabled={isLoadingRoosters}
+                >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder={isLoadingRoosters ? "Loading roosters..." : "Select an available rooster"} />
+                    <SelectValue
+                      placeholder={
+                        isLoadingRoosters
+                          ? "Loading roosters..."
+                          : "Select an available rooster"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {isLoadingRoosters ? (
@@ -280,14 +324,19 @@ export function RecordSaleDialog({
                       </div>
                     ) : availableRoosters.length === 0 ? (
                       <div className="p-4 text-sm text-center space-y-3">
-                        <p className="text-gray-500 font-medium">No available roosters</p>
+                        <p className="text-gray-500 font-medium">
+                          No available roosters
+                        </p>
                         {roosters.length > 0 ? (
                           <>
                             <p className="text-xs text-gray-400">
-                              {roosters.length} rooster{roosters.length !== 1 ? 's' : ''} found, but none are marked as &quot;Available&quot;
+                              {roosters.length} rooster
+                              {roosters.length !== 1 ? "s" : ""} found, but none
+                              are marked as &quot;Available&quot;
                             </p>
                             <p className="text-xs text-gray-400">
-                              Update rooster status in the Roosters management page
+                              Update rooster status in the Roosters management
+                              page
                             </p>
                           </>
                         ) : (
@@ -296,8 +345,8 @@ export function RecordSaleDialog({
                               No roosters found in the system
                             </p>
                             <Link href="/admin/roosters/add">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 className="mt-2 border-[#3d6c58]/20 hover:bg-[#3d6c58]/10"
                               >
@@ -311,19 +360,27 @@ export function RecordSaleDialog({
                     ) : (
                       availableRoosters.map((rooster) => {
                         // Format price safely
-                        const price = rooster.price ? parseFloat(String(rooster.price)) : 0
-                        const formattedPrice = isNaN(price) || price <= 0 ? "N/A" : price.toLocaleString()
-                        
+                        const price = rooster.price
+                          ? parseFloat(String(rooster.price))
+                          : 0;
+                        const formattedPrice =
+                          isNaN(price) || price <= 0
+                            ? "N/A"
+                            : price.toLocaleString();
+
                         return (
                           <SelectItem key={rooster.id} value={rooster.id}>
                             <div className="flex flex-col">
-                              <span className="font-medium">{rooster.name} ({rooster.id})</span>
+                              <span className="font-medium">
+                                {rooster.name} ({rooster.id})
+                              </span>
                               <span className="text-sm text-gray-500">
-                                {rooster.breed} • {rooster.age || "N/A"} • {rooster.weight || "N/A"} • ₱{formattedPrice}
+                                {rooster.breed} • {rooster.age || "N/A"} •{" "}
+                                {rooster.weight || "N/A"} • ₱{formattedPrice}
                               </span>
                             </div>
                           </SelectItem>
-                        )
+                        );
                       })
                     )}
                   </SelectContent>
@@ -351,7 +408,9 @@ export function RecordSaleDialog({
                       id="amount"
                       placeholder="Enter amount"
                       value={formData.amount}
-                      onChange={(e) => handleInputChange("amount", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("amount", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -362,29 +421,41 @@ export function RecordSaleDialog({
 
           {/* Customer Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#1f3f2c]">Customer Information</h3>
+            <h3 className="text-lg font-semibold text-[#1f3f2c]">
+              Customer Information
+            </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="customerName" className="flex items-center gap-1">
+                <Label
+                  htmlFor="customerName"
+                  className="flex items-center gap-1"
+                >
                   Customer Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="customerName"
                   placeholder="Enter customer name"
                   value={formData.customerName}
-                  onChange={(e) => handleInputChange("customerName", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("customerName", e.target.value)
+                  }
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="customerContact" className="flex items-center gap-1">
+                <Label
+                  htmlFor="customerContact"
+                  className="flex items-center gap-1"
+                >
                   Contact <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="customerContact"
                   placeholder="Phone or email"
                   value={formData.customerContact}
-                  onChange={(e) => handleInputChange("customerContact", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("customerContact", e.target.value)
+                  }
                   className="mt-1"
                 />
               </div>
@@ -393,7 +464,9 @@ export function RecordSaleDialog({
 
           {/* Sale Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#1f3f2c]">Buyer Information</h3>
+            <h3 className="text-lg font-semibold text-[#1f3f2c]">
+              Buyer Information
+            </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="amount" className="flex items-center gap-1">
@@ -409,10 +482,18 @@ export function RecordSaleDialog({
                 />
               </div>
               <div>
-                <Label htmlFor="paymentMethod" className="flex items-center gap-1">
+                <Label
+                  htmlFor="paymentMethod"
+                  className="flex items-center gap-1"
+                >
                   Payment Method
                 </Label>
-                <Select value={formData.paymentMethod} onValueChange={(value: string) => handleInputChange("paymentMethod", value)}>
+                <Select
+                  value={formData.paymentMethod}
+                  onValueChange={(value: string) =>
+                    handleInputChange("paymentMethod", value)
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>
@@ -441,15 +522,15 @@ export function RecordSaleDialog({
         </div>
 
         <DialogFooter className="flex flex-col gap-3 pt-4 border-t border-gray-200 sm:flex-row sm:justify-end">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleClose}
             disabled={isSaving}
             className="w-full sm:w-auto"
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             disabled={isSaving}
             className="bg-[#3d6c58] hover:bg-[#4e816b] w-full sm:w-auto"
@@ -469,5 +550,5 @@ export function RecordSaleDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,31 +1,31 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react";
 
 type LightboxSlide = {
-  src: string
-  alt?: string
-}
+  src: string;
+  alt?: string;
+};
 
 type UseLightboxResult = {
-  open: boolean
-  index: number
-  slides: LightboxSlide[]
-  openAt: (nextIndex: number) => void
-  close: () => void
-  setIndex: (nextIndex: number) => void
-}
+  open: boolean;
+  index: number;
+  slides: LightboxSlide[];
+  openAt: (nextIndex: number) => void;
+  close: () => void;
+  setIndex: (nextIndex: number) => void;
+};
 
 export function useLightbox(slides: LightboxSlide[]): UseLightboxResult {
-  const [open, setOpen] = useState(false)
-  const [index, setIndex] = useState(0)
+  const [open, setOpen] = useState(false);
+  const [index, setIndex] = useState(0);
 
-  const memoSlides = useMemo(() => slides, [slides])
+  const memoSlides = useMemo(() => slides, [slides]);
 
   const openAt = useCallback((nextIndex: number) => {
-    setIndex(nextIndex)
-    setOpen(true)
-  }, [])
+    setIndex(nextIndex);
+    setOpen(true);
+  }, []);
 
-  const close = useCallback(() => setOpen(false), [])
+  const close = useCallback(() => setOpen(false), []);
 
   return {
     open,
@@ -34,5 +34,5 @@ export function useLightbox(slides: LightboxSlide[]): UseLightboxResult {
     openAt,
     close,
     setIndex,
-  }
+  };
 }

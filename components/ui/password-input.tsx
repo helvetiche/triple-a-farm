@@ -1,12 +1,12 @@
-import * as React from "react"
-import { Eye, EyeOff } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export type PasswordInputProps = React.InputHTMLAttributes<HTMLInputElement>
+export type PasswordInputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(false);
 
     return (
       <div className="relative">
@@ -25,7 +25,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           className="absolute right-0 top-0 h-full flex items-center px-3 cursor-pointer"
           onClick={() => !props.disabled && setShowPassword((prev) => !prev)}
           onMouseDown={(e) => e.preventDefault()}
-          style={{ pointerEvents: 'auto' }}
+          style={{ pointerEvents: "auto" }}
         >
           {showPassword ? (
             <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
@@ -34,9 +34,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           )}
         </div>
       </div>
-    )
+    );
   }
-)
-PasswordInput.displayName = "PasswordInput"
+);
+PasswordInput.displayName = "PasswordInput";
 
-export { PasswordInput }
+export { PasswordInput };

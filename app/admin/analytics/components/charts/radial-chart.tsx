@@ -1,39 +1,45 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Target } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Target } from "lucide-react";
 import {
   RadialBarChart,
   RadialBar,
   ResponsiveContainer,
   Tooltip,
-  Legend
-} from "recharts"
+  Legend,
+} from "recharts";
 
 interface RadialChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-    maxValue: number
-    color?: string
-  }>
-  height?: number
+    label: string;
+    value: number;
+    maxValue: number;
+    color?: string;
+  }>;
+  height?: number;
 }
 
-export function SimpleRadialChart({ 
-  title, 
-  description, 
-  data, 
-  height = 300
+export function SimpleRadialChart({
+  title,
+  description,
+  data,
+  height = 300,
 }: RadialChartProps) {
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     name: item.label,
     value: item.value,
-    fill: item.color || '#3d6c58'
-  }))
-  
+    fill: item.color || "#3d6c58",
+  }));
+
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -45,11 +51,11 @@ export function SimpleRadialChart({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>
-          <RadialBarChart 
-            cx="50%" 
-            cy="50%" 
-            innerRadius="10%" 
-            outerRadius="80%" 
+          <RadialBarChart
+            cx="50%"
+            cy="50%"
+            innerRadius="10%"
+            outerRadius="80%"
             data={chartData}
             startAngle={180}
             endAngle={0}
@@ -58,36 +64,41 @@ export function SimpleRadialChart({
               dataKey="value"
               cornerRadius={0}
               fill="#3d6c58"
-              label={{ position: 'insideStart', fill: '#fff' }}
+              label={{ position: "insideStart", fill: "#fff" }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 0
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 0,
               }}
             />
-            <Legend 
+            <Legend
               iconSize={10}
               layout="vertical"
               verticalAlign="middle"
               align="right"
               wrapperStyle={{
-                paddingLeft: '20px'
+                paddingLeft: "20px",
               }}
             />
           </RadialBarChart>
         </ResponsiveContainer>
-        
+
         <div className="mt-4 space-y-2">
-          <h4 className="text-sm font-medium text-[#1f3f2c]">Performance Summary</h4>
+          <h4 className="text-sm font-medium text-[#1f3f2c]">
+            Performance Summary
+          </h4>
           <div className="grid grid-cols-2 gap-4">
             {data.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-2 border">
+              <div
+                key={index}
+                className="flex items-center justify-between p-2 border"
+              >
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3" 
-                    style={{ backgroundColor: item.color || '#3d6c58' }}
+                  <div
+                    className="w-3 h-3"
+                    style={{ backgroundColor: item.color || "#3d6c58" }}
                   />
                   <span className="text-sm text-gray-700">{item.label}</span>
                 </div>
@@ -95,13 +106,16 @@ export function SimpleRadialChart({
                   <div className="text-sm font-medium text-gray-700">
                     {item.value}%
                   </div>
-                  <div className="w-12 bg-gray-200 h-1 mt-1" style={{ borderRadius: 0 }}>
+                  <div
+                    className="w-12 bg-gray-200 h-1 mt-1"
+                    style={{ borderRadius: 0 }}
+                  >
                     <div
                       className="h-1"
                       style={{
                         width: `${item.value}%`,
-                        backgroundColor: item.color || '#3d6c58',
-                        borderRadius: 0
+                        backgroundColor: item.color || "#3d6c58",
+                        borderRadius: 0,
                       }}
                     />
                   </div>
@@ -112,57 +126,61 @@ export function SimpleRadialChart({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface PerformanceRadialChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    date: string
-    overallHealth: number
-    vaccinationCoverage: number
-    diseaseIncidence: number
-    mortalityRate: number
-    averageWeight: number
-  }>
+    date: string;
+    overallHealth: number;
+    vaccinationCoverage: number;
+    diseaseIncidence: number;
+    mortalityRate: number;
+    averageWeight: number;
+  }>;
 }
 
-export function PerformanceRadialChart({ title, description, data }: PerformanceRadialChartProps) {
-  const latestData = data[data.length - 1]
-  
+export function PerformanceRadialChart({
+  title,
+  description,
+  data,
+}: PerformanceRadialChartProps) {
+  const latestData = data[data.length - 1];
+
   const radialData = [
     {
       label: "Health Score",
       value: latestData.overallHealth,
       maxValue: 100,
-      color: '#3d6c58'
+      color: "#3d6c58",
     },
     {
       label: "Vaccination",
       value: latestData.vaccinationCoverage,
       maxValue: 100,
-      color: '#82c91e'
+      color: "#82c91e",
     },
     {
       label: "Low Disease",
       value: 100 - latestData.diseaseIncidence,
       maxValue: 100,
-      color: '#4c6ef5'
+      color: "#4c6ef5",
     },
     {
       label: "Low Mortality",
       value: 100 - latestData.mortalityRate,
       maxValue: 100,
-      color: '#f59f00'
-    }
-  ]
-  
+      color: "#f59f00",
+    },
+  ];
+
   return (
     <SimpleRadialChart
       title={title}
       description={description}
       data={radialData}
     />
-  )
+  );
 }

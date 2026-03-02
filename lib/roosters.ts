@@ -64,14 +64,17 @@ export const getRoosters = async (
       status: (data.status as Rooster["status"]) || "Available",
       health: (data.health as Rooster["health"]) || "good",
       images: Array.isArray(data.images) ? (data.images as string[]) : [],
-      dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+      dateAdded:
+        (data.dateAdded as string) || new Date().toISOString().split("T")[0],
       description: (data.description as string) || "",
       locationId: (data.locationId as string) || "",
       location: (data.location as string) || "",
       locationAddress: (data.locationAddress as string) || undefined,
       owner: data.owner as string | undefined,
       image: data.image as string | undefined,
-      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
+      vaccinations: Array.isArray(data.vaccinations)
+        ? (data.vaccinations as Vaccination[])
+        : undefined,
     };
 
     return rooster;
@@ -104,14 +107,17 @@ export const getRoosterById = async (
     status: (data.status as Rooster["status"]) || "Available",
     health: (data.health as Rooster["health"]) || "good",
     images: Array.isArray(data.images) ? (data.images as string[]) : [],
-    dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+    dateAdded:
+      (data.dateAdded as string) || new Date().toISOString().split("T")[0],
     description: (data.description as string) || "",
     locationId: (data.locationId as string) || "",
     location: (data.location as string) || "",
     locationAddress: (data.locationAddress as string) || undefined,
     owner: data.owner as string | undefined,
     image: data.image as string | undefined,
-    vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
+    vaccinations: Array.isArray(data.vaccinations)
+      ? (data.vaccinations as Vaccination[])
+      : undefined,
   };
 
   return rooster;
@@ -223,7 +229,10 @@ const applyUpdateToRooster = (
     images: input.images !== undefined ? input.images : existing.images,
     dateAdded:
       input.dateAdded !== undefined ? input.dateAdded : existing.dateAdded,
-    description: input.description !== undefined ? input.description : existing.description,
+    description:
+      input.description !== undefined
+        ? input.description
+        : existing.description,
     location: input.location !== undefined ? input.location : existing.location,
   };
 
@@ -255,7 +264,10 @@ const applyUpdateToRooster = (
       docData.vaccinations = input.vaccinations;
     }
     // If null or empty array, don't include (will be removed from Firestore with merge)
-  } else if (existing.vaccinations !== undefined && existing.vaccinations !== null) {
+  } else if (
+    existing.vaccinations !== undefined &&
+    existing.vaccinations !== null
+  ) {
     docData.vaccinations = existing.vaccinations;
   }
 
@@ -440,10 +452,13 @@ export const getRoosterStats = async (
 
   const averagePrice = total > 0 ? totalValue / total : 0;
 
-  const breedCounts = roosters.reduce((acc, r) => {
-    acc[r.breed] = (acc[r.breed] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const breedCounts = roosters.reduce(
+    (acc, r) => {
+      acc[r.breed] = (acc[r.breed] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const topBreed =
     Object.entries(breedCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || "N/A";

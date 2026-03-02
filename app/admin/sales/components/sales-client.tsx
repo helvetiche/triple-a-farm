@@ -1,176 +1,178 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { SiteHeader } from "@/components/dashboard/site-header"
+import { useState, useEffect } from "react";
+import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { SiteHeader } from "@/components/dashboard/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Pagination } from "@/components/ui/pagination"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/pagination";
 import {
-  Plus, 
-  Search, 
-  Filter, 
-  Calendar, 
-  CreditCard, 
+  Plus,
+  Search,
+  CreditCard,
   Wallet,
-  Clock,
   TrendingUp,
   PhilippinePeso,
-  Download
-} from "lucide-react"
-import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { 
+  Download,
+} from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import {
   SalesViewDialog,
   RecordSaleDialog,
   RevenueTrendChart,
   SalesTable,
-  LoadingSpinner,
-  SalesStatsCardsSkeleton
-} from "./index"
-import { PageHeaderSkeleton, TabsSkeleton } from "../../inventory/components"
-import { 
-  SalesTransaction,
-  SalesStats,
-  RevenueTrend
-} from "../types"
-import { toastCRUD } from "../utils/toast"
-import { PageHeader, StatCards } from "@/components/dashboard"
-import { getAvailableRoosters, roosterBreeds, type Rooster } from "../../data/roosters"
-import { exportSalesToExcel } from "../utils/export-to-excel"
-import { toast } from "sonner"
-import { useAuth } from "@/contexts/AuthContext"
+  SalesStatsCardsSkeleton,
+} from "./index";
+import { PageHeaderSkeleton, TabsSkeleton } from "../../inventory/components";
+import { SalesTransaction, SalesStats, RevenueTrend } from "../types";
+import { toastCRUD } from "../utils/toast";
+import { PageHeader, StatCards } from "@/components/dashboard";
+import { exportSalesToExcel } from "../utils/export-to-excel";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
-export const description = "Sales & Transaction Tracking"
+export const description = "Sales & Transaction Tracking";
 
 export function SalesClient() {
   // Auth
-  const { userData } = useAuth()
-  
-  const [isLoading, setIsLoading] = useState(true)
-  const [sales, setSales] = useState<SalesTransaction[]>([])
+  const { userData } = useAuth();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [sales, setSales] = useState<SalesTransaction[]>([]);
   const [stats, setStats] = useState<SalesStats>({
     totalRevenue: 0,
     totalTransactions: 0,
     pendingTransactions: 0,
     averageSaleAmount: 0,
     monthlyGrowth: 0,
-    topBreed: ""
-  })
-  const [revenueTrend, setRevenueTrend] = useState<RevenueTrend[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState("all")
-  const [showRecordSaleDialog, setShowRecordSaleDialog] = useState(false)
-  const [selectedSale, setSelectedSale] = useState<SalesTransaction | null>(null)
-  const [showViewDialog, setShowViewDialog] = useState(false)
-  const [isSendingConfirmation, setIsSendingConfirmation] = useState(false)
-  const [prefilledRoosterData, setPrefilledRoosterData] = useState<{ roosterId: string; breed: string; price: number; name: string } | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 8
-  
-  const searchParams = useSearchParams()
+    topBreed: "",
+  });
+  const [revenueTrend, setRevenueTrend] = useState<RevenueTrend[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [showRecordSaleDialog, setShowRecordSaleDialog] = useState(false);
+  const [selectedSale, setSelectedSale] = useState<SalesTransaction | null>(
+    null
+  );
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [prefilledRoosterData, setPrefilledRoosterData] = useState<
+    | { roosterId: string; breed: string; price: number; name: string }
+    | undefined
+  >(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const searchParams = useSearchParams();
 
   // Fetch sales data from API
   const fetchSalesData = async () => {
     try {
-      setIsLoading(true)
-      
+      setIsLoading(true);
+
       const [transactionsResponse, analyticsResponse] = await Promise.all([
         fetch("/api/sales/transactions"),
         fetch("/api/sales/analytics"),
-      ])
+      ]);
 
-      const transactionsResult = await transactionsResponse.json()
-      const analyticsResult = await analyticsResponse.json()
+      const transactionsResult = await transactionsResponse.json();
+      const analyticsResult = await analyticsResponse.json();
 
       if (transactionsResult.success) {
-        const fetchedSales = transactionsResult.data || []
-        console.log("Fetched sales:", fetchedSales.length)
-        setSales(fetchedSales)
+        const fetchedSales = transactionsResult.data || [];
+        console.log("Fetched sales:", fetchedSales.length);
+        setSales(fetchedSales);
       } else {
-        console.error("Failed to fetch transactions:", transactionsResult.error)
+        console.error(
+          "Failed to fetch transactions:",
+          transactionsResult.error
+        );
       }
 
       if (analyticsResult.success) {
-        setStats(analyticsResult.data.stats || {
-          totalRevenue: 0,
-          totalTransactions: 0,
-          averageSaleAmount: 0,
-          monthlyGrowth: 0,
-          topBreed: ""
-        })
-        setRevenueTrend(analyticsResult.data.trend || [])
+        setStats(
+          analyticsResult.data.stats || {
+            totalRevenue: 0,
+            totalTransactions: 0,
+            averageSaleAmount: 0,
+            monthlyGrowth: 0,
+            topBreed: "",
+          }
+        );
+        setRevenueTrend(analyticsResult.data.trend || []);
       } else {
-        console.error("Failed to fetch analytics:", analyticsResult.error)
+        console.error("Failed to fetch analytics:", analyticsResult.error);
       }
     } catch (error) {
-      console.error("Error fetching sales data:", error)
+      console.error("Error fetching sales data:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchSalesData()
-  }, [])
+    fetchSalesData();
+  }, []);
 
   // Handle URL parameter for pre-filled rooster data
   useEffect(() => {
-    const roosterParam = searchParams.get('rooster')
+    const roosterParam = searchParams.get("rooster");
     if (roosterParam) {
       try {
-        const roosterData = JSON.parse(decodeURIComponent(roosterParam))
-        setPrefilledRoosterData(roosterData)
-        setShowRecordSaleDialog(true)
+        const roosterData = JSON.parse(decodeURIComponent(roosterParam));
+        setPrefilledRoosterData(roosterData);
+        setShowRecordSaleDialog(true);
       } catch (error) {
-        console.error('Error parsing rooster data from URL:', error)
+        console.error("Error parsing rooster data from URL:", error);
       }
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleRecordSale = async (saleData: SalesTransaction) => {
     try {
       // Sale is already saved to Firebase by record-sale-dialog
       // Close dialog first
-      setShowRecordSaleDialog(false)
-      
+      setShowRecordSaleDialog(false);
+
       // Add to local state immediately for instant feedback
-      setSales([saleData, ...sales])
-      
+      setSales([saleData, ...sales]);
+
       // Then refresh from Firebase to ensure we have the latest data
       // Wait a moment to ensure Firebase has processed the write
       setTimeout(async () => {
-        await fetchSalesData()
-      }, 500)
+        await fetchSalesData();
+      }, 500);
     } catch (error) {
-      console.error("Error recording sale:", error)
-      toastCRUD.createError("Sale", "Failed to record sale. Please try again.")
+      console.error("Error recording sale:", error);
+      toastCRUD.createError("Sale", "Failed to record sale. Please try again.");
     }
-  }
+  };
 
-  const filteredSales = sales.filter(sale => {
-    const matchesSearch = sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         sale.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         sale.id.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesSearch
-  })
+  const filteredSales = sales.filter((sale) => {
+    const matchesSearch =
+      sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      sale.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      sale.id.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedSales = filteredSales.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedSales = filteredSales.slice(startIndex, endIndex);
 
   // Reset to page 1 when search or filter changes
   useEffect(() => {
-    setCurrentPage(1)
-  }, [searchQuery, selectedStatus])
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   if (isLoading) {
     return (
@@ -189,7 +191,7 @@ export function SalesClient() {
           </div>
         </SidebarProvider>
       </div>
-    )
+    );
   }
 
   return (
@@ -211,14 +213,16 @@ export function SalesClient() {
                     className="border-[#3d6c58]/20 hover:bg-[#3d6c58]/10 w-full sm:w-auto"
                     onClick={() => {
                       try {
-                        const exportedBy = userData 
+                        const exportedBy = userData
                           ? `${userData.firstName} ${userData.lastName} (${userData.email})`
-                          : "Unknown"
-                        exportSalesToExcel(sales, stats, exportedBy)
-                        toast.success("Sales report exported successfully!")
+                          : "Unknown";
+                        exportSalesToExcel(sales, stats, exportedBy);
+                        toast.success("Sales report exported successfully!");
                       } catch (error) {
-                        console.error("Error exporting sales:", error)
-                        toast.error("Failed to export report. Please try again.")
+                        console.error("Error exporting sales:", error);
+                        toast.error(
+                          "Failed to export report. Please try again."
+                        );
                       }
                     }}
                   >
@@ -241,12 +245,12 @@ export function SalesClient() {
                   {
                     title: "Total Revenue",
                     value: `₱${stats.totalRevenue.toLocaleString()}`,
-                    description: `${stats.monthlyGrowth >= 0 ? '+' : ''}${stats.monthlyGrowth.toFixed(1)}%`,
+                    description: `${stats.monthlyGrowth >= 0 ? "+" : ""}${stats.monthlyGrowth.toFixed(1)}%`,
                     icon: TrendingUp,
                     trend: {
-                      value: `${stats.monthlyGrowth >= 0 ? '+' : ''}${stats.monthlyGrowth.toFixed(1)}%`,
-                      type: stats.monthlyGrowth >= 0 ? "increase" : "decrease"
-                    }
+                      value: `${stats.monthlyGrowth >= 0 ? "+" : ""}${stats.monthlyGrowth.toFixed(1)}%`,
+                      type: stats.monthlyGrowth >= 0 ? "increase" : "decrease",
+                    },
                   },
                   {
                     title: "Total Sales",
@@ -265,7 +269,7 @@ export function SalesClient() {
                     value: stats.topBreed || "N/A",
                     description: "Best selling",
                     icon: Wallet,
-                  }
+                  },
                 ]}
               />
 
@@ -274,8 +278,12 @@ export function SalesClient() {
                 <CardHeader style={{ borderRadius: 0 }}>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <CardTitle className="text-[#1f3f2c]">Recent Transactions</CardTitle>
-                      <CardDescription>Latest sales and payment records</CardDescription>
+                      <CardTitle className="text-[#1f3f2c]">
+                        Recent Transactions
+                      </CardTitle>
+                      <CardDescription>
+                        Latest sales and payment records
+                      </CardDescription>
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <div className="relative w-full sm:w-auto">
@@ -304,8 +312,8 @@ export function SalesClient() {
                   <SalesTable
                     transactions={paginatedSales}
                     onViewTransaction={(sale: SalesTransaction) => {
-                      setSelectedSale(sale)
-                      setShowViewDialog(true)
+                      setSelectedSale(sale);
+                      setShowViewDialog(true);
                     }}
                   />
                   {totalPages > 1 && (
@@ -325,7 +333,9 @@ export function SalesClient() {
               {/* Revenue Trend Chart */}
               <Card className="border-[#3d6c58]/20" style={{ borderRadius: 0 }}>
                 <CardHeader style={{ borderRadius: 0 }}>
-                  <CardTitle className="text-[#1f3f2c]">Revenue Trend</CardTitle>
+                  <CardTitle className="text-[#1f3f2c]">
+                    Revenue Trend
+                  </CardTitle>
                   <CardDescription>Monthly revenue performance</CardDescription>
                 </CardHeader>
                 <CardContent style={{ borderRadius: 0 }}>
@@ -349,8 +359,7 @@ export function SalesClient() {
           open={showViewDialog}
           onOpenChange={setShowViewDialog}
         />
-
       </SidebarProvider>
     </div>
-  )
+  );
 }

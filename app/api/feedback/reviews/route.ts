@@ -17,7 +17,9 @@ export interface Review {
   transactionId?: string;
 }
 
-const assertReviewPermission = (user: Awaited<ReturnType<typeof getSessionUser>>) => {
+const assertReviewPermission = (
+  user: Awaited<ReturnType<typeof getSessionUser>>
+) => {
   if (!user) {
     throw new Error("UNAUTHENTICATED");
   }
@@ -36,7 +38,11 @@ export async function GET(request: NextRequest) {
     assertReviewPermission(sessionUser);
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") as "published" | "pending" | "hidden" | null;
+    const status = searchParams.get("status") as
+      | "published"
+      | "pending"
+      | "hidden"
+      | null;
 
     let query = reviewsCollectionRef().orderBy("date", "desc");
 
@@ -78,11 +84,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.error("GET /api/feedback/reviews error:", error);
-    return jsonError(
-      "REVIEWS_FETCH_FAILED",
-      "Failed to load reviews.",
-      500
-    );
+    return jsonError("REVIEWS_FETCH_FAILED", "Failed to load reviews.", 500);
   }
 }
 
@@ -94,7 +96,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { customer, rating, rooster, comment, customerId, transactionId } = body;
+    const { customer, rating, rooster, comment, customerId, transactionId } =
+      body;
 
     // Validation
     if (!customer || !rating || !rooster || !comment) {
@@ -106,11 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (rating < 1 || rating > 5) {
-      return jsonError(
-        "INVALID_RATING",
-        "Rating must be between 1 and 5",
-        400
-      );
+      return jsonError("INVALID_RATING", "Rating must be between 1 and 5", 400);
     }
 
     // Create new review
@@ -120,25 +119,18 @@ export async function POST(request: NextRequest) {
       rooster,
       comment,
       status: "pending",
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       customerId,
       transactionId,
       createdAt: new Date().toISOString(),
     };
 
     const docRef = await reviewsCollectionRef().add(newReview);
-    
-    return jsonSuccess(
-      { id: docRef.id, ...newReview },
-      { status: 201 }
-    );
+
+    return jsonSuccess({ id: docRef.id, ...newReview }, { status: 201 });
   } catch (error: unknown) {
     console.error("POST /api/feedback/reviews error:", error);
-    return jsonError(
-      "REVIEW_CREATE_FAILED",
-      "Failed to create review.",
-      500
-    );
+    return jsonError("REVIEW_CREATE_FAILED", "Failed to create review.", 500);
   }
 }
 
@@ -170,11 +162,7 @@ export async function PUT(request: NextRequest) {
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      return jsonError(
-        "REVIEW_NOT_FOUND",
-        "Review not found.",
-        404
-      );
+      return jsonError("REVIEW_NOT_FOUND", "Review not found.", 404);
     }
 
     await docRef.update({
@@ -188,11 +176,6 @@ export async function PUT(request: NextRequest) {
     );
   } catch (error: unknown) {
     console.error("PUT /api/feedback/reviews error:", error);
-    return jsonError(
-      "REVIEW_UPDATE_FAILED",
-      "Failed to update review.",
-      500
-    );
+    return jsonError("REVIEW_UPDATE_FAILED", "Failed to update review.", 500);
   }
 }
-

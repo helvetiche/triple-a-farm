@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
-import { EnhancedProgressBar } from "@/components/enhanced-progress-bar"
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { EnhancedProgressBar } from "@/components/enhanced-progress-bar";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function DashboardLayout({
   useEffect(() => {
     // Only redirect if we're definitely not loading and there's no user
     if (!loading && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, loading, router]);
 
@@ -34,5 +34,5 @@ export default function DashboardLayout({
       </Suspense>
       {children}
     </>
-  )
+  );
 }

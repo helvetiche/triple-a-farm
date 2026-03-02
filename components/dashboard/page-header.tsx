@@ -1,21 +1,21 @@
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import Link from "next/link"
-import { ReactNode } from "react"
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { ReactNode } from "react";
 
 interface PageHeaderProps {
-  title: string
-  description: string
-  children?: ReactNode
+  title: string;
+  description: string;
+  children?: ReactNode;
 }
 
 interface PageHeaderActionProps {
-  children: ReactNode
-  variant?: "default" | "outline" | "secondary" | "ghost" | "destructive"
-  asChild?: boolean
-  href?: string
-  onClick?: () => void
-  className?: string
+  children: ReactNode;
+  variant?: "default" | "outline" | "secondary" | "ghost" | "destructive";
+  asChild?: boolean;
+  href?: string;
+  onClick?: () => void;
+  className?: string;
 }
 
 export function PageHeader({ title, description, children }: PageHeaderProps) {
@@ -29,56 +29,56 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
         {children}
       </div>
     </div>
-  )
+  );
 }
 
-export function PageHeaderAction({ 
-  children, 
-  variant = "default", 
-  asChild = false, 
-  href, 
+export function PageHeaderAction({
+  children,
+  variant = "default",
+  asChild = false,
+  href,
   onClick,
-  className = ""
+  className = "",
 }: PageHeaderActionProps) {
-  const buttonClass = variant === "default" 
-    ? "bg-[#3d6c58] hover:bg-[#4e816b]" 
-    : variant === "outline" 
-    ? "border-[#3d6c58]/20" 
-    : ""
+  const buttonClass =
+    variant === "default"
+      ? "bg-[#3d6c58] hover:bg-[#4e816b]"
+      : variant === "outline"
+        ? "border-[#3d6c58]/20"
+        : "";
 
-  const combinedClassName = `${buttonClass} w-full sm:w-auto ${className}`.trim()
+  const combinedClassName =
+    `${buttonClass} w-full sm:w-auto ${className}`.trim();
 
   if (asChild && href) {
     return (
       <Button asChild variant={variant} className={combinedClassName}>
-        <Link href={href}>
-          {children}
-        </Link>
+        <Link href={href}>{children}</Link>
       </Button>
-    )
+    );
   }
 
   return (
     <Button variant={variant} onClick={onClick} className={combinedClassName}>
       {children}
     </Button>
-  )
+  );
 }
 
-export function PageHeaderAddButton({ 
-  text, 
-  href, 
-  onClick 
-}: { 
-  text: string
-  href?: string
-  onClick?: () => void 
+export function PageHeaderAddButton({
+  text,
+  href,
+  onClick,
+}: {
+  text: string;
+  href?: string;
+  onClick?: () => void;
 }) {
   return (
-    <PageHeaderAction 
-      variant="default" 
-      asChild={!!href} 
-      href={href} 
+    <PageHeaderAction
+      variant="default"
+      asChild={!!href}
+      href={href}
       onClick={onClick}
     >
       <>
@@ -86,23 +86,19 @@ export function PageHeaderAddButton({
         {text}
       </>
     </PageHeaderAction>
-  )
+  );
 }
 
-export function PageHeaderLinkButton({ 
-  text, 
-  href 
-}: { 
-  text: string
-  href: string 
+export function PageHeaderLinkButton({
+  text,
+  href,
+}: {
+  text: string;
+  href: string;
 }) {
   return (
-    <PageHeaderAction 
-      variant="outline" 
-      asChild={true} 
-      href={href}
-    >
+    <PageHeaderAction variant="outline" asChild={true} href={href}>
       {text}
     </PageHeaderAction>
-  )
+  );
 }

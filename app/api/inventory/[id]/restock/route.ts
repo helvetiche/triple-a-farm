@@ -28,12 +28,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const updated = await restockInventoryItem(
-      sessionUser,
-      id,
-      amount,
-      reason
-    );
+    const updated = await restockInventoryItem(sessionUser, id, amount, reason);
 
     return jsonSuccess(updated, { status: 200 });
   } catch (error: unknown) {

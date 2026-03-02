@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -12,36 +18,36 @@ import {
   Legend,
   ResponsiveContainer,
   LineChart,
-  Line
-} from "recharts"
+  Line,
+} from "recharts";
 
 interface AreaChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-    value2?: number
-  }>
-  height?: number
-  color?: string
-  color2?: string
+    label: string;
+    value: number;
+    value2?: number;
+  }>;
+  height?: number;
+  color?: string;
+  color2?: string;
 }
 
-export function SimpleAreaChart({ 
-  title, 
-  description, 
-  data, 
+export function SimpleAreaChart({
+  title,
+  description,
+  data,
   height = 256,
-  color = '#3d6c58',
-  color2 = '#82c91e'
+  color = "#3d6c58",
+  color2 = "#82c91e",
 }: AreaChartProps) {
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     name: item.label,
     revenue: item.value,
-    profit: item.value2 || 0
-  }))
-  
+    profit: item.value2 || 0,
+  }));
+
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader>
@@ -53,41 +59,41 @@ export function SimpleAreaChart({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>
-          <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <AreaChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <YAxis 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <YAxis
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 0
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 0,
               }}
-              formatter={(value) => [`₱${(value ?? 0).toLocaleString()}`, '']}
+              formatter={(value) => [`₱${(value ?? 0).toLocaleString()}`, ""]}
             />
-            <Legend 
-              wrapperStyle={{ paddingTop: '20px' }}
-              iconType="square"
-            />
-            <Area 
-              type="monotone" 
-              dataKey="revenue" 
+            <Legend wrapperStyle={{ paddingTop: "20px" }} iconType="square" />
+            <Area
+              type="monotone"
+              dataKey="revenue"
               stackId="1"
               stroke={color}
               fill={color}
               fillOpacity={0.3}
               name="Revenue"
             />
-            <Area 
-              type="monotone" 
-              dataKey="profit" 
+            <Area
+              type="monotone"
+              dataKey="profit"
               stackId="2"
               stroke={color2}
               fill={color2}
@@ -98,32 +104,32 @@ export function SimpleAreaChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface LineChartProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-  }>
-  height?: number
-  color?: string
+    label: string;
+    value: number;
+  }>;
+  height?: number;
+  color?: string;
 }
 
-export function SimpleLineChart({ 
-  title, 
-  description, 
-  data, 
+export function SimpleLineChart({
+  title,
+  description,
+  data,
   height = 256,
-  color = '#3d6c58'
+  color = "#3d6c58",
 }: LineChartProps) {
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     name: item.label,
-    value: item.value
-  }))
-  
+    value: item.value,
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -135,28 +141,31 @@ export function SimpleLineChart({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>
-          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <YAxis 
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+            <YAxis
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 0
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 0,
               }}
-              formatter={(value) => [`${value ?? 0}%`, 'Health Score']}
+              formatter={(value) => [`${value ?? 0}%`, "Health Score"]}
             />
-            <Line 
-              type="monotone" 
-              dataKey="value" 
+            <Line
+              type="monotone"
+              dataKey="value"
               stroke={color}
               strokeWidth={2}
               dot={{ fill: color, strokeWidth: 2, r: 4 }}
@@ -167,5 +176,5 @@ export function SimpleLineChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

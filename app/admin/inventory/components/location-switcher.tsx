@@ -102,7 +102,10 @@ export const LocationSwitcher = ({
             <SelectContent>
               <SelectItem value="all">All Locations</SelectItem>
               {locations.map((location) => (
-                <SelectItem key={location.locationId} value={location.locationId}>
+                <SelectItem
+                  key={location.locationId}
+                  value={location.locationId}
+                >
                   <div className="flex flex-col">
                     <span>{location.name}</span>
                     {location.address && (

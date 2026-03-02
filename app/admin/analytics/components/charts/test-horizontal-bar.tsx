@@ -1,22 +1,28 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface TestHorizontalBarProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   data: Array<{
-    label: string
-    value: number
-    percentage?: number
-    color?: string
-  }>
+    label: string;
+    value: number;
+    percentage?: number;
+    color?: string;
+  }>;
 }
 
-export function TestHorizontalBar({ 
-  title, 
-  description, 
-  data 
+export function TestHorizontalBar({
+  title,
+  description,
+  data,
 }: TestHorizontalBarProps) {
   return (
     <Card className="border-[#3d6c58]/20">
@@ -32,13 +38,16 @@ export function TestHorizontalBar({
                 {item.label}
               </div>
               <div className="flex-1 relative">
-                <div className="w-full bg-gray-200 h-6" style={{ borderRadius: 0 }}>
+                <div
+                  className="w-full bg-gray-200 h-6"
+                  style={{ borderRadius: 0 }}
+                >
                   <div
                     className="h-6"
-                    style={{ 
+                    style={{
                       width: `${item.percentage}%`,
-                      backgroundColor: item.color || '#3d6c58',
-                      borderRadius: 0
+                      backgroundColor: item.color || "#3d6c58",
+                      borderRadius: 0,
                     }}
                   />
                 </div>
@@ -52,17 +61,15 @@ export function TestHorizontalBar({
             </div>
           ))}
         </div>
-        
+
         {/* Debug info */}
         <div className="mt-4 p-2 bg-gray-100 text-xs">
           <div>Debug - Raw Data:</div>
           {data.map((item, index) => (
-            <div key={index}>
-              {JSON.stringify(item)}
-            </div>
+            <div key={index}>{JSON.stringify(item)}</div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

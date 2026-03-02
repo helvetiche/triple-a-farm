@@ -14,7 +14,12 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as SignUpRequestBody;
 
-    if (!body?.email || !body?.password || !body?.firstName || !body?.lastName) {
+    if (
+      !body?.email ||
+      !body?.password ||
+      !body?.firstName ||
+      !body?.lastName
+    ) {
       return jsonError("BAD_REQUEST", "Missing required fields.", 400);
     }
 
@@ -64,5 +69,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-

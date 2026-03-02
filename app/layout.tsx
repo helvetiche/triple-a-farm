@@ -17,17 +17,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Triple A Gamefarm - Rooster Farm Management System",
-  description: "A comprehensive management system for gamefowl breeders to track rooster health, feed schedules, inventory, and sales.",
+  description:
+    "A comprehensive management system for gamefowl breeders to track rooster health, feed schedules, inventory, and sales.",
   icons: {
     icon: [
-      { url: '/images/logo-png.png', media: '(prefers-color-scheme: light)' },
-      { url: '/images/logo-white-png.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/images/logo-png.png' }, // fallback
+      { url: "/images/logo-png.png", media: "(prefers-color-scheme: light)" },
+      {
+        url: "/images/logo-white-png.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+      { url: "/images/logo-png.png" }, // fallback
     ],
     apple: [
-      { url: '/images/logo-png.png', media: '(prefers-color-scheme: light)' },
-      { url: '/images/logo-white-png.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/images/logo-png.png' }, // fallback
+      { url: "/images/logo-png.png", media: "(prefers-color-scheme: light)" },
+      {
+        url: "/images/logo-white-png.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+      { url: "/images/logo-png.png" }, // fallback
     ],
   },
 };

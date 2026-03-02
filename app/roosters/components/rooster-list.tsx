@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { ZoomIn } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { RoosterDetailModal } from './rooster-detail-modal';
-import type { Rooster } from '@/app/admin/data/roosters';
+import { useState } from "react";
+import Image from "next/image";
+import { ZoomIn } from "lucide-react";
+import { RoosterDetailModal } from "./rooster-detail-modal";
+import type { Rooster } from "@/app/admin/data/roosters";
 
 interface RoosterListProps {
   roosters: Rooster[];
@@ -25,7 +24,7 @@ export function RoosterList({ roosters }: RoosterListProps) {
   return (
     <>
       <div className="space-y-3 sm:space-y-4">
-        {roosters.map((rooster, index) => (
+        {roosters.map((rooster) => (
           <div
             key={rooster.id}
             className="border border-gray-200 bg-white hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
@@ -42,7 +41,7 @@ export function RoosterList({ roosters }: RoosterListProps) {
                   src={
                     rooster.image ||
                     rooster.images?.[0] ||
-                    '/images/roosters/rooster-sample.jpg'
+                    "/images/roosters/rooster-sample.jpg"
                   }
                   alt={`${rooster.breed} - ${rooster.id}`}
                   fill
@@ -58,16 +57,24 @@ export function RoosterList({ roosters }: RoosterListProps) {
                     <div className="font-medium text-gray-900 text-sm truncate mb-1">
                       {rooster.breed}
                     </div>
-                    <div className="text-xs text-gray-400 font-mono">ID: {rooster.id}</div>
+                    <div className="text-xs text-gray-400 font-mono">
+                      ID: {rooster.id}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded ${
-                      rooster.status === 'Available' ? 'bg-green-100 text-green-800' :
-                      rooster.status === 'Sold' ? 'bg-gray-100 text-gray-800' :
-                      rooster.status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
-                      rooster.status === 'Quarantine' ? 'bg-orange-100 text-orange-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded ${
+                        rooster.status === "Available"
+                          ? "bg-green-100 text-green-800"
+                          : rooster.status === "Sold"
+                            ? "bg-gray-100 text-gray-800"
+                            : rooster.status === "Reserved"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : rooster.status === "Quarantine"
+                                ? "bg-orange-100 text-orange-800"
+                                : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {rooster.status}
                     </span>
                     <div className="font-semibold text-gray-900 text-sm">
@@ -96,7 +103,7 @@ export function RoosterList({ roosters }: RoosterListProps) {
                   src={
                     rooster.image ||
                     rooster.images?.[0] ||
-                    '/images/roosters/rooster-sample.jpg'
+                    "/images/roosters/rooster-sample.jpg"
                   }
                   alt={`${rooster.breed} - ${rooster.id}`}
                   fill
@@ -111,16 +118,24 @@ export function RoosterList({ roosters }: RoosterListProps) {
                     <div className="font-medium text-gray-900 text-base sm:text-lg truncate mb-1">
                       {rooster.breed}
                     </div>
-                    <div className="text-xs sm:text-sm text-gray-500 font-mono mb-2">ID: {rooster.id}</div>
+                    <div className="text-xs sm:text-sm text-gray-500 font-mono mb-2">
+                      ID: {rooster.id}
+                    </div>
                   </div>
                   <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2 sm:gap-0">
-                    <span className={`inline-block text-xs font-medium px-2 py-1 rounded ${
-                      rooster.status === 'Available' ? 'bg-green-100 text-green-800' :
-                      rooster.status === 'Sold' ? 'bg-gray-100 text-gray-800' :
-                      rooster.status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
-                      rooster.status === 'Quarantine' ? 'bg-orange-100 text-orange-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`inline-block text-xs font-medium px-2 py-1 rounded ${
+                        rooster.status === "Available"
+                          ? "bg-green-100 text-green-800"
+                          : rooster.status === "Sold"
+                            ? "bg-gray-100 text-gray-800"
+                            : rooster.status === "Reserved"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : rooster.status === "Quarantine"
+                                ? "bg-orange-100 text-orange-800"
+                                : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {rooster.status}
                     </span>
                     <div className="font-semibold text-gray-900 text-base sm:text-lg">
@@ -151,10 +166,7 @@ export function RoosterList({ roosters }: RoosterListProps) {
         ))}
       </div>
 
-      <RoosterDetailModal
-        rooster={selectedRooster}
-        onClose={closeModal}
-      />
+      <RoosterDetailModal rooster={selectedRooster} onClose={closeModal} />
     </>
   );
 }

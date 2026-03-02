@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Stats Cards Skeleton
 export function SalesStatsCardsSkeleton() {
@@ -18,7 +18,7 @@ export function SalesStatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 // Revenue Chart Skeleton
@@ -42,7 +42,7 @@ export function RevenueChartSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Quick Actions Skeleton
@@ -59,7 +59,7 @@ export function QuickActionsSkeleton() {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Table Skeleton
@@ -97,5 +97,5 @@ export function SalesTableSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

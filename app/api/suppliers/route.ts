@@ -29,11 +29,7 @@ export async function GET() {
     }
 
     console.error("GET /api/suppliers error:", error);
-    return jsonError(
-      "SUPPLIERS_LIST_FAILED",
-      "Failed to load suppliers.",
-      500
-    );
+    return jsonError("SUPPLIERS_LIST_FAILED", "Failed to load suppliers.", 500);
   }
 }
 
@@ -49,11 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!body.name || !body.phone) {
-      return jsonError(
-        "VALIDATION_ERROR",
-        "Name and phone are required",
-        400
-      );
+      return jsonError("VALIDATION_ERROR", "Name and phone are required", 400);
     }
 
     const supplier = await createSupplier({

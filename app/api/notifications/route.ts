@@ -26,10 +26,12 @@ const formatTimeAgo = (date: Date): string => {
   const diffDays = Math.floor(diffMs / 86400000);
 
   if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
-  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+  if (diffMins < 60)
+    return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
+  if (diffHours < 24)
+    return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
   if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
-  
+
   const weeks = Math.floor(diffDays / 7);
   return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
 };
@@ -44,7 +46,11 @@ export async function GET(request: NextRequest) {
 
     const canRead = hasRequiredRole(sessionUser.roles, ["admin", "staff"]);
     if (!canRead) {
-      return jsonError("FORBIDDEN", "You do not have permission to view notifications.", 403);
+      return jsonError(
+        "FORBIDDEN",
+        "You do not have permission to view notifications.",
+        403
+      );
     }
 
     const notifications: Notification[] = [];
@@ -86,11 +92,16 @@ export async function GET(request: NextRequest) {
         .filter((item) => item.status === "low" || item.status === "critical")
         .slice(0, 5)
         .map((item) => {
-          const lastRestocked = item.lastRestocked ? new Date(item.lastRestocked) : new Date();
+          const lastRestocked = item.lastRestocked
+            ? new Date(item.lastRestocked)
+            : new Date();
           return {
             id: `inventory-${item.id}`,
             type: "inventory" as const,
-            title: item.status === "critical" ? "Critical Stock Alert" : "Low Stock Alert",
+            title:
+              item.status === "critical"
+                ? "Critical Stock Alert"
+                : "Low Stock Alert",
             description: `${item.name} running low. Only ${item.currentStock} ${item.unit} remaining.`,
             time: formatTimeAgo(lastRestocked),
             timestamp: lastRestocked.getTime(),
@@ -148,7 +159,9 @@ export async function GET(request: NextRequest) {
 
       const healthAlerts = roostersSnapshot.docs.map((doc) => {
         const data = doc.data();
-        const dateAdded = data.dateAdded ? new Date(data.dateAdded) : new Date();
+        const dateAdded = data.dateAdded
+          ? new Date(data.dateAdded)
+          : new Date();
         return {
           id: `health-${doc.id}`,
           type: "health" as const,
@@ -177,12 +190,19 @@ export async function GET(request: NextRequest) {
       }
 
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to view notifications.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to view notifications.",
+          403
+        );
       }
     }
 
     console.error("GET /api/notifications error:", error);
-    return jsonError("NOTIFICATIONS_FETCH_FAILED", "Failed to load notifications.", 500);
+    return jsonError(
+      "NOTIFICATIONS_FETCH_FAILED",
+      "Failed to load notifications.",
+      500
+    );
   }
 }
-

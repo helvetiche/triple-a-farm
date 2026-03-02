@@ -1,33 +1,49 @@
-"use client"
+"use client";
 
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, Calendar } from "lucide-react"
-import { RevenueTrend } from "../types"
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { TrendingUp, Calendar } from "lucide-react";
+import { RevenueTrend } from "../types";
 
 interface RevenueTrendChartProps {
-  data: RevenueTrend[]
-  title?: string
-  description?: string
+  data: RevenueTrend[];
+  title?: string;
+  description?: string;
 }
 
-export function RevenueTrendChart({ 
-  data, 
-  title = "Sales Overview", 
-  description = "Daily revenue and transaction trends" 
+export function RevenueTrendChart({
+  data,
+  title = "Sales Overview",
+  description = "Daily revenue and transaction trends",
 }: RevenueTrendChartProps) {
-  const chartData = data.map(item => ({
-    date: new Date(item.date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
+  const chartData = data.map((item) => ({
+    date: new Date(item.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     }),
     revenue: item.revenue,
     transactions: item.transactions,
-  }))
+  }));
 
-  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0)
-  const totalTransactions = data.reduce((sum, item) => sum + item.transactions, 0)
-  const averageRevenue = totalRevenue / data.length || 0
+  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+  const totalTransactions = data.reduce(
+    (sum, item) => sum + item.transactions,
+    0
+  );
+  const averageRevenue = totalRevenue / data.length || 0;
 
   return (
     <Card className="border-[#3d6c58]/20">
@@ -52,29 +68,33 @@ export function RevenueTrendChart({
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 stroke="#6b7280"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
-              <YAxis 
+              <YAxis
                 stroke="#6b7280"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value: number) => `₱${(value / 1000).toFixed(0)}k`}
+                tickFormatter={(value: number) =>
+                  `₱${(value / 1000).toFixed(0)}k`
+                }
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px'
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
                 }}
                 formatter={(value, name) => [
-                  name === 'revenue' ? `₱${(value ?? 0).toLocaleString()}` : value ?? 0,
-                  name === 'revenue' ? 'Revenue' : 'Transactions'
+                  name === "revenue"
+                    ? `₱${(value ?? 0).toLocaleString()}`
+                    : (value ?? 0),
+                  name === "revenue" ? "Revenue" : "Transactions",
                 ]}
               />
               <Line
@@ -98,7 +118,7 @@ export function RevenueTrendChart({
             </LineChart>
           </ResponsiveContainer>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-200">
           <div className="text-center">
             <p className="text-2xl font-bold text-[#1f3f2c]">
@@ -121,5 +141,5 @@ export function RevenueTrendChart({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

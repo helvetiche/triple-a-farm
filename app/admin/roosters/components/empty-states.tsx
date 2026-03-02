@@ -1,14 +1,23 @@
-import { Empty, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty"
-import { Button } from "@/components/ui/button"
-import { Bird, Plus, Search } from "lucide-react"
-import Link from "next/link"
+import {
+  Empty,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
+import { Bird, Plus, Search } from "lucide-react";
+import Link from "next/link";
 
 interface RoosterEmptyStateProps {
-  type: "no-data" | "no-search-results"
-  onClearSearch?: () => void
+  type: "no-data" | "no-search-results";
+  onClearSearch?: () => void;
 }
 
-export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProps) {
+export function RoosterEmptyState({
+  type,
+  onClearSearch,
+}: RoosterEmptyStateProps) {
   if (type === "no-search-results") {
     return (
       <Empty>
@@ -18,7 +27,7 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
           </EmptyMedia>
           <EmptyTitle>No roosters found</EmptyTitle>
           <EmptyDescription>
-            We couldn&apos;t find any roosters matching your search criteria. 
+            We couldn&apos;t find any roosters matching your search criteria.
             Try adjusting your search terms or filters.
           </EmptyDescription>
           {onClearSearch && (
@@ -28,7 +37,7 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
           )}
         </EmptyContent>
       </Empty>
-    )
+    );
   }
 
   return (
@@ -39,9 +48,9 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
         </EmptyMedia>
         <EmptyTitle>No roosters yet</EmptyTitle>
         <EmptyDescription>
-          You haven&apos;t added any roosters to your inventory yet. 
-          Get started by adding your first rooster to track their health, 
-          feed schedules, and sales information.
+          You haven&apos;t added any roosters to your inventory yet. Get started
+          by adding your first rooster to track their health, feed schedules,
+          and sales information.
         </EmptyDescription>
         <Button asChild className="bg-[#3d6c58] hover:bg-[#4e816b]">
           <Link href="/admin/roosters/add">
@@ -51,5 +60,5 @@ export function RoosterEmptyState({ type, onClearSearch }: RoosterEmptyStateProp
         </Button>
       </EmptyContent>
     </Empty>
-  )
+  );
 }

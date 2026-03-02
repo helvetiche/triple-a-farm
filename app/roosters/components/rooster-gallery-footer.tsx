@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import Link from "next/link";
+import { Facebook, Phone, MapPin } from "lucide-react";
 
 export function RoosterGalleryFooter() {
   return (
@@ -12,8 +12,8 @@ export function RoosterGalleryFooter() {
           <div>
             <h3 className="text-xl font-bold mb-4">Triple A Gamefarm</h3>
             <p className="text-white/80 text-sm leading-relaxed">
-              Pinagkakatiwalaan ng mga mahilig at kompetidor. 
-              Mga world-class na manok na siguradong pampanalo.
+              Pinagkakatiwalaan ng mga mahilig at kompetidor. Mga world-class na
+              manok na siguradong pampanalo.
             </p>
           </div>
 
@@ -22,17 +22,26 @@ export function RoosterGalleryFooter() {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-white/80 hover:text-white transition-colors">
+                <Link
+                  href="/"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/roosters" className="text-white/80 hover:text-white transition-colors">
+                <Link
+                  href="/roosters"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
                   Rooster Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/#testimonials" className="text-white/80 hover:text-white transition-colors">
+                <Link
+                  href="/#testimonials"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
                   Testimonials
                 </Link>
               </li>
@@ -50,16 +59,17 @@ export function RoosterGalleryFooter() {
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span className="text-white/80">
-                  119 Purok 1 Rose, Paltok<br />
+                  119 Purok 1 Rose, Paltok
+                  <br />
                   Angat, Bulacan
                 </span>
               </li>
             </ul>
-            
+
             {/* Social Media */}
             <div className="mt-4">
-              <a 
-                href="https://www.facebook.com/profile.php?id=61578922746473" 
+              <a
+                href="https://www.facebook.com/profile.php?id=61578922746473"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
@@ -81,4 +91,3 @@ export function RoosterGalleryFooter() {
     </footer>
   );
 }
-

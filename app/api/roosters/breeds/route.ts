@@ -17,9 +17,11 @@ export interface RoosterBreed {
   createdBy?: string;
 }
 
-const assertBreedPermission = async (action: "read" | "create" | "update" | "delete") => {
+const assertBreedPermission = async (
+  action: "read" | "create" | "update" | "delete"
+) => {
   const sessionUser = await getSessionUser();
-  
+
   if (!sessionUser) {
     throw new Error("UNAUTHENTICATED");
   }
@@ -74,7 +76,11 @@ export async function GET() {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to view breeds.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to view breeds.",
+          403
+        );
       }
     }
 
@@ -100,7 +106,11 @@ export async function POST(request: NextRequest) {
       .get();
 
     if (!existingSnapshot.empty) {
-      return jsonError("BREED_EXISTS", "A breed with this name already exists.", 409);
+      return jsonError(
+        "BREED_EXISTS",
+        "A breed with this name already exists.",
+        409
+      );
     }
 
     const newBreed: Omit<RoosterBreed, "id"> = {
@@ -138,7 +148,11 @@ export async function POST(request: NextRequest) {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to create breeds.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to create breeds.",
+          403
+        );
       }
     }
 
@@ -174,12 +188,14 @@ export async function PUT(request: NextRequest) {
       .where("name", "==", name.trim())
       .get();
 
-    const conflictingBreed = existingSnapshot.docs.find(
-      (doc) => doc.id !== id
-    );
+    const conflictingBreed = existingSnapshot.docs.find((doc) => doc.id !== id);
 
     if (conflictingBreed) {
-      return jsonError("BREED_EXISTS", "A breed with this name already exists.", 409);
+      return jsonError(
+        "BREED_EXISTS",
+        "A breed with this name already exists.",
+        409
+      );
     }
 
     const updatedBreed = {
@@ -213,7 +229,11 @@ export async function PUT(request: NextRequest) {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to update breeds.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to update breeds.",
+          403
+        );
       }
     }
 
@@ -273,14 +293,21 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return jsonSuccess({ message: "Breed deleted successfully" }, { status: 200 });
+    return jsonSuccess(
+      { message: "Breed deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {
         return jsonError("UNAUTHENTICATED", "No active session.", 401);
       }
       if (error.message === "FORBIDDEN") {
-        return jsonError("FORBIDDEN", "You do not have permission to delete breeds.", 403);
+        return jsonError(
+          "FORBIDDEN",
+          "You do not have permission to delete breeds.",
+          403
+        );
       }
     }
 

@@ -194,7 +194,9 @@ export function SupplierAddDialog({
               className="bg-[#3d6c58] hover:bg-[#4e816b]"
               disabled={isSubmitting}
             >
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Add Supplier
             </Button>
           </DialogFooter>

@@ -1,24 +1,29 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LucideIcon } from "lucide-react"
-import { ReactNode } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
-  title: string
-  value: string | number
-  description: string
-  icon: LucideIcon
+  title: string;
+  value: string | number;
+  description: string;
+  icon: LucideIcon;
   trend?: {
-    value: string
-    type: "increase" | "decrease" | "neutral"
-  }
+    value: string;
+    type: "increase" | "decrease" | "neutral";
+  };
 }
 
 interface StatCardsProps {
-  cards: StatCardProps[]
-  className?: string
+  cards: StatCardProps[];
+  className?: string;
 }
 
-export function StatCard({ title, value, description, icon: Icon, trend }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  description,
+  icon: Icon,
+  trend,
+}: StatCardProps) {
   return (
     <Card className="border-[#3d6c58]/20">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -31,11 +36,15 @@ export function StatCard({ title, value, description, icon: Icon, trend }: StatC
         <div className="text-2xl font-bold text-[#1f3f2c]">{value}</div>
         <p className="text-xs text-[#4a6741]">
           {trend && (
-            <span className={`${
-              trend.type === "increase" ? "text-green-600" : 
-              trend.type === "decrease" ? "text-red-600" : 
-              "text-gray-600"
-            }`}>
+            <span
+              className={`${
+                trend.type === "increase"
+                  ? "text-green-600"
+                  : trend.type === "decrease"
+                    ? "text-red-600"
+                    : "text-gray-600"
+              }`}
+            >
               {trend.type === "increase" && "+"}
               {trend.value}
             </span>
@@ -45,7 +54,7 @@ export function StatCard({ title, value, description, icon: Icon, trend }: StatC
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function StatCards({ cards, className = "" }: StatCardsProps) {
@@ -55,5 +64,5 @@ export function StatCards({ cards, className = "" }: StatCardsProps) {
         <StatCard key={index} {...card} />
       ))}
     </div>
-  )
+  );
 }

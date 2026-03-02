@@ -1,12 +1,16 @@
-import React from "react"
+import React from "react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function FeedbackStatsCardsSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <Card key={index} className="border-[#3d6c58]/20" style={{ borderRadius: 0 }}>
+        <Card
+          key={index}
+          className="border-[#3d6c58]/20"
+          style={{ borderRadius: 0 }}
+        >
           <CardHeader className="pb-2" style={{ borderRadius: 0 }}>
             <div className="h-4 w-24 bg-gray-200 animate-pulse"></div>
           </CardHeader>
@@ -17,7 +21,7 @@ export function FeedbackStatsCardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export function ReviewsTableSkeleton() {
@@ -52,7 +56,10 @@ export function ReviewsTableSkeleton() {
         <div className="hidden sm:block w-full overflow-x-auto">
           <div className="min-w-[720px] space-y-4">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex items-center space-x-4 p-4 border">
+              <div
+                key={index}
+                className="flex items-center space-x-4 p-4 border"
+              >
                 <div className="h-4 w-20 bg-gray-200 animate-pulse"></div>
                 <div className="h-4 w-24 bg-gray-200 animate-pulse"></div>
                 <div className="h-4 w-32 bg-gray-200 animate-pulse"></div>
@@ -67,7 +74,7 @@ export function ReviewsTableSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function PageHeaderSkeleton() {
@@ -82,5 +89,5 @@ export function PageHeaderSkeleton() {
         <div className="h-10 w-full sm:w-32 bg-gray-200 animate-pulse"></div>
       </div>
     </div>
-  )
+  );
 }
