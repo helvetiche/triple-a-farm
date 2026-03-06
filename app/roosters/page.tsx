@@ -61,9 +61,11 @@ export default function RoosterGalleryPage() {
       const matchesStatus =
         activeFilters.status === "all" || r.status === activeFilters.status;
 
-      // Breed filter
+      // Breed filter - check both breedId and breed name
       const matchesBreed =
-        activeFilters.breed === "all" || r.breedId === activeFilters.breed;
+        activeFilters.breed === "all" || 
+        r.breedId === activeFilters.breed ||
+        r.breed.toLowerCase() === activeFilters.breed.toLowerCase();
 
       // Health filter
       const matchesHealth =
@@ -75,7 +77,7 @@ export default function RoosterGalleryPage() {
         const price = parseFloat(r.price || "0");
         switch (activeFilters.priceRange) {
           case "0-10000":
-            matchesPrice = price <= 10000;
+            matchesPrice = price >= 0 && price <= 10000;
             break;
           case "10000-15000":
             matchesPrice = price > 10000 && price <= 15000;
@@ -89,13 +91,25 @@ export default function RoosterGalleryPage() {
         }
       }
 
-      // Age range filter
+      // Age range filter - handle both "X months" and numeric values
       let matchesAge = true;
       if (activeFilters.ageRange !== "all") {
-        const ageMonths = parseInt(r.age) || 0;
+        // Extract numeric value from age string (e.g., "18 months" -> 18)
+        const ageStr = r.age.toLowerCase();
+        let ageMonths = 0;
+        
+        if (ageStr.includes("month")) {
+          ageMonths = parseInt(ageStr) || 0;
+        } else if (ageStr.includes("year")) {
+          const years = parseFloat(ageStr) || 0;
+          ageMonths = years * 12;
+        } else {
+          ageMonths = parseInt(ageStr) || 0;
+        }
+        
         switch (activeFilters.ageRange) {
           case "0-12":
-            matchesAge = ageMonths <= 12;
+            matchesAge = ageMonths >= 0 && ageMonths <= 12;
             break;
           case "12-18":
             matchesAge = ageMonths > 12 && ageMonths <= 18;
@@ -109,13 +123,16 @@ export default function RoosterGalleryPage() {
         }
       }
 
-      // Weight range filter
+      // Weight range filter - handle "X kg" format
       let matchesWeight = true;
       if (activeFilters.weightRange !== "all") {
-        const weight = parseFloat(r.weight) || 0;
+        // Extract numeric value from weight string (e.g., "2.5 kg" -> 2.5)
+        const weightStr = r.weight.toLowerCase().replace(/[^0-9.]/g, "");
+        const weight = parseFloat(weightStr) || 0;
+        
         switch (activeFilters.weightRange) {
           case "0-2":
-            matchesWeight = weight <= 2;
+            matchesWeight = weight >= 0 && weight <= 2;
             break;
           case "2-2.5":
             matchesWeight = weight > 2 && weight <= 2.5;

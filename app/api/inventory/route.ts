@@ -3,8 +3,10 @@ import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import {
   createInventoryItem,
   getInventoryItems,
+  getInventoryItemsPaginated,
   type CreateInventoryItemInput,
 } from "@/lib/inventory";
+import { withCache, CACHE_KEYS, CACHE_TTL } from "@/lib/redis";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,8 +14,39 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const locationId = searchParams.get("locationId") || undefined;
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || undefined;
+    const category = searchParams.get("category") || undefined;
+    const status = searchParams.get("status") || undefined;
 
-    const items = await getInventoryItems(sessionUser, { locationId });
+    // If pagination is requested
+    if (searchParams.has("page") || searchParams.has("limit")) {
+      // Build cache key based on all query parameters
+      const cacheKey = `inventory:paginated:${locationId || 'all'}:${page}:${limit}:${search || ''}:${category || ''}:${status || ''}`;
+      
+      const result = await withCache(
+        cacheKey,
+        CACHE_TTL.FAST,
+        () => getInventoryItemsPaginated(sessionUser, {
+          locationId,
+          page,
+          limit,
+          search,
+          category,
+          status: status as "critical" | "low" | "normal" | "good" | "perfect" | "all" | undefined,
+        })
+      );
+
+      return jsonSuccess(result, { status: 200 });
+    }
+
+    // Legacy: return all items (for backwards compatibility)
+    const items = await withCache(
+      CACHE_KEYS.INVENTORY(locationId),
+      CACHE_TTL.FAST,
+      () => getInventoryItems(sessionUser, { locationId })
+    );
 
     return jsonSuccess(items, { status: 200 });
   } catch (error: unknown) {

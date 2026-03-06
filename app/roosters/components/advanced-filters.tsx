@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,13 +29,6 @@ interface AdvancedFiltersProps extends Omit<
   onFiltersChange: (filters: FilterState) => void;
 }
 
-// Available breeds from our database
-const AVAILABLE_BREEDS = [
-  { breedId: "BR001", name: "Lemon" },
-  { breedId: "BR002", name: "Golden Boy" },
-  { breedId: "BR003", name: "Sweater" },
-];
-
 // Define the filter state type
 type FilterState = {
   status: string;
@@ -45,86 +38,6 @@ type FilterState = {
   ageRange: string;
   weightRange: string;
 };
-
-// Filter options
-const FILTER_OPTIONS = {
-  status: {
-    label: "Status",
-    options: [
-      { value: "all", label: "All Status", color: "gray" },
-      { value: "Available", label: "Available", color: "green" },
-      { value: "Sold", label: "Sold", color: "gray" },
-      { value: "Reserved", label: "Reserved", color: "yellow" },
-      { value: "Quarantine", label: "Quarantine", color: "orange" },
-      { value: "Deceased", label: "Deceased", color: "red" },
-    ],
-  },
-  breed: {
-    label: "Breed",
-    options: [
-      { value: "all", label: "All Breeds", color: "gray" },
-      ...AVAILABLE_BREEDS.map((breed) => ({
-        value: breed.breedId,
-        label: breed.name,
-        color: "blue",
-      })),
-    ],
-  },
-  health: {
-    label: "Health",
-    options: [
-      { value: "all", label: "All Health", color: "gray" },
-      { value: "excellent", label: "Excellent", color: "emerald" },
-      { value: "good", label: "Good", color: "blue" },
-      { value: "fair", label: "Fair", color: "yellow" },
-      { value: "poor", label: "Poor", color: "red" },
-    ],
-  },
-  priceRange: {
-    label: "Price Range",
-    options: [
-      { value: "all", label: "All Prices", color: "gray" },
-      { value: "0-10000", label: "Under ₱10,000", color: "green" },
-      { value: "10000-15000", label: "₱10,000 - ₱15,000", color: "blue" },
-      { value: "15000-20000", label: "₱15,000 - ₱20,000", color: "purple" },
-      { value: "20000+", label: "Over ₱20,000", color: "red" },
-    ],
-  },
-  ageRange: {
-    label: "Age Range",
-    options: [
-      { value: "all", label: "All Ages", color: "gray" },
-      { value: "0-12", label: "Under 1 year", color: "green" },
-      { value: "12-18", label: "1-1.5 years", color: "blue" },
-      { value: "18-24", label: "1.5-2 years", color: "purple" },
-      { value: "24+", label: "Over 2 years", color: "red" },
-    ],
-  },
-  weightRange: {
-    label: "Weight Range",
-    options: [
-      { value: "all", label: "All Weights", color: "gray" },
-      { value: "0-2", label: "Under 2kg", color: "green" },
-      { value: "2-2.5", label: "2-2.5kg", color: "blue" },
-      { value: "2.5-3", label: "2.5-3kg", color: "purple" },
-      { value: "3+", label: "Over 3kg", color: "red" },
-    ],
-  },
-};
-
-// Sort options
-const SORT_OPTIONS = [
-  { value: "breed", label: "Breed (A-Z)" },
-  { value: "breed-desc", label: "Breed (Z-A)" },
-  { value: "price-low", label: "Price (Low to High)" },
-  { value: "price-high", label: "Price (High to Low)" },
-  { value: "date-newest", label: "Date (Newest First)" },
-  { value: "date-oldest", label: "Date (Oldest First)" },
-  { value: "age-youngest", label: "Age (Youngest First)" },
-  { value: "age-oldest", label: "Age (Oldest First)" },
-  { value: "weight-lightest", label: "Weight (Lightest First)" },
-  { value: "weight-heaviest", label: "Weight (Heaviest First)" },
-];
 
 export function AdvancedFilters({
   query,
@@ -138,6 +51,103 @@ export function AdvancedFilters({
   onSortByChange,
 }: AdvancedFiltersProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [availableBreeds, setAvailableBreeds] = useState<Array<{ breedId: string; name: string }>>([]);
+
+  // Fetch breeds from API
+  useEffect(() => {
+    const fetchBreeds = async () => {
+      try {
+        const response = await fetch("/api/public/breeds");
+        const result = await response.json();
+        if (result.success && result.data) {
+          setAvailableBreeds(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching breeds:", error);
+      }
+    };
+    fetchBreeds();
+  }, []);
+
+  // Build filter options dynamically
+  const FILTER_OPTIONS = {
+    status: {
+      label: "Status",
+      options: [
+        { value: "all", label: "All Status", color: "gray" },
+        { value: "Available", label: "Available", color: "green" },
+        { value: "Sold", label: "Sold", color: "gray" },
+        { value: "Reserved", label: "Reserved", color: "yellow" },
+        { value: "Quarantine", label: "Quarantine", color: "orange" },
+        { value: "Deceased", label: "Deceased", color: "red" },
+      ],
+    },
+    breed: {
+      label: "Breed",
+      options: [
+        { value: "all", label: "All Breeds", color: "gray" },
+        ...availableBreeds.map((breed) => ({
+          value: breed.name, // Use breed name instead of breedId for matching
+          label: breed.name,
+          color: "blue",
+        })),
+      ],
+    },
+    health: {
+      label: "Health",
+      options: [
+        { value: "all", label: "All Health", color: "gray" },
+        { value: "excellent", label: "Excellent", color: "emerald" },
+        { value: "good", label: "Good", color: "blue" },
+        { value: "fair", label: "Fair", color: "yellow" },
+        { value: "poor", label: "Poor", color: "red" },
+      ],
+    },
+    priceRange: {
+      label: "Price Range",
+      options: [
+        { value: "all", label: "All Prices", color: "gray" },
+        { value: "0-10000", label: "Under ₱10,000", color: "green" },
+        { value: "10000-15000", label: "₱10,000 - ₱15,000", color: "blue" },
+        { value: "15000-20000", label: "₱15,000 - ₱20,000", color: "purple" },
+        { value: "20000+", label: "Over ₱20,000", color: "red" },
+      ],
+    },
+    ageRange: {
+      label: "Age Range",
+      options: [
+        { value: "all", label: "All Ages", color: "gray" },
+        { value: "0-12", label: "Under 1 year", color: "green" },
+        { value: "12-18", label: "1-1.5 years", color: "blue" },
+        { value: "18-24", label: "1.5-2 years", color: "purple" },
+        { value: "24+", label: "Over 2 years", color: "red" },
+      ],
+    },
+    weightRange: {
+      label: "Weight Range",
+      options: [
+        { value: "all", label: "All Weights", color: "gray" },
+        { value: "0-2", label: "Under 2kg", color: "green" },
+        { value: "2-2.5", label: "2-2.5kg", color: "blue" },
+        { value: "2.5-3", label: "2.5-3kg", color: "purple" },
+        { value: "3+", label: "Over 3kg", color: "red" },
+      ],
+    },
+  };
+
+  // Sort options
+  const SORT_OPTIONS = [
+    { value: "breed", label: "Breed (A-Z)" },
+    { value: "breed-desc", label: "Breed (Z-A)" },
+    { value: "price-low", label: "Price (Low to High)" },
+    { value: "price-high", label: "Price (High to Low)" },
+    { value: "date-newest", label: "Date (Newest First)" },
+    { value: "date-oldest", label: "Date (Oldest First)" },
+    { value: "age-youngest", label: "Age (Youngest First)" },
+    { value: "age-oldest", label: "Age (Oldest First)" },
+    { value: "weight-lightest", label: "Weight (Lightest First)" },
+    { value: "weight-heaviest", label: "Weight (Heaviest First)" },
+  ];
 
   // Count active filters (excluding 'all' values)
   const activeFilterCount = Object.values(activeFilters).filter(

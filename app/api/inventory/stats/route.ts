@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getInventoryStats } from "@/lib/inventory";
+import { withCache, CACHE_KEYS, CACHE_TTL } from "@/lib/redis";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const locationId = searchParams.get("locationId") || undefined;
 
-    const stats = await getInventoryStats(sessionUser, locationId);
+    const stats = await withCache(
+      CACHE_KEYS.INVENTORY_STATS(locationId),
+      CACHE_TTL.MEDIUM,
+      () => getInventoryStats(sessionUser, locationId)
+    );
 
     return jsonSuccess(stats, { status: 200 });
   } catch (error: unknown) {

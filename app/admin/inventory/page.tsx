@@ -50,7 +50,6 @@ import { Package, AlertTriangle, AlertCircle, Download } from "lucide-react";
 // Import modular components
 import {
   InventoryFilters,
-  InventoryTable,
   StatsCardsSkeleton,
   PageHeaderSkeleton,
   TabsSkeleton,
@@ -72,11 +71,11 @@ import {
   LocationSwitcher,
   type FarmLocation,
 } from "./components";
+import { InventoryTablePaginated } from "./components/inventory-table-paginated";
 
-import { filterInventoryItems, getStatusColor } from "./data/helpers";
+import { getStatusColor } from "./data/helpers";
 import type {
   InventoryItem,
-  InventoryStats,
   InventoryActivity,
 } from "@/lib/inventory-types";
 import type { Supplier } from "@/lib/supplier-types";
@@ -86,6 +85,7 @@ import { toastCRUD } from "./utils/toast";
 import { exportInventoryToExcel } from "./utils/export-to-excel";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useInventoryPaginated, useInventoryStats } from "@/hooks/use-inventory";
 
 export const description = "Farm Supply & Inventory Management";
 
@@ -95,9 +95,6 @@ export default function InventoryPage() {
 
   // State and settings
   const [searchValue, setSearchValue] = useState("");
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [stats, setStats] = useState<InventoryStats | null>(null);
   const [allActivities, setAllActivities] = useState<InventoryActivity[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
   const [activitySearchValue, setActivitySearchValue] = useState("");
@@ -147,6 +144,28 @@ export default function InventoryPage() {
     null
   );
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
+  
+  // All items for alerts tab (need to fetch separately from paginated data)
+  const [allItems, setAllItems] = useState<InventoryItem[]>([]);
+
+  // Use SWR hooks for data fetching with pagination
+  const {
+    items: paginatedItems,
+    total,
+    totalPages,
+    isLoading: isLoadingPaginated,
+    mutate: mutateInventory,
+  } = useInventoryPaginated({
+    locationId: selectedLocation?.locationId,
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchValue,
+  });
+
+  const {
+    stats,
+    mutate: mutateStats,
+  } = useInventoryStats(selectedLocation?.locationId);
 
   // Load locations on mount
   useEffect(() => {
@@ -186,78 +205,8 @@ export default function InventoryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load data from API
-  useEffect(() => {
-    const loadData = async () => {
-      if (isLoadingLocations) return;
-
-      try {
-        setIsDataLoading(true);
-
-        const locationParam = selectedLocation?.locationId
-          ? `?locationId=${selectedLocation.locationId}`
-          : "";
-
-        const [itemsResponse, statsResponse] = await Promise.all([
-          fetch(`/api/inventory${locationParam}`),
-          fetch(`/api/inventory/stats${locationParam}`),
-        ]);
-
-        const itemsJson = await itemsResponse.json();
-        const statsJson = await statsResponse.json();
-
-        if (!itemsResponse.ok || !itemsJson?.success) {
-          if (itemsResponse.status === 401 || itemsResponse.status === 403) {
-            toastCRUD.permissionError();
-          } else {
-            toastCRUD.loadError("inventory items");
-          }
-        } else {
-          setItems(itemsJson.data as InventoryItem[]);
-        }
-
-        if (!statsResponse.ok || !statsJson?.success) {
-          if (statsResponse.status === 401 || statsResponse.status === 403) {
-            toastCRUD.permissionError();
-          } else {
-            toastCRUD.loadError("inventory stats");
-          }
-        } else {
-          setStats(statsJson.data as InventoryStats);
-        }
-      } catch (error) {
-        console.error("Failed to load inventory data:", error);
-        toastCRUD.networkError();
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-
-    loadData();
-  }, [isLoadingLocations, selectedLocation]);
-
-  const handleRefreshStats = async () => {
-    try {
-      const locationParam = selectedLocation?.locationId
-        ? `?locationId=${selectedLocation.locationId}`
-        : "";
-      const response = await fetch(`/api/inventory/stats${locationParam}`);
-      const json = await response.json();
-
-      if (!response.ok || !json?.success) {
-        if (response.status === 401 || response.status === 403) {
-          toastCRUD.permissionError();
-        } else {
-          toastCRUD.loadError("inventory stats");
-        }
-        return;
-      }
-
-      setStats(json.data as InventoryStats);
-    } catch (error) {
-      console.error("Failed to refresh inventory stats:", error);
-      toastCRUD.networkError();
-    }
+  const handleRefreshStats = () => {
+    mutateStats();
   };
 
   const handleLocationChange = (location: FarmLocation | null) => {
@@ -313,9 +262,6 @@ export default function InventoryPage() {
     }
   };
 
-  // Filter inventory items based on search
-  const filteredItems = filterInventoryItems(items, searchValue);
-
   // Filter activities based on search
   const filteredActivities = allActivities.filter((activity) => {
     // Search filter
@@ -360,16 +306,10 @@ export default function InventoryPage() {
     return true;
   });
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedItems = filteredItems.slice(startIndex, endIndex);
-
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or location changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchValue]);
+  }, [searchValue, selectedLocation]);
 
   // Reset activity page when activity search changes
   useEffect(() => {
@@ -378,7 +318,7 @@ export default function InventoryPage() {
 
   // Event handlers
   const handleViewDetails = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setSelectedItem(item);
       setIsViewDialogOpen(true);
@@ -386,7 +326,7 @@ export default function InventoryPage() {
   };
 
   const handleEdit = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setSelectedItem(item);
       setIsEditDialogOpen(true);
@@ -394,7 +334,7 @@ export default function InventoryPage() {
   };
 
   const handleDelete = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setConfirmDialog({
         open: true,
@@ -419,7 +359,7 @@ export default function InventoryPage() {
               return;
             }
 
-            setItems((prev) => prev.filter((existing) => existing.id !== id));
+            mutateInventory();
             toastCRUD.itemDeleted(item.name);
             handleRefreshStats();
           } catch (error) {
@@ -435,7 +375,7 @@ export default function InventoryPage() {
   };
 
   const handleRestock = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setSelectedItem(item);
       setIsRestockDialogOpen(true);
@@ -443,7 +383,7 @@ export default function InventoryPage() {
   };
 
   const handleConsume = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setSelectedItem(item);
       setIsConsumeDialogOpen(true);
@@ -451,7 +391,7 @@ export default function InventoryPage() {
   };
 
   const handleViewActivity = (id: string) => {
-    const item = items.find((r) => r.id === id);
+    const item = paginatedItems?.find((r) => r.id === id);
     if (item) {
       setSelectedItem(item);
       setIsActivityLogDialogOpen(true);
@@ -463,22 +403,18 @@ export default function InventoryPage() {
     // TODO: Open filter modal or drawer
   };
 
-  const handleItemAdded = (newItem: InventoryItem) => {
-    setItems((prev) => [...prev, newItem]);
+  const handleItemAdded = () => {
+    mutateInventory();
     handleRefreshStats();
   };
 
-  const handleItemUpdated = (updatedItem: InventoryItem) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === updatedItem.id ? updatedItem : item))
-    );
+  const handleItemUpdated = () => {
+    mutateInventory();
     handleRefreshStats();
   };
 
-  const handleItemRestocked = (item: InventoryItem) => {
-    setItems((prev) =>
-      prev.map((existing) => (existing.id === item.id ? item : existing))
-    );
+  const handleItemRestocked = () => {
+    mutateInventory();
     handleRefreshStats();
     // Refresh activities if they've been loaded
     if (allActivities.length > 0) {
@@ -486,10 +422,8 @@ export default function InventoryPage() {
     }
   };
 
-  const handleItemConsumed = (item: InventoryItem) => {
-    setItems((prev) =>
-      prev.map((existing) => (existing.id === item.id ? item : existing))
-    );
+  const handleItemConsumed = () => {
+    mutateInventory();
     handleRefreshStats();
     // Refresh activities if they've been loaded
     if (allActivities.length > 0) {
@@ -564,8 +498,27 @@ export default function InventoryPage() {
     );
   };
 
-  // Show loading state while data is being loaded
-  if (isDataLoading) {
+  // Load all items for alerts tab (need to fetch separately from paginated data)
+  useEffect(() => {
+    const loadAllItems = async () => {
+      try {
+        const locationParam = selectedLocation?.locationId
+          ? `?locationId=${selectedLocation.locationId}`
+          : "";
+        const response = await fetch(`/api/inventory${locationParam}`);
+        const json = await response.json();
+        if (response.ok && json?.success) {
+          setAllItems(json.data as InventoryItem[]);
+        }
+      } catch (error) {
+        console.error("Failed to load all items:", error);
+      }
+    };
+    loadAllItems();
+  }, [selectedLocation]);
+
+  // Show loading state while locations are being loaded
+  if (isLoadingLocations) {
     return (
       <div className="[--header-height:calc(--spacing(14))]">
         <SidebarProvider className="flex flex-col">
@@ -608,7 +561,7 @@ export default function InventoryPage() {
                           ? `${userData.firstName} ${userData.lastName} (${userData.email})`
                           : "Unknown";
                         exportInventoryToExcel(
-                          items,
+                          allItems,
                           stats || undefined,
                           exportedBy
                         );
@@ -704,34 +657,29 @@ export default function InventoryPage() {
                   />
 
                   {/* Inventory Table */}
-                  {filteredItems.length === 0 && searchValue ? (
-                    <NoSearchResultsState searchValue={searchValue} />
-                  ) : filteredItems.length === 0 ? (
-                    <EmptyInventoryState />
+                  {isLoadingPaginated ? (
+                    <TableSkeleton />
+                  ) : !paginatedItems || paginatedItems.length === 0 ? (
+                    searchValue ? (
+                      <NoSearchResultsState searchValue={searchValue} />
+                    ) : (
+                      <EmptyInventoryState />
+                    )
                   ) : (
-                    <>
-                      <InventoryTable
-                        items={paginatedItems}
-                        onViewDetails={handleViewDetails}
-                        onEdit={handleEdit}
-                        onRestock={handleRestock}
-                        onConsume={handleConsume}
-                        onViewActivity={handleViewActivity}
-                      />
-                      {totalPages > 1 && (
-                        <Card className="border-[#3d6c58]/20">
-                          <CardContent className="pt-6">
-                            <Pagination
-                              currentPage={currentPage}
-                              totalPages={totalPages}
-                              onPageChange={setCurrentPage}
-                              totalItems={filteredItems.length}
-                              itemsPerPage={itemsPerPage}
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
-                    </>
+                    <InventoryTablePaginated
+                      items={paginatedItems}
+                      total={total || 0}
+                      page={currentPage}
+                      limit={itemsPerPage}
+                      totalPages={totalPages || 1}
+                      isLoading={isLoadingPaginated}
+                      onPageChange={setCurrentPage}
+                      onViewDetails={handleViewDetails}
+                      onEdit={handleEdit}
+                      onRestock={handleRestock}
+                      onConsume={handleConsume}
+                      onViewActivity={handleViewActivity}
+                    />
                   )}
                 </TabsContent>
 
@@ -746,13 +694,13 @@ export default function InventoryPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {items.filter((item) => item.status !== "adequate")
+                      {allItems.filter((item) => item.status === "low" || item.status === "critical")
                         .length === 0 ? (
                         <NoAlertsState />
                       ) : (
                         <div className="space-y-4">
-                          {items
-                            .filter((item) => item.status !== "adequate")
+                          {allItems
+                            .filter((item) => item.status === "low" || item.status === "critical")
                             .map((item) => (
                               <div
                                 key={item.id}

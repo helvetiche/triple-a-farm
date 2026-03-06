@@ -3,10 +3,21 @@ import type { SessionUser } from "@/lib/auth";
 import { hasRequiredRole } from "@/lib/roles";
 import type { Rooster, Vaccination } from "@/app/admin/data/roosters";
 import { logAuditEvent } from "@/lib/audit";
+import { invalidatePattern } from "@/lib/redis";
 
 type RoosterAction = "read" | "create" | "update" | "delete" | "readStats";
 
 const ROOSTERS_COLLECTION = "roosters";
+
+// Helper to invalidate all rooster-related caches
+const invalidateRoosterCaches = async () => {
+  try {
+    await invalidatePattern("roosters:*");
+    await invalidatePattern("rooster:*");
+  } catch (error) {
+    console.error("Failed to invalidate rooster caches:", error);
+  }
+};
 
 const assertRoosterPermission = (
   user: SessionUser | null,
@@ -41,6 +52,22 @@ const assertRoosterPermission = (
 };
 
 const roostersCollectionRef = () => adminDb.collection(ROOSTERS_COLLECTION);
+
+export interface GetRoostersPaginatedOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: Rooster["status"] | "all";
+  breedId?: string;
+}
+
+export interface PaginatedRoostersResult {
+  roosters: Rooster[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 export const getRoosters = async (
   user: SessionUser | null
@@ -79,6 +106,152 @@ export const getRoosters = async (
 
     return rooster;
   });
+};
+
+export const getRoostersPaginated = async (
+  user: SessionUser | null,
+  options: GetRoostersPaginatedOptions = {}
+): Promise<PaginatedRoostersResult> => {
+  assertRoosterPermission(user, "read");
+
+  const {
+    page = 1,
+    limit = 10,
+    search,
+    status,
+    breedId,
+  } = options;
+
+  // Build base query with filters
+  let query: FirebaseFirestore.Query = roostersCollectionRef();
+
+  // Apply filters
+  if (status && status !== "all") {
+    query = query.where("status", "==", status);
+  }
+
+  if (breedId && breedId !== "all") {
+    query = query.where("breedId", "==", breedId);
+  }
+
+  // Order by dateAdded for consistent pagination
+  query = query.orderBy("dateAdded", "desc");
+
+  // If search is provided, use prefix matching with limited fetch
+  if (search && search.trim()) {
+    const searchLower = search.toLowerCase();
+    
+    // Try prefix search on name field
+    const searchEnd = searchLower.slice(0, -1) + String.fromCharCode(searchLower.charCodeAt(searchLower.length - 1) + 1);
+    
+    const searchQuery = query
+      .where("nameLower", ">=", searchLower)
+      .where("nameLower", "<", searchEnd)
+      .limit(limit * 3); // Get more results for additional filtering
+    
+    const snapshot = await searchQuery.get();
+    
+    // Additional client-side filtering for other fields
+    const filteredDocs = snapshot.docs.filter((doc) => {
+      const data = doc.data();
+      return (
+        data.name?.toLowerCase().includes(searchLower) ||
+        data.breed?.toLowerCase().includes(searchLower) ||
+        data.id?.toLowerCase().includes(searchLower) ||
+        data.description?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    const filteredTotal = filteredDocs.length;
+    const totalPages = Math.ceil(filteredTotal / limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
+
+    const roosters: Rooster[] = paginatedDocs.map((doc) => {
+      const data = doc.data() as Record<string, unknown>;
+      return {
+        id: doc.id,
+        breedId: (data.breedId as string) || "",
+        breed: (data.breed as string) || "",
+        name: (data.name as string) || "",
+        age: (data.age as string) || "",
+        weight: (data.weight as string) || "",
+        price: (data.price as string) || "",
+        status: (data.status as Rooster["status"]) || "Available",
+        health: (data.health as Rooster["health"]) || "good",
+        images: Array.isArray(data.images) ? (data.images as string[]) : [],
+        dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+        description: (data.description as string) || "",
+        locationId: (data.locationId as string) || "",
+        location: (data.location as string) || "",
+        locationAddress: (data.locationAddress as string) || undefined,
+        owner: data.owner as string | undefined,
+        image: data.image as string | undefined,
+        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
+      };
+    });
+
+    return {
+      roosters,
+      total: filteredTotal,
+      page,
+      limit,
+      totalPages,
+    };
+  }
+
+  // No search - use proper Firestore pagination
+  const offset = (page - 1) * limit;
+  
+  const paginatedQuery = query.limit(limit).offset(offset);
+  const snapshot = await paginatedQuery.get();
+
+  const roosters: Rooster[] = snapshot.docs.map((doc) => {
+    const data = doc.data() as Record<string, unknown>;
+    return {
+      id: doc.id,
+      breedId: (data.breedId as string) || "",
+      breed: (data.breed as string) || "",
+      name: (data.name as string) || "",
+      age: (data.age as string) || "",
+      weight: (data.weight as string) || "",
+      price: (data.price as string) || "",
+      status: (data.status as Rooster["status"]) || "Available",
+      health: (data.health as Rooster["health"]) || "good",
+      images: Array.isArray(data.images) ? (data.images as string[]) : [],
+      dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+      description: (data.description as string) || "",
+      locationId: (data.locationId as string) || "",
+      location: (data.location as string) || "",
+      locationAddress: (data.locationAddress as string) || undefined,
+      owner: data.owner as string | undefined,
+      image: data.image as string | undefined,
+      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
+    };
+  });
+
+  // Get total count
+  let total = 0;
+  try {
+    const countQuery = query.count();
+    const countSnapshot = await countQuery.get();
+    total = countSnapshot.data().count;
+  } catch (error) {
+    console.warn("Count query failed, using estimation:", error);
+    total = roosters.length < limit ? (page - 1) * limit + roosters.length : page * limit + 1;
+  }
+  
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    roosters,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
 };
 
 export const getRoosterById = async (
@@ -185,6 +358,7 @@ const buildRoosterDocFromCreate = (
     breedId: input.breedId,
     breed: input.breed,
     name: input.name,
+    nameLower: input.name.toLowerCase(), // For search indexing
     age: input.age,
     weight: input.weight,
     price: input.price,
@@ -217,10 +391,13 @@ const applyUpdateToRooster = (
   existing: Rooster,
   input: UpdateRoosterInput
 ): Omit<Rooster, "id"> => {
+  const updatedName = input.name !== undefined ? input.name : existing.name;
+  
   const docData: Record<string, unknown> = {
     breedId: input.breedId !== undefined ? input.breedId : existing.breedId,
     breed: input.breed !== undefined ? input.breed : existing.breed,
-    name: input.name !== undefined ? input.name : existing.name,
+    name: updatedName,
+    nameLower: updatedName.toLowerCase(), // Update search index
     age: input.age !== undefined ? input.age : existing.age,
     weight: input.weight !== undefined ? input.weight : existing.weight,
     price: input.price !== undefined ? input.price : existing.price,
@@ -289,6 +466,9 @@ export const createRooster = async (
 
   await docRef.set(cleanedData);
 
+  // Invalidate caches
+  await invalidateRoosterCaches();
+
   const createdRooster: Rooster = {
     id: docRef.id,
     ...docData,
@@ -353,6 +533,9 @@ export const updateRooster = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
+  // Invalidate caches
+  await invalidateRoosterCaches();
+
   const updatedRooster = updated as Rooster;
 
   logAuditEvent(user, {
@@ -397,6 +580,9 @@ export const deleteRooster = async (
 
     tx.delete(docRef);
   });
+
+  // Invalidate caches
+  await invalidateRoosterCaches();
 
   if (deletedRooster) {
     const rooster = deletedRooster as Rooster;

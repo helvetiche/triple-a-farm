@@ -315,15 +315,6 @@ export function EnhancedDropzone({
             <h4 className="text-sm font-medium text-gray-900">
               Selected Files ({value.length}/{maxFiles})
             </h4>
-            {!isUploading && (
-              <Button
-                size="sm"
-                onClick={uploadFiles}
-                className="bg-[#3d6c58] hover:bg-[#4e816b]"
-              >
-                Upload All
-              </Button>
-            )}
           </div>
 
           {value.map((file, index) => {

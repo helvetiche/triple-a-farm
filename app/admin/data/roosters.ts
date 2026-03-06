@@ -10,6 +10,7 @@ export interface Rooster {
   breedId: string;
   breed: string;
   name: string;
+  nameLower?: string; // Lowercase version for efficient search indexing
   age: string;
   weight: string;
   price: string;

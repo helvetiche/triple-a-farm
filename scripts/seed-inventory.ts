@@ -410,7 +410,8 @@ async function seedInventory() {
         const createdAt = new Date().toISOString().split("T")[0];
         const status = calculateInventoryStatus(
           currentStock,
-          template.minStock
+          template.minStock,
+          template.maxStock
         );
 
         const docRef = inventoryRef.doc();

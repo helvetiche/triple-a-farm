@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { SiteHeader } from "@/components/dashboard/site-header";
@@ -28,12 +28,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { getRoosterStats, type Rooster } from "./data/roosters";
+import { getRoosterStats } from "./data/roosters";
 import { exportDashboardToExcel } from "./utils/export-dashboard";
 import { DateRangeSelector } from "./analytics/components/date-range-selector";
 import type { DateRange } from "./analytics/data/mock-data";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoosters, useDashboardActivity } from "@/hooks";
 
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import { useLightbox } from "@/hooks/use-lightbox";
@@ -46,13 +47,6 @@ export const iframeHeight = "800px";
 
 export const description = "Triple A Gamefarm Dashboard";
 
-interface Activity {
-  action: string;
-  detail: string;
-  time: string;
-  icon: string;
-}
-
 const iconMap: Record<string, typeof Bird> = {
   Bird,
   PhilippinePeso,
@@ -64,59 +58,40 @@ export default function Page() {
   // Auth
   const { userData } = useAuth();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [roosters, setRoosters] = useState<Rooster[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    available: 0,
-    sold: 0,
-    reserved: 0,
-    quarantine: 0,
-    totalValue: 0,
-    availableValue: 0,
-    averagePrice: 0,
-    topBreed: "N/A",
-  });
+  // SWR hooks for data fetching with caching
+  const { roosters, isLoading: roostersLoading } = useRoosters();
+  const { activities, isLoading: activitiesLoading } = useDashboardActivity();
+
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
     endDate: new Date(),
   });
 
-  // Fetch roosters and activities from API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [roostersResponse, activitiesResponse] = await Promise.all([
-          fetch("/api/roosters"),
-          fetch("/api/dashboard/activity"),
-        ]);
+  const isLoading = roostersLoading || activitiesLoading;
 
-        const roostersResult = await roostersResponse.json();
-        if (roostersResult.success) {
-          const fetchedRoosters = roostersResult.data || [];
-          setRoosters(fetchedRoosters);
-          setStats(getRoosterStats(fetchedRoosters));
-        }
-
-        const activitiesResult = await activitiesResponse.json();
-        if (activitiesResult.success) {
-          setActivities(activitiesResult.data || []);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // Calculate stats from roosters data
+  const stats = useMemo(() => {
+    if (!roosters) {
+      return {
+        total: 0,
+        available: 0,
+        sold: 0,
+        reserved: 0,
+        quarantine: 0,
+        totalValue: 0,
+        availableValue: 0,
+        averagePrice: 0,
+        topBreed: "N/A",
+      };
+    }
+    return getRoosterStats(roosters);
+  }, [roosters]);
 
   // Get featured roosters (first 3 available roosters)
-  const featuredRoosters = roosters
-    .filter((r) => r.status === "Available")
-    .slice(0, 3);
+  const featuredRoosters = useMemo(() => {
+    if (!roosters) return [];
+    return roosters.filter((r) => r.status === "Available").slice(0, 3);
+  }, [roosters]);
 
   const handleExportReport = async () => {
     try {
@@ -125,8 +100,8 @@ export default function Page() {
         : "Unknown";
       await exportDashboardToExcel(
         stats,
-        roosters,
-        activities,
+        roosters || [],
+        activities || [],
         selectedDateRange,
         exportedBy
       );
@@ -532,7 +507,7 @@ export default function Page() {
                         </div>
                       ))}
                     </div>
-                  ) : activities.length === 0 ? (
+                  ) : !activities || activities.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8">
                       <Calendar className="h-8 w-8 text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">

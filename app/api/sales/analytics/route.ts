@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import { getSalesStats, getRevenueTrend } from "@/lib/sales";
+import { withCache, CACHE_TTL } from "@/lib/redis";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,18 +10,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get("days") || "30");
 
-    const [stats, trend] = await Promise.all([
-      getSalesStats(sessionUser),
-      getRevenueTrend(sessionUser, days),
-    ]);
+    const cacheKey = `sales:analytics:${days}`;
 
-    return jsonSuccess(
-      {
-        stats,
-        trend,
-      },
-      { status: 200 }
+    const result = await withCache(
+      cacheKey,
+      CACHE_TTL.MEDIUM,
+      async () => {
+        const [stats, trend] = await Promise.all([
+          getSalesStats(sessionUser),
+          getRevenueTrend(sessionUser, days),
+        ]);
+        return { stats, trend };
+      }
     );
+
+    return jsonSuccess(result, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "UNAUTHENTICATED") {

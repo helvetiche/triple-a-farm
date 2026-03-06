@@ -1,4 +1,4 @@
-export type InventoryStatus = "adequate" | "low" | "critical";
+export type InventoryStatus = "critical" | "low" | "normal" | "good" | "perfect";
 
 export interface InventoryItem {
   id: string;
@@ -12,6 +12,10 @@ export interface InventoryItem {
    */
   createdAt?: string;
   name: string;
+  /**
+   * Lowercase version of name for efficient search indexing
+   */
+  nameLower?: string;
   category: string;
   currentStock: number;
   minStock: number;
@@ -85,21 +89,36 @@ export const CONSUME_REASONS = [
 
 export const calculateInventoryStatus = (
   currentStock: number,
-  minStock: number
+  minStock: number,
+  maxStock?: number
 ): InventoryStatus => {
+  // If no stock, it's critical
   if (currentStock === 0) {
     return "critical";
   }
 
-  if (currentStock <= minStock * 0.5) {
-    return "critical";
+  // Use maxStock as the baseline, fallback to minStock * 2 if not provided
+  const targetStock = maxStock && maxStock > 0 ? maxStock : minStock * 2;
+  const percentage = (currentStock / targetStock) * 100;
+
+  // Percentage-based thresholds based on maxStock
+  if (percentage <= 5) {
+    return "critical"; // 0-5% of max: Critical
   }
 
-  if (currentStock <= minStock) {
-    return "low";
+  if (percentage <= 15) {
+    return "low"; // 5-15% of max: Low stock
   }
 
-  return "adequate";
+  if (percentage <= 50) {
+    return "normal"; // 15-50% of max: Normal
+  }
+
+  if (percentage <= 75) {
+    return "good"; // 50-75% of max: Good
+  }
+
+  return "perfect"; // 75-100%+ of max: Perfect
 };
 
 export const formatInventoryDisplayId = (

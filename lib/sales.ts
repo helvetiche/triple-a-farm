@@ -7,10 +7,20 @@ import type {
   RevenueTrend,
 } from "@/app/admin/sales/types";
 import { logAuditEvent } from "@/lib/audit";
+import { invalidatePattern } from "@/lib/redis";
 
 type SalesAction = "read" | "create" | "update" | "delete" | "readStats";
 
 const SALES_COLLECTION = "sales";
+
+// Helper to invalidate all sales-related caches
+const invalidateSalesCaches = async () => {
+  try {
+    await invalidatePattern("sales:*");
+  } catch (error) {
+    console.error("Failed to invalidate sales caches:", error);
+  }
+};
 
 const assertSalesPermission = (
   user: SessionUser | null,
@@ -62,6 +72,21 @@ export interface UpdateSalesTransactionInput {
   notes?: string;
 }
 
+export interface GetSalesTransactionsPaginatedOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  paymentMethod?: string;
+}
+
+export interface PaginatedSalesResult {
+  transactions: SalesTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const getSalesTransactions = async (
   user: SessionUser | null
 ): Promise<SalesTransaction[]> => {
@@ -82,6 +107,114 @@ export const getSalesTransactions = async (
       transactionId,
     };
   });
+};
+
+export const getSalesTransactionsPaginated = async (
+  user: SessionUser | null,
+  options: GetSalesTransactionsPaginatedOptions = {}
+): Promise<PaginatedSalesResult> => {
+  assertSalesPermission(user, "read");
+
+  const {
+    page = 1,
+    limit = 10,
+    search,
+    paymentMethod,
+  } = options;
+
+  // Build base query
+  let query: FirebaseFirestore.Query = salesCollectionRef();
+
+  // Apply filters
+  if (paymentMethod && paymentMethod !== "all") {
+    query = query.where("paymentMethod", "==", paymentMethod);
+  }
+
+  // Order by date for consistent pagination
+  query = query.orderBy("date", "desc");
+
+  // If search is provided, use prefix matching with limited fetch
+  if (search && search.trim()) {
+    const searchLower = search.toLowerCase();
+    
+    // Fetch limited results for search
+    const searchQuery = query.limit(limit * 3);
+    const snapshot = await searchQuery.get();
+    
+    // Client-side filtering for search
+    const filteredDocs = snapshot.docs.filter((doc) => {
+      const data = doc.data();
+      const transactionId = data.transactionId || formatSalesTransactionId(doc.id, data.date);
+      return (
+        data.customerName?.toLowerCase().includes(searchLower) ||
+        data.breed?.toLowerCase().includes(searchLower) ||
+        transactionId?.toLowerCase().includes(searchLower) ||
+        data.customerContact?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    const filteredTotal = filteredDocs.length;
+    const totalPages = Math.ceil(filteredTotal / limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
+
+    const transactions: SalesTransaction[] = paginatedDocs.map((doc) => {
+      const data = doc.data() as Omit<SalesTransaction, "id">;
+      const transactionId = data.transactionId || formatSalesTransactionId(doc.id, data.date);
+      return {
+        id: doc.id,
+        ...data,
+        transactionId,
+      };
+    });
+
+    return {
+      transactions,
+      total: filteredTotal,
+      page,
+      limit,
+      totalPages,
+    };
+  }
+
+  // No search - use proper Firestore pagination
+  const offset = (page - 1) * limit;
+  
+  const paginatedQuery = query.limit(limit).offset(offset);
+  const snapshot = await paginatedQuery.get();
+
+  const transactions: SalesTransaction[] = snapshot.docs.map((doc) => {
+    const data = doc.data() as Omit<SalesTransaction, "id">;
+    const transactionId = data.transactionId || formatSalesTransactionId(doc.id, data.date);
+    return {
+      id: doc.id,
+      ...data,
+      transactionId,
+    };
+  });
+
+  // Get total count
+  let total = 0;
+  try {
+    const countQuery = query.count();
+    const countSnapshot = await countQuery.get();
+    total = countSnapshot.data().count;
+  } catch (error) {
+    console.warn("Count query failed, using estimation:", error);
+    total = transactions.length < limit ? (page - 1) * limit + transactions.length : page * limit + 1;
+  }
+  
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    transactions,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
 };
 
 export const getSalesTransactionById = async (
@@ -164,6 +297,9 @@ export const createSalesTransaction = async (
 
   await docRef.set(cleanedDoc);
 
+  // Invalidate caches
+  await invalidateSalesCaches();
+
   const createdTransaction: SalesTransaction = {
     id: docRef.id,
     ...docData,
@@ -239,6 +375,9 @@ export const updateSalesTransaction = async (
     throw new Error("UNKNOWN_ERROR");
   }
 
+  // Invalidate caches
+  await invalidateSalesCaches();
+
   const updatedTransaction = updated as SalesTransaction;
 
   logAuditEvent(user, {
@@ -278,6 +417,9 @@ export const deleteSalesTransaction = async (
   } as SalesTransaction;
 
   await docRef.delete();
+
+  // Invalidate caches
+  await invalidateSalesCaches();
 
   logAuditEvent(user, {
     action: "delete",

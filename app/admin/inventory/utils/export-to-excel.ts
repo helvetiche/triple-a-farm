@@ -65,7 +65,7 @@ export const exportInventoryToExcel = (
 
   // Sheet 3: Stock Alerts (if any, sorted alphabetically by name)
   const alertItems = items
-    .filter((item) => item.status !== "adequate")
+    .filter((item) => item.status === "critical" || item.status === "low")
     .sort((a, b) => a.name.localeCompare(b.name));
   if (alertItems.length > 0) {
     const alertsData = [

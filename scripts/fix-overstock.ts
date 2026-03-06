@@ -80,9 +80,9 @@ const initializeFirebase = () => {
 };
 
 const calculateStatus = (currentStock: number, minStock: number): string => {
-  if (currentStock <= 0) return "critical";
+  if (currentStock === 0) return "critical";
   if (currentStock <= minStock) return "low";
-  return "adequate";
+  return "normal";
 };
 
 const main = async () => {

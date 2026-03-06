@@ -2,15 +2,47 @@ import { NextRequest } from "next/server";
 import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import {
   getSalesTransactions,
+  getSalesTransactionsPaginated,
   createSalesTransaction,
   type CreateSalesTransactionInput,
 } from "@/lib/sales";
+import { withCache, CACHE_TTL } from "@/lib/redis";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const sessionUser = await getSessionUser();
 
-    const transactions = await getSalesTransactions(sessionUser);
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || undefined;
+    const paymentMethod = searchParams.get("paymentMethod") || undefined;
+
+    // If pagination is requested
+    if (searchParams.has("page") || searchParams.has("limit")) {
+      const cacheKey = `sales:paginated:${page}:${limit}:${search || ''}:${paymentMethod || ''}`;
+      
+      const result = await withCache(
+        cacheKey,
+        CACHE_TTL.FAST,
+        () => getSalesTransactionsPaginated(sessionUser, {
+          page,
+          limit,
+          search,
+          paymentMethod,
+        })
+      );
+
+      return jsonSuccess(result, { status: 200 });
+    }
+
+    // Legacy: return all transactions
+    const cacheKey = "sales:transactions:all";
+    const transactions = await withCache(
+      cacheKey,
+      CACHE_TTL.FAST,
+      () => getSalesTransactions(sessionUser)
+    );
 
     return jsonSuccess(transactions, { status: 200 });
   } catch (error: unknown) {

@@ -63,7 +63,7 @@ export function NoAlertsState() {
       <CardContent className="flex flex-col items-center justify-center py-16">
         <AlertTriangle className="h-16 w-16 text-green-600 mb-4" />
         <h3 className="text-xl font-semibold text-[#1f3f2c] mb-2">
-          All stock levels are adequate
+          All stock levels are good
         </h3>
         <p className="text-[#4a6741] text-center mb-6 max-w-md">
           Great job! All your inventory items have sufficient stock levels. No

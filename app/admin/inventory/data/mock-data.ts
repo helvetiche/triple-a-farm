@@ -9,7 +9,7 @@ export interface InventoryItem {
   unit: string;
   lastRestocked: string;
   supplier: string;
-  status: "adequate" | "low" | "critical";
+  status: "critical" | "low" | "normal" | "good" | "perfect";
   description?: string;
   price?: number;
   location?: string;
@@ -34,7 +34,7 @@ export const mockInventoryItems: InventoryItem[] = [
     unit: "kg",
     lastRestocked: "2024-11-15",
     supplier: "AgriFeeds Corp",
-    status: "adequate",
+    status: "normal",
     description:
       "High-quality gamefowl feed with balanced nutrition for optimal growth and performance.",
     price: 45.5,
@@ -66,7 +66,7 @@ export const mockInventoryItems: InventoryItem[] = [
     unit: "kg",
     lastRestocked: "2024-11-01",
     supplier: "AgriFeeds Corp",
-    status: "adequate",
+    status: "normal",
     description:
       "Calcium-rich powder supplement for strong bone development in gamefowl.",
     price: 35.75,
@@ -98,7 +98,7 @@ export const mockInventoryItems: InventoryItem[] = [
     unit: "kg",
     lastRestocked: "2024-11-10",
     supplier: "Farm Supply Co",
-    status: "adequate",
+    status: "normal",
     description:
       "Clean and absorbent bedding materials for comfortable gamefowl housing.",
     price: 12.5,
@@ -130,7 +130,7 @@ export const mockInventoryItems: InventoryItem[] = [
     unit: "kg",
     lastRestocked: "2024-11-05",
     supplier: "AgriFeeds Corp",
-    status: "adequate",
+    status: "normal",
     description: "Natural grit supplement for proper digestion in gamefowl.",
     price: 18.0,
     location: "Warehouse A - Section 4",
@@ -174,8 +174,12 @@ export const getInventoryStats = (items: InventoryItem[]): InventoryStats => {
 // Helper functions for status and progress
 export const getStatusColor = (status: string) => {
   switch (status) {
-    case "adequate":
+    case "perfect":
+      return "bg-emerald-100 text-emerald-800";
+    case "good":
       return "bg-green-100 text-green-800";
+    case "normal":
+      return "bg-blue-100 text-blue-800";
     case "low":
       return "bg-yellow-100 text-yellow-800";
     case "critical":

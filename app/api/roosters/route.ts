@@ -3,14 +3,47 @@ import { getSessionUser, jsonError, jsonSuccess } from "@/lib/auth";
 import {
   createRooster,
   getRoosters,
+  getRoostersPaginated,
   type CreateRoosterInput,
 } from "@/lib/roosters";
+import { withCache, CACHE_KEYS, CACHE_TTL, invalidatePattern } from "@/lib/redis";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const sessionUser = await getSessionUser();
 
-    const roosters = await getRoosters(sessionUser);
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || undefined;
+    const status = searchParams.get("status") || undefined;
+    const breedId = searchParams.get("breedId") || undefined;
+
+    // If pagination is requested
+    if (searchParams.has("page") || searchParams.has("limit")) {
+      const cacheKey = `roosters:paginated:${page}:${limit}:${search || ''}:${status || ''}:${breedId || ''}`;
+      
+      const result = await withCache(
+        cacheKey,
+        CACHE_TTL.FAST,
+        () => getRoostersPaginated(sessionUser, {
+          page,
+          limit,
+          search,
+          status: status as "Available" | "Sold" | "Reserved" | "Quarantine" | "Deceased" | undefined,
+          breedId,
+        })
+      );
+
+      return jsonSuccess(result, { status: 200 });
+    }
+
+    // Legacy: return all roosters
+    const roosters = await withCache(
+      CACHE_KEYS.ROOSTERS,
+      CACHE_TTL.FAST,
+      () => getRoosters(sessionUser)
+    );
 
     return jsonSuccess(roosters, { status: 200 });
   } catch (error: unknown) {
@@ -79,6 +112,10 @@ export async function POST(request: NextRequest) {
     };
 
     const created = await createRooster(sessionUser, input);
+
+    // Invalidate rooster caches
+    await invalidatePattern("roosters:*");
+    await invalidatePattern("rooster:*");
 
     return jsonSuccess(created, { status: 201 });
   } catch (error: unknown) {

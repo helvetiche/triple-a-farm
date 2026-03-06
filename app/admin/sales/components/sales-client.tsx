@@ -38,6 +38,7 @@ import { PageHeader, StatCards } from "@/components/dashboard";
 import { exportSalesToExcel } from "../utils/export-to-excel";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSalesPaginated } from "@/hooks/use-sales";
 
 export const description = "Sales & Transaction Tracking";
 
@@ -45,19 +46,10 @@ export function SalesClient() {
   // Auth
   const { userData } = useAuth();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [sales, setSales] = useState<SalesTransaction[]>([]);
-  const [stats, setStats] = useState<SalesStats>({
-    totalRevenue: 0,
-    totalTransactions: 0,
-    pendingTransactions: 0,
-    averageSaleAmount: 0,
-    monthlyGrowth: 0,
-    topBreed: "",
-  });
-  const [revenueTrend, setRevenueTrend] = useState<RevenueTrend[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const [showRecordSaleDialog, setShowRecordSaleDialog] = useState(false);
   const [selectedSale, setSelectedSale] = useState<SalesTransaction | null>(
     null
@@ -67,64 +59,55 @@ export function SalesClient() {
     | { roosterId: string; breed: string; price: number; name: string }
     | undefined
   >(undefined);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
 
   const searchParams = useSearchParams();
 
-  // Fetch sales data from API
-  const fetchSalesData = async () => {
-    try {
-      setIsLoading(true);
+  // Use paginated hook
+  const {
+    transactions: paginatedSales,
+    total,
+    totalPages,
+    isLoading,
+    mutate: mutateSales,
+  } = useSalesPaginated({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery,
+  });
 
-      const [transactionsResponse, analyticsResponse] = await Promise.all([
-        fetch("/api/sales/transactions"),
-        fetch("/api/sales/analytics"),
-      ]);
+  // Fetch stats and trend separately
+  const [stats, setStats] = useState<SalesStats>({
+    totalRevenue: 0,
+    totalTransactions: 0,
+    pendingTransactions: 0,
+    averageSaleAmount: 0,
+    monthlyGrowth: 0,
+    topBreed: "",
+  });
+  const [revenueTrend, setRevenueTrend] = useState<RevenueTrend[]>([]);
 
-      const transactionsResult = await transactionsResponse.json();
-      const analyticsResult = await analyticsResponse.json();
-
-      if (transactionsResult.success) {
-        const fetchedSales = transactionsResult.data || [];
-        console.log("Fetched sales:", fetchedSales.length);
-        setSales(fetchedSales);
-      } else {
-        console.error(
-          "Failed to fetch transactions:",
-          transactionsResult.error
-        );
-      }
-
-      if (analyticsResult.success) {
-        setStats(
-          analyticsResult.data.stats || {
-            totalRevenue: 0,
-            totalTransactions: 0,
-            averageSaleAmount: 0,
-            monthlyGrowth: 0,
-            topBreed: "",
-          }
-        );
-        setRevenueTrend(analyticsResult.data.trend || []);
-      } else {
-        console.error("Failed to fetch analytics:", analyticsResult.error);
-      }
-    } catch (error) {
-      console.error("Error fetching sales data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Fetch analytics data
   useEffect(() => {
-    fetchSalesData();
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch("/api/sales/analytics");
+        const result = await response.json();
+
+        if (result.success) {
+          setStats(result.data.stats || stats);
+          setRevenueTrend(result.data.trend || []);
+        }
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+      }
+    };
+    fetchAnalytics();
   }, []);
 
   // Handle URL parameter for pre-filled rooster data
   useEffect(() => {
     const roosterParam = searchParams.get("rooster");
-    if (roosterParam) {
+    if (roosterParam && !prefilledRoosterData) {
       try {
         const roosterData = JSON.parse(decodeURIComponent(roosterParam));
         setPrefilledRoosterData(roosterData);
@@ -133,46 +116,27 @@ export function SalesClient() {
         console.error("Error parsing rooster data from URL:", error);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedStatus]);
 
   const handleRecordSale = async (saleData: SalesTransaction) => {
     try {
-      // Sale is already saved to Firebase by record-sale-dialog
-      // Close dialog first
       setShowRecordSaleDialog(false);
-
-      // Add to local state immediately for instant feedback
-      setSales([saleData, ...sales]);
-
-      // Then refresh from Firebase to ensure we have the latest data
-      // Wait a moment to ensure Firebase has processed the write
-      setTimeout(async () => {
-        await fetchSalesData();
-      }, 500);
+      await mutateSales(); // Refresh the paginated data
+      toastCRUD.createSuccess("Sale");
     } catch (error) {
       console.error("Error recording sale:", error);
       toastCRUD.createError("Sale", "Failed to record sale. Please try again.");
     }
   };
-
-  const filteredSales = sales.filter((sale) => {
-    const matchesSearch =
-      sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sale.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sale.id.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedSales = filteredSales.slice(startIndex, endIndex);
-
-  // Reset to page 1 when search or filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedStatus]);
 
   if (isLoading) {
     return (
@@ -216,7 +180,7 @@ export function SalesClient() {
                         const exportedBy = userData
                           ? `${userData.firstName} ${userData.lastName} (${userData.email})`
                           : "Unknown";
-                        exportSalesToExcel(sales, stats, exportedBy);
+                        exportSalesToExcel(paginatedSales || [], stats, exportedBy);
                         toast.success("Sales report exported successfully!");
                       } catch (error) {
                         console.error("Error exporting sales:", error);
@@ -310,19 +274,19 @@ export function SalesClient() {
                 </CardHeader>
                 <CardContent style={{ borderRadius: 0 }}>
                   <SalesTable
-                    transactions={paginatedSales}
+                    transactions={paginatedSales || []}
                     onViewTransaction={(sale: SalesTransaction) => {
                       setSelectedSale(sale);
                       setShowViewDialog(true);
                     }}
                   />
-                  {totalPages > 1 && (
+                  {(totalPages || 1) > 1 && (
                     <div className="pt-6">
                       <Pagination
                         currentPage={currentPage}
-                        totalPages={totalPages}
+                        totalPages={totalPages || 1}
                         onPageChange={setCurrentPage}
-                        totalItems={filteredSales.length}
+                        totalItems={total || 0}
                         itemsPerPage={itemsPerPage}
                       />
                     </div>

@@ -41,13 +41,12 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Import unified rooster data
 import {
-  getRoosterStats,
-  filterRoosters,
   type Rooster,
 } from "../data/roosters";
 
 // Import settings
 import { useRoosterSettings } from "./utils/use-rooster-settings";
+import { useRoostersPaginated } from "@/hooks/use-roosters";
 
 export const description = "Rooster Inventory Management";
 
@@ -57,14 +56,12 @@ export default function RoostersPage() {
 
   // State and settings
   const [searchValue, setSearchValue] = useState("");
-  const [roosters, setRoosters] = useState<Rooster[]>([]);
-  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const [selectedRooster, setSelectedRooster] = useState<Rooster | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isBreedDialogOpen, setIsBreedDialogOpen] = useState(false);
   const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     title: string;
@@ -78,51 +75,67 @@ export default function RoostersPage() {
   });
   const { viewMode, setViewMode } = useRoosterSettings();
 
-  // Fetch roosters from API
-  const fetchRoosters = async () => {
-    try {
-      setIsDataLoading(true);
-      const response = await fetch("/api/roosters");
-      const result = await response.json();
+  // Use paginated hook
+  const {
+    roosters: paginatedRoosters,
+    total,
+    totalPages,
+    isLoading: isDataLoading,
+    isError,
+    mutate: mutateRoosters,
+  } = useRoostersPaginated({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchValue,
+  });
 
-      if (result.success) {
-        setRoosters(result.data || []);
-      } else {
-        toastCRUD.loadError("roosters");
-        console.error("Failed to load roosters:", result.error);
-      }
-    } catch (error) {
-      toastCRUD.networkError();
-      console.error("Error fetching roosters:", error);
-    } finally {
-      setIsDataLoading(false);
-    }
-  };
-
+  // Debug logging
   useEffect(() => {
-    fetchRoosters();
-  }, []);
-
-  // Filter roosters based on search
-  const filteredRoosters = filterRoosters(roosters, searchValue);
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredRoosters.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedRoosters = filteredRoosters.slice(startIndex, endIndex);
+    console.log("Roosters data:", {
+      paginatedRoosters,
+      total,
+      totalPages,
+      isDataLoading,
+      isError,
+      currentPage,
+      searchValue,
+    });
+  }, [paginatedRoosters, total, totalPages, isDataLoading, isError, currentPage, searchValue]);
 
   // Reset to page 1 when search changes
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
-  // Calculate stats
-  const stats = getRoosterStats(roosters);
+  // Calculate stats - fetch all roosters for stats
+  const [stats, setStats] = useState({
+    total: 0,
+    available: 0,
+    sold: 0,
+    quarantine: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/roosters/stats");
+        const result = await response.json();
+        if (result.success) {
+          setStats(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
 
   // Event handlers
   const handleViewDetails = (id: string) => {
-    const rooster = roosters.find((r) => r.id === id);
+    const rooster = paginatedRoosters?.find((r) => r.id === id);
     if (rooster) {
       setSelectedRooster(rooster);
       setIsViewDialogOpen(true);
@@ -134,7 +147,7 @@ export default function RoostersPage() {
   };
 
   const handleDelete = (id: string) => {
-    const rooster = roosters.find((r) => r.id === id);
+    const rooster = paginatedRoosters?.find((r) => r.id === id);
     if (rooster) {
       setConfirmDialog({
         open: true,
@@ -150,7 +163,7 @@ export default function RoostersPage() {
             if (result.success) {
               toastCRUD.roosterDeleted(rooster.id);
               setConfirmDialog((prev) => ({ ...prev, open: false }));
-              await fetchRoosters();
+              mutateRoosters();
             } else {
               toastCRUD.deleteError("rooster", result.error?.message);
             }
@@ -210,15 +223,18 @@ export default function RoostersPage() {
                           const exportedBy = userData
                             ? `${userData.firstName} ${userData.lastName} (${userData.email})`
                             : "Unknown";
-                          exportRoostersToExcel(roosters, stats, exportedBy);
-                          toast.success(
-                            "Rooster report exported successfully!"
-                          );
+                          // Note: Export will need all roosters, not just paginated
+                          fetch("/api/roosters")
+                            .then((res) => res.json())
+                            .then((result) => {
+                              if (result.success) {
+                                exportRoostersToExcel(result.data, stats, exportedBy);
+                                toast.success("Rooster report exported successfully!");
+                              }
+                            });
                         } catch (error) {
                           console.error("Error exporting roosters:", error);
-                          toast.error(
-                            "Failed to export report. Please try again."
-                          );
+                          toast.error("Failed to export report. Please try again.");
                         }
                       }}
                     >
@@ -322,7 +338,7 @@ export default function RoostersPage() {
                 ) : (
                   <CardsSkeleton />
                 )
-              ) : filteredRoosters.length === 0 ? (
+              ) : !paginatedRoosters || paginatedRoosters.length === 0 ? (
                 <Card className="border-[#3d6c58]/20">
                   <CardContent className="py-12">
                     <RoosterEmptyState
@@ -342,14 +358,14 @@ export default function RoostersPage() {
                     onDelete={handleDelete}
                     onBuyRooster={handleBuyRooster}
                   />
-                  {totalPages > 1 && (
+                  {(totalPages || 1) > 1 && (
                     <Card className="border-[#3d6c58]/20">
                       <CardContent className="pt-6">
                         <Pagination
                           currentPage={currentPage}
-                          totalPages={totalPages}
+                          totalPages={totalPages || 1}
                           onPageChange={setCurrentPage}
-                          totalItems={filteredRoosters.length}
+                          totalItems={total || 0}
                           itemsPerPage={itemsPerPage}
                         />
                       </CardContent>
@@ -364,14 +380,14 @@ export default function RoostersPage() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                   />
-                  {totalPages > 1 && (
+                  {(totalPages || 1) > 1 && (
                     <Card className="border-[#3d6c58]/20">
                       <CardContent className="pt-6">
                         <Pagination
                           currentPage={currentPage}
-                          totalPages={totalPages}
+                          totalPages={totalPages || 1}
                           onPageChange={setCurrentPage}
-                          totalItems={filteredRoosters.length}
+                          totalItems={total || 0}
                           itemsPerPage={itemsPerPage}
                         />
                       </CardContent>

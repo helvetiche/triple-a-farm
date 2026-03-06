@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -47,8 +46,12 @@ export function InventoryTable({
 }: InventoryTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "adequate":
+      case "perfect":
+        return "bg-emerald-100 text-emerald-800";
+      case "good":
         return "bg-green-100 text-green-800";
+      case "normal":
+        return "bg-blue-100 text-blue-800";
       case "low":
         return "bg-yellow-100 text-yellow-800";
       case "critical":
@@ -59,13 +62,22 @@ export function InventoryTable({
   };
 
   const getStockProgress = (item: InventoryItem) => {
-    if (item.maxStock && item.maxStock > 0) {
-      return Math.min((item.currentStock / item.maxStock) * 100, 100);
-    }
-    // Fallback: use minStock * 3 as a reasonable "full" reference
-    const referenceMax = item.minStock * 3;
-    if (referenceMax === 0) return 100;
-    return Math.min((item.currentStock / referenceMax) * 100, 100);
+    // Always use maxStock as baseline, fallback to minStock * 2 if not provided
+    const targetStock = item.maxStock && item.maxStock > 0 
+      ? item.maxStock 
+      : item.minStock * 2;
+    
+    if (targetStock === 0) return 100;
+    
+    return Math.min((item.currentStock / targetStock) * 100, 100);
+  };
+
+  const getProgressColor = (percentage: number) => {
+    if (percentage <= 5) return "bg-red-500";
+    if (percentage <= 15) return "bg-yellow-500";
+    if (percentage <= 50) return "bg-blue-500";
+    if (percentage <= 75) return "bg-green-500";
+    return "bg-emerald-500";
   };
 
   if (items.length === 0) {
@@ -165,7 +177,12 @@ export function InventoryTable({
                   </div>
                 </div>
                 <div className="mt-2">
-                  <Progress value={getStockProgress(item)} className="h-2" />
+                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className={`h-full transition-all ${getProgressColor(getStockProgress(item))}`}
+                      style={{ width: `${getStockProgress(item)}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -246,10 +263,12 @@ export function InventoryTable({
                           {item.unit}
                         </span>
                       </div>
-                      <Progress
-                        value={getStockProgress(item)}
-                        className="h-2"
-                      />
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className={`h-full transition-all ${getProgressColor(getStockProgress(item))}`}
+                          style={{ width: `${getStockProgress(item)}%` }}
+                        />
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
