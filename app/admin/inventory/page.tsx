@@ -86,6 +86,7 @@ import { exportInventoryToExcel } from "./utils/export-to-excel";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInventoryPaginated, useInventoryStats } from "@/hooks/use-inventory";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const description = "Farm Supply & Inventory Management";
 
@@ -95,6 +96,9 @@ export default function InventoryPage() {
 
   // State and settings
   const [searchValue, setSearchValue] = useState("");
+  const debouncedSearchValue = useDebounce(searchValue, 300); // Debounce search by 300ms
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [allActivities, setAllActivities] = useState<InventoryActivity[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
   const [activitySearchValue, setActivitySearchValue] = useState("");
@@ -159,7 +163,9 @@ export default function InventoryPage() {
     locationId: selectedLocation?.locationId,
     page: currentPage,
     limit: itemsPerPage,
-    search: searchValue,
+    search: debouncedSearchValue, // Use debounced value
+    category: categoryFilter,
+    status: statusFilter,
   });
 
   const {
@@ -309,7 +315,7 @@ export default function InventoryPage() {
   // Reset to page 1 when search or location changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchValue, selectedLocation]);
+  }, [debouncedSearchValue, selectedLocation, categoryFilter, statusFilter]); // Use debounced value to sync with API call
 
   // Reset activity page when activity search changes
   useEffect(() => {
@@ -396,11 +402,6 @@ export default function InventoryPage() {
       setSelectedItem(item);
       setIsActivityLogDialogOpen(true);
     }
-  };
-
-  const handleFilterClick = () => {
-    console.log("Open filters");
-    // TODO: Open filter modal or drawer
   };
 
   const handleItemAdded = () => {
@@ -653,7 +654,10 @@ export default function InventoryPage() {
                   <InventoryFilters
                     searchValue={searchValue}
                     onSearchChange={setSearchValue}
-                    onFilterClick={handleFilterClick}
+                    categoryFilter={categoryFilter}
+                    onCategoryFilterChange={setCategoryFilter}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
                   />
 
                   {/* Inventory Table */}

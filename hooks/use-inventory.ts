@@ -63,12 +63,13 @@ export function useInventoryPaginated(options: UseInventoryPaginatedOptions = {}
     key,
     fetcher,
     {
-      refreshInterval: 0, // Disable auto-refresh, rely on manual mutate
-      revalidateOnMount: true, // Changed to true to ensure initial fetch
-      keepPreviousData: true, // Keep previous data while loading new page
-      dedupingInterval: 5000, // Dedupe requests within 5 seconds
-      revalidateOnFocus: false, // Don't revalidate on focus
-      revalidateIfStale: false, // Don't revalidate if data exists
+      refreshInterval: 0,
+      revalidateOnMount: true,
+      keepPreviousData: true,
+      dedupingInterval: 1000, // Reduced to 1 second
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      revalidateOnReconnect: false,
     }
   );
 

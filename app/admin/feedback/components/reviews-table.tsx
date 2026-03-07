@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Edit, Eye, EyeOff, MoreHorizontal } from "lucide-react";
+import { Check, Edit, Eye, EyeOff, MoreHorizontal, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ type ReviewsTableProps = {
   onEdit: (review: CustomerReview) => void;
   onPublish: (review: CustomerReview) => void;
   onUnpublish: (review: CustomerReview) => void;
+  onDelete: (review: CustomerReview) => void;
 };
 
 export function ReviewsTable({
@@ -44,6 +45,7 @@ export function ReviewsTable({
   onEdit,
   onPublish,
   onUnpublish,
+  onDelete,
 }: ReviewsTableProps) {
   return (
     <Card className="border-[#3d6c58]/20" style={{ borderRadius: 0 }}>
@@ -96,6 +98,14 @@ export function ReviewsTable({
                         Publish to Landing
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onDelete(review)}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Review
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -211,6 +221,14 @@ export function ReviewsTable({
                             Publish to Landing
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => onDelete(review)}
+                          className="text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete Review
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

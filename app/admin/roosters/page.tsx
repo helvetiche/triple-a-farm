@@ -47,6 +47,7 @@ import {
 // Import settings
 import { useRoosterSettings } from "./utils/use-rooster-settings";
 import { useRoostersPaginated } from "@/hooks/use-roosters";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const description = "Rooster Inventory Management";
 
@@ -56,6 +57,9 @@ export default function RoostersPage() {
 
   // State and settings
   const [searchValue, setSearchValue] = useState("");
+  const debouncedSearchValue = useDebounce(searchValue, 300); // Debounce search by 300ms
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [breedFilter, setBreedFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [selectedRooster, setSelectedRooster] = useState<Rooster | null>(null);
@@ -86,7 +90,9 @@ export default function RoostersPage() {
   } = useRoostersPaginated({
     page: currentPage,
     limit: itemsPerPage,
-    search: searchValue,
+    search: debouncedSearchValue, // Use debounced value
+    status: statusFilter,
+    breedId: breedFilter,
   });
 
   // Debug logging
@@ -108,7 +114,7 @@ export default function RoostersPage() {
       setCurrentPage(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue]);
+  }, [debouncedSearchValue, statusFilter, breedFilter]); // Use debounced value to sync with API call
 
   // Calculate stats - fetch all roosters for stats
   const [stats, setStats] = useState({
@@ -174,11 +180,6 @@ export default function RoostersPage() {
         },
       });
     }
-  };
-
-  const handleFilterClick = () => {
-    console.log("Open filters");
-    // TODO: Open filter modal or drawer
   };
 
   const handleClearSearch = () => {
@@ -325,7 +326,10 @@ export default function RoostersPage() {
                     <RoosterFilters
                       searchValue={searchValue}
                       onSearchChange={setSearchValue}
-                      onFilterClick={handleFilterClick}
+                      statusFilter={statusFilter}
+                      onStatusFilterChange={setStatusFilter}
+                      breedFilter={breedFilter}
+                      onBreedFilterChange={setBreedFilter}
                     />
                   </CardContent>
                 </Card>

@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Plus,
-  Search,
   CreditCard,
   Wallet,
   TrendingUp,
@@ -31,6 +30,7 @@ import {
   SalesTable,
   SalesStatsCardsSkeleton,
 } from "./index";
+import { SalesFilters } from "./sales-filters";
 import { PageHeaderSkeleton, TabsSkeleton } from "../../inventory/components";
 import { SalesTransaction, SalesStats, RevenueTrend } from "../types";
 import { toastCRUD } from "../utils/toast";
@@ -39,6 +39,7 @@ import { exportSalesToExcel } from "../utils/export-to-excel";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSalesPaginated } from "@/hooks/use-sales";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const description = "Sales & Transaction Tracking";
 
@@ -47,7 +48,8 @@ export function SalesClient() {
   const { userData } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search by 300ms
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [showRecordSaleDialog, setShowRecordSaleDialog] = useState(false);
@@ -72,7 +74,8 @@ export function SalesClient() {
   } = useSalesPaginated({
     page: currentPage,
     limit: itemsPerPage,
-    search: searchQuery,
+    search: debouncedSearchQuery, // Use debounced value
+    paymentMethod: paymentMethodFilter,
   });
 
   // Fetch stats and trend separately
@@ -125,7 +128,7 @@ export function SalesClient() {
       setCurrentPage(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedStatus]);
+  }, [debouncedSearchQuery, paymentMethodFilter]); // Use debounced value to sync with API call
 
   const handleRecordSale = async (saleData: SalesTransaction) => {
     try {
@@ -249,30 +252,17 @@ export function SalesClient() {
                         Latest sales and payment records
                       </CardDescription>
                     </div>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                      <div className="relative w-full sm:w-auto">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          placeholder="Search transactions..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10 w-full sm:w-64 border-[#3d6c58]/20 focus:border-[#3d6c58]"
-                        />
-                      </div>
-                      <select
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full sm:w-auto px-3 py-2 border border-[#3d6c58]/20 rounded-none focus:outline-none focus:border-[#3d6c58]"
-                      >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                        <option value="failed">Failed</option>
-                      </select>
-                    </div>
                   </div>
                 </CardHeader>
                 <CardContent style={{ borderRadius: 0 }}>
+                  <div className="mb-4">
+                    <SalesFilters
+                      searchValue={searchQuery}
+                      onSearchChange={setSearchQuery}
+                      paymentMethodFilter={paymentMethodFilter}
+                      onPaymentMethodFilterChange={setPaymentMethodFilter}
+                    />
+                  </div>
                   <SalesTable
                     transactions={paginatedSales || []}
                     onViewTransaction={(sale: SalesTransaction) => {

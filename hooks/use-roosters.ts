@@ -67,11 +67,12 @@ export function useRoostersPaginated(options: UseRoostersPaginatedOptions = {}) 
     fetcher,
     {
       refreshInterval: 0,
-      revalidateOnMount: true, // Changed to true to ensure initial fetch
+      revalidateOnMount: true,
       keepPreviousData: true,
-      dedupingInterval: 5000,
+      dedupingInterval: 1000, // Reduced to 1 second
       revalidateOnFocus: false,
-      revalidateIfStale: false,
+      revalidateIfStale: true,
+      revalidateOnReconnect: false,
     }
   );
 

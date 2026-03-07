@@ -54,6 +54,8 @@ export default function FeedbackPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [reviews, setReviews] = useState<CustomerReview[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState("all");
   const [selectedReview, setSelectedReview] = useState<CustomerReview | null>(
     null
   );
@@ -61,6 +63,7 @@ export default function FeedbackPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [isUnpublishDialogOpen, setIsUnpublishDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingReview, setEditingReview] = useState<CustomerReview | null>(
     null
   );
@@ -114,8 +117,13 @@ export default function FeedbackPage() {
     fetchReviews(0, true);
   };
 
-  // Filter reviews based on search
-  const filteredReviews = filterReviews(reviews, searchValue);
+  // Filter reviews based on search and filters
+  const filteredReviews = filterReviews(
+    reviews,
+    searchValue,
+    statusFilter,
+    ratingFilter
+  );
 
   const handleClearSearch = () => {
     setSearchValue("");
@@ -227,6 +235,38 @@ export default function FeedbackPage() {
     setIsViewDialogOpen(true);
   };
 
+  const handleDeleteReview = (review: CustomerReview) => {
+    setSelectedReview(review);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedReview) return;
+
+    try {
+      const response = await fetch(
+        `/api/feedback/reviews?id=${selectedReview.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete review");
+      }
+
+      // Update local state
+      setReviews((prev) => prev.filter((review) => review.id !== selectedReview.id));
+
+      toast.success("Review deleted successfully");
+      setIsDeleteDialogOpen(false);
+      setSelectedReview(null);
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("Failed to delete review");
+    }
+  };
+
   const handleExportReport = () => {
     try {
       const exportedBy = userData
@@ -288,6 +328,10 @@ export default function FeedbackPage() {
                   <FeedbackSearchFilter
                     searchValue={searchValue}
                     onSearchValueChange={setSearchValue}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                    ratingFilter={ratingFilter}
+                    onRatingFilterChange={setRatingFilter}
                   />
                   <ReviewsTable
                     reviews={filteredReviews}
@@ -295,6 +339,7 @@ export default function FeedbackPage() {
                     onEdit={handleEditReview}
                     onPublish={handlePublishReview}
                     onUnpublish={handleUnpublishReview}
+                    onDelete={handleDeleteReview}
                   />
 
                   {/* Empty State for No Search Results */}
@@ -788,6 +833,49 @@ export default function FeedbackPage() {
                 </Button>
                 <Button variant="destructive" onClick={handleConfirmUnpublish}>
                   Remove
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md" style={{ borderRadius: 0 }}>
+          <DialogHeader style={{ borderRadius: 0 }}>
+            <DialogTitle>Delete Review</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete this review? This
+              action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedReview && (
+            <div className="space-y-4">
+              <div className="p-4 bg-red-50 border border-red-200">
+                <p className="font-semibold text-[#1f3f2c]">
+                  {selectedReview.customer}
+                </p>
+                <div className="flex items-center my-2">
+                  {renderStars(selectedReview.rating)}
+                  <span className="ml-2 text-sm text-[#4a6741]">
+                    ({selectedReview.rating}/5)
+                  </span>
+                </div>
+                <p className="text-sm text-[#4a6741] line-clamp-3">
+                  &quot;{selectedReview.comment}&quot;
+                </p>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  className="border-[#3d6c58]/20"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleConfirmDelete}>
+                  Delete Permanently
                 </Button>
               </div>
             </div>

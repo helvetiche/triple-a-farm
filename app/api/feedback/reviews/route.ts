@@ -179,3 +179,34 @@ export async function PUT(request: NextRequest) {
     return jsonError("REVIEW_UPDATE_FAILED", "Failed to update review.", 500);
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const sessionUser = await getSessionUser();
+    assertReviewPermission(sessionUser);
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return jsonError("INVALID_INPUT", "Missing required field: id", 400);
+    }
+
+    const docRef = reviewsCollectionRef().doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return jsonError("REVIEW_NOT_FOUND", "Review not found.", 404);
+    }
+
+    await docRef.delete();
+
+    return jsonSuccess(
+      { id, message: "Review deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    console.error("DELETE /api/feedback/reviews error:", error);
+    return jsonError("REVIEW_DELETE_FAILED", "Failed to delete review.", 500);
+  }
+}

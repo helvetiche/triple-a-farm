@@ -30,25 +30,44 @@ interface ReviewFilterable {
   comment?: string;
   status?: string;
   date?: string;
+  rating?: number;
 }
 
 export function filterReviews<T extends ReviewFilterable>(
   reviews: T[],
-  searchValue: string
+  searchValue: string,
+  statusFilter: string = "all",
+  ratingFilter: string = "all"
 ) {
-  if (!searchValue) return reviews;
+  let filtered = reviews;
 
-  const search = searchValue.toLowerCase();
-  return reviews.filter((review) =>
-    [
-      review.id,
-      review.customer,
-      review.rooster,
-      review.comment,
-      review.status,
-      review.date,
-    ]
-      .filter(Boolean)
-      .some((field) => String(field).toLowerCase().includes(search))
-  );
+  // Apply search filter
+  if (searchValue) {
+    const search = searchValue.toLowerCase();
+    filtered = filtered.filter((review) =>
+      [
+        review.id,
+        review.customer,
+        review.rooster,
+        review.comment,
+        review.status,
+        review.date,
+      ]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(search))
+    );
+  }
+
+  // Apply status filter
+  if (statusFilter && statusFilter !== "all") {
+    filtered = filtered.filter((review) => review.status === statusFilter);
+  }
+
+  // Apply rating filter
+  if (ratingFilter && ratingFilter !== "all") {
+    const targetRating = parseInt(ratingFilter);
+    filtered = filtered.filter((review) => review.rating === targetRating);
+  }
+
+  return filtered;
 }

@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 import { ArrowRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { EnhancedDropzone } from "@/components/ui/enhanced-dropzone";
 
 interface FeedbackDialogProps {
   children: React.ReactNode;
@@ -34,7 +33,6 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [proofFiles, setProofFiles] = useState<File[]>([]);
   const [breeds, setBreeds] = useState<
     Array<{ breedId: string; name: string }>
   >([]);
@@ -88,14 +86,6 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
       return;
     }
 
-    if (proofFiles.length === 0) {
-      toast.error("Please upload proof of purchase", {
-        description: "Add at least one file before submitting feedback.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
@@ -137,7 +127,6 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
       // Reset form
       setFormData({ name: "", email: "", breedId: "", breed: "", message: "" });
       setRating(0);
-      setProofFiles([]);
 
       // Close dialog after a short delay
       setTimeout(() => {
@@ -169,7 +158,6 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     // Reset form
     setFormData({ name: "", email: "", breedId: "", breed: "", message: "" });
     setRating(0);
-    setProofFiles([]);
     setOpen(false);
   };
 
@@ -305,23 +293,6 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
               className="border-[#A8D5BA] focus:border-[#3d6c58] focus:ring-[#3d6c58] min-h-[120px] transition-colors"
               required
             />
-          </div>
-
-          {/* Proof of Purchase - Full Width */}
-          <div className="space-y-2">
-            <Label className="text-[#3d6c58]">Proof of Purchase</Label>
-            <EnhancedDropzone
-              value={proofFiles}
-              onValueChange={setProofFiles}
-              accept="image/*,.pdf"
-              multiple
-              maxFiles={3}
-              maxSize={5}
-              disabled={isSubmitting}
-            />
-            <p className="text-xs text-[#4a6741]">
-              Upload a screenshot/photo or PDF receipt. Max 5MB per file.
-            </p>
           </div>
 
           {/* Submit Button */}
