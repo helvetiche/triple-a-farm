@@ -52,6 +52,106 @@ const assertRoosterPermission = (
 };
 
 const roostersCollectionRef = () => adminDb.collection(ROOSTERS_COLLECTION);
+const breedsCollectionRef = () => adminDb.collection("rooster_breeds");
+
+interface ResolvedBreedFilter {
+  nameLower: string | null;
+  acceptedIds: Set<string>;
+}
+
+const toBreedSlug = (value: string): string => {
+  return value.trim().toLowerCase().replace(/\s+/g, "-");
+};
+
+const normalizeLower = (value: unknown): string => {
+  return String(value || "").trim().toLowerCase();
+};
+
+const resolveBreedFilter = async (
+  breedIdentifier: string
+): Promise<ResolvedBreedFilter> => {
+  const normalizedIdentifier = breedIdentifier.trim();
+  const acceptedIds = new Set<string>();
+  if (!normalizedIdentifier) {
+    return {
+      nameLower: null,
+      acceptedIds,
+    };
+  }
+  acceptedIds.add(normalizedIdentifier.toLowerCase());
+
+  // First try direct document ID lookup.
+  const byDocId = await breedsCollectionRef().doc(normalizedIdentifier).get();
+  const byDocIdData = byDocId.data();
+  const byDocIdName = (byDocIdData?.name as string | undefined)?.trim();
+  const byDocIdBreedId = (byDocIdData?.breedId as string | undefined)?.trim();
+  if (byDocId.id) {
+    acceptedIds.add(byDocId.id.toLowerCase());
+  }
+  if (byDocIdBreedId) {
+    acceptedIds.add(byDocIdBreedId.toLowerCase());
+  }
+  if (byDocIdName) {
+    acceptedIds.add(toBreedSlug(byDocIdName));
+    return {
+      nameLower: byDocIdName.toLowerCase(),
+      acceptedIds,
+    };
+  }
+
+  // Fallback to custom `breedId` field lookup for datasets that store a separate ID.
+  const byFieldSnapshot = await breedsCollectionRef()
+    .where("breedId", "==", normalizedIdentifier)
+    .limit(1)
+    .get();
+  const byFieldDoc = byFieldSnapshot.docs[0];
+  const byFieldName = (byFieldDoc?.data()?.name as string | undefined)?.trim();
+  const byFieldBreedId = (
+    byFieldDoc?.data()?.breedId as string | undefined
+  )?.trim();
+  if (byFieldDoc?.id) {
+    acceptedIds.add(byFieldDoc.id.toLowerCase());
+  }
+  if (byFieldBreedId) {
+    acceptedIds.add(byFieldBreedId.toLowerCase());
+  }
+  if (byFieldName) {
+    acceptedIds.add(toBreedSlug(byFieldName));
+    return {
+      nameLower: byFieldName.toLowerCase(),
+      acceptedIds,
+    };
+  }
+
+  return {
+    nameLower: null,
+    acceptedIds,
+  };
+};
+
+const mapDocToRooster = (doc: FirebaseFirestore.QueryDocumentSnapshot): Rooster => {
+  const data = doc.data() as Record<string, unknown>;
+  return {
+    id: doc.id,
+    breedId: (data.breedId as string) || "",
+    breed: (data.breed as string) || "",
+    name: (data.name as string) || "",
+    age: (data.age as string) || "",
+    weight: (data.weight as string) || "",
+    price: (data.price as string) || "",
+    status: (data.status as Rooster["status"]) || "Available",
+    health: (data.health as Rooster["health"]) || "good",
+    images: Array.isArray(data.images) ? (data.images as string[]) : [],
+    dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
+    description: (data.description as string) || "",
+    locationId: (data.locationId as string) || "",
+    location: (data.location as string) || "",
+    locationAddress: (data.locationAddress as string) || undefined,
+    owner: data.owner as string | undefined,
+    image: data.image as string | undefined,
+    vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
+  };
+};
 
 export interface GetRoostersPaginatedOptions {
   page?: number;
@@ -124,6 +224,7 @@ export const getRoostersPaginated = async (
 
   // Build base query with filters
   let query: FirebaseFirestore.Query = roostersCollectionRef();
+  let selectedBreedFilter: ResolvedBreedFilter | null = null;
 
   // Apply filters
   if (status && status !== "all") {
@@ -131,8 +232,26 @@ export const getRoostersPaginated = async (
   }
 
   if (breedId && breedId !== "all") {
-    query = query.where("breedId", "==", breedId);
+    selectedBreedFilter = await resolveBreedFilter(breedId);
   }
+
+  const matchesSelectedBreed = (data: Record<string, unknown>): boolean => {
+    if (!selectedBreedFilter) {
+      return true;
+    }
+
+    const breedNameLower = normalizeLower(data.breed);
+    const breedIdLower = normalizeLower(data.breedId);
+
+    if (
+      selectedBreedFilter.nameLower &&
+      breedNameLower === selectedBreedFilter.nameLower
+    ) {
+      return true;
+    }
+
+    return selectedBreedFilter.acceptedIds.has(breedIdLower);
+  };
 
   // Order by dateAdded for consistent pagination
   query = query.orderBy("dateAdded", "desc");
@@ -154,12 +273,17 @@ export const getRoostersPaginated = async (
     // Additional client-side filtering for other fields
     const filteredDocs = snapshot.docs.filter((doc) => {
       const data = doc.data();
-      return (
+      const matchesSearch =
         data.name?.toLowerCase().includes(searchLower) ||
         data.breed?.toLowerCase().includes(searchLower) ||
         data.id?.toLowerCase().includes(searchLower) ||
-        data.description?.toLowerCase().includes(searchLower)
-      );
+        data.description?.toLowerCase().includes(searchLower);
+
+      if (!matchesSearch) {
+        return false;
+      }
+
+      return matchesSelectedBreed(data as Record<string, unknown>);
     });
 
     const filteredTotal = filteredDocs.length;
@@ -169,29 +293,7 @@ export const getRoostersPaginated = async (
     const endIndex = startIndex + limit;
     const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
 
-    const roosters: Rooster[] = paginatedDocs.map((doc) => {
-      const data = doc.data() as Record<string, unknown>;
-      return {
-        id: doc.id,
-        breedId: (data.breedId as string) || "",
-        breed: (data.breed as string) || "",
-        name: (data.name as string) || "",
-        age: (data.age as string) || "",
-        weight: (data.weight as string) || "",
-        price: (data.price as string) || "",
-        status: (data.status as Rooster["status"]) || "Available",
-        health: (data.health as Rooster["health"]) || "good",
-        images: Array.isArray(data.images) ? (data.images as string[]) : [],
-        dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
-        description: (data.description as string) || "",
-        locationId: (data.locationId as string) || "",
-        location: (data.location as string) || "",
-        locationAddress: (data.locationAddress as string) || undefined,
-        owner: data.owner as string | undefined,
-        image: data.image as string | undefined,
-        vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
-      };
-    });
+    const roosters: Rooster[] = paginatedDocs.map(mapDocToRooster);
 
     return {
       roosters,
@@ -205,32 +307,31 @@ export const getRoostersPaginated = async (
   // No search - use proper Firestore pagination
   const offset = (page - 1) * limit;
   
+  // If breed data is inconsistent in some records, strict filtering by resolved breed
+  // metadata must happen before pagination; otherwise unrelated breeds can slip in
+  // or legitimate rows can be missed due to legacy breedId values.
+  if (selectedBreedFilter) {
+    const fullSnapshot = await query.get();
+    const strictlyFilteredDocs = fullSnapshot.docs.filter(
+      (doc) => matchesSelectedBreed(doc.data() as Record<string, unknown>)
+    );
+    const total = strictlyFilteredDocs.length;
+    const paginatedDocs = strictlyFilteredDocs.slice(offset, offset + limit);
+    const roosters = paginatedDocs.map(mapDocToRooster);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      roosters,
+      total,
+      page,
+      limit,
+      totalPages,
+    };
+  }
+
   const paginatedQuery = query.limit(limit).offset(offset);
   const snapshot = await paginatedQuery.get();
-
-  const roosters: Rooster[] = snapshot.docs.map((doc) => {
-    const data = doc.data() as Record<string, unknown>;
-    return {
-      id: doc.id,
-      breedId: (data.breedId as string) || "",
-      breed: (data.breed as string) || "",
-      name: (data.name as string) || "",
-      age: (data.age as string) || "",
-      weight: (data.weight as string) || "",
-      price: (data.price as string) || "",
-      status: (data.status as Rooster["status"]) || "Available",
-      health: (data.health as Rooster["health"]) || "good",
-      images: Array.isArray(data.images) ? (data.images as string[]) : [],
-      dateAdded: (data.dateAdded as string) || new Date().toISOString().split("T")[0],
-      description: (data.description as string) || "",
-      locationId: (data.locationId as string) || "",
-      location: (data.location as string) || "",
-      locationAddress: (data.locationAddress as string) || undefined,
-      owner: data.owner as string | undefined,
-      image: data.image as string | undefined,
-      vaccinations: Array.isArray(data.vaccinations) ? (data.vaccinations as Vaccination[]) : undefined,
-    };
-  });
+  const roosters: Rooster[] = snapshot.docs.map(mapDocToRooster);
 
   // Get total count
   let total = 0;

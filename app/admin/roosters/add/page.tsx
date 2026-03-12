@@ -28,10 +28,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toastCRUD } from "../utils/toast";
 import {
-  getRoosterBreeds,
+  getRoosterBreedsWithIds,
   getRoosterLocationsWithIds,
   roosterStatuses,
   healthStatuses,
+  type BreedOption,
   type LocationOption,
 } from "../../data/roosters";
 
@@ -40,7 +41,7 @@ export const description = "Add New Rooster";
 export default function AddRoosterPage() {
   const router = useRouter();
   // State for dynamic breeds and locations
-  const [breeds, setBreeds] = useState<string[]>([]);
+  const [breeds, setBreeds] = useState<BreedOption[]>([]);
   const [locations, setLocations] = useState<LocationOption[]>([]);
   const [isLoadingBreeds, setIsLoadingBreeds] = useState(true);
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
@@ -70,7 +71,7 @@ export default function AddRoosterPage() {
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const breedsList = await getRoosterBreeds();
+        const breedsList = await getRoosterBreedsWithIds();
         setBreeds(breedsList);
       } catch (error) {
         console.error("Error fetching breeds:", error);
@@ -282,13 +283,17 @@ export default function AddRoosterPage() {
                         <div className="space-y-2">
                           <Label htmlFor="breed">Breed</Label>
                           <Select
-                            value={formData.breed}
+                            value={formData.breedId}
                             onValueChange={(value) => {
-                              handleInputChange("breed", value);
-                              handleInputChange(
-                                "breedId",
-                                value.toLowerCase().replace(/\s+/g, "-")
+                              const selectedBreed = breeds.find(
+                                (breed) => breed.breedId === value
                               );
+                              if (!selectedBreed) {
+                                return;
+                              }
+
+                              handleInputChange("breedId", selectedBreed.breedId);
+                              handleInputChange("breed", selectedBreed.name);
                             }}
                           >
                             <SelectTrigger className="border-[#3d6c58]/20">
@@ -300,9 +305,12 @@ export default function AddRoosterPage() {
                                   Loading breeds...
                                 </SelectItem>
                               ) : (
-                                breeds.map((breed: string) => (
-                                  <SelectItem key={breed} value={breed}>
-                                    {breed}
+                                breeds.map((breed) => (
+                                  <SelectItem
+                                    key={breed.breedId}
+                                    value={breed.breedId}
+                                  >
+                                    {breed.name}
                                   </SelectItem>
                                 ))
                               )}

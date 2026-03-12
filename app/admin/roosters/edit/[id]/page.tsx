@@ -30,10 +30,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { ConfirmDialog } from "../../components";
 import { toastCRUD } from "../../utils/toast";
 import {
-  getRoosterBreeds,
+  getRoosterBreedsWithIds,
   getRoosterLocationsWithIds,
   roosterStatuses,
   healthStatuses,
+  type BreedOption,
   type Rooster,
   type LocationOption,
 } from "../../../data/roosters";
@@ -47,7 +48,7 @@ export default function EditRoosterPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State for dynamic breeds and locations
-  const [breeds, setBreeds] = useState<string[]>([]);
+  const [breeds, setBreeds] = useState<BreedOption[]>([]);
   const [locations, setLocations] = useState<LocationOption[]>([]);
   const [isLoadingBreeds, setIsLoadingBreeds] = useState(true);
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
@@ -56,6 +57,7 @@ export default function EditRoosterPage() {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
+    breedId: "",
     breed: "",
     locationId: "",
     location: "",
@@ -92,6 +94,7 @@ export default function EditRoosterPage() {
           setFormData({
             id: rooster.id || "",
             name: rooster.name || "",
+            breedId: rooster.breedId || "",
             breed: rooster.breed || "",
             locationId: rooster.locationId || "",
             location: rooster.location || "",
@@ -126,7 +129,7 @@ export default function EditRoosterPage() {
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const breedsList = await getRoosterBreeds();
+        const breedsList = await getRoosterBreedsWithIds();
         setBreeds(breedsList);
       } catch (error) {
         console.error("Error fetching breeds:", error);
@@ -228,6 +231,7 @@ export default function EditRoosterPage() {
   const handleSave = async () => {
     if (
       !formData.id ||
+      !formData.breedId ||
       !formData.breed ||
       !formData.age ||
       !formData.weight ||
@@ -249,6 +253,7 @@ export default function EditRoosterPage() {
 
       const roosterData = {
         name: formData.name || formData.breed,
+        breedId: formData.breedId,
         breed: formData.breed,
         age: formData.age,
         weight: formData.weight,
@@ -403,10 +408,18 @@ export default function EditRoosterPage() {
                             <div className="space-y-2">
                               <Label htmlFor="breed">Breed</Label>
                               <Select
-                                value={formData.breed}
-                                onValueChange={(value) =>
-                                  handleInputChange("breed", value)
-                                }
+                                value={formData.breedId}
+                                onValueChange={(value) => {
+                                  const selectedBreed = breeds.find(
+                                    (breed) => breed.breedId === value
+                                  );
+                                  if (!selectedBreed) {
+                                    return;
+                                  }
+
+                                  handleInputChange("breedId", selectedBreed.breedId);
+                                  handleInputChange("breed", selectedBreed.name);
+                                }}
                               >
                                 <SelectTrigger className="border-[#3d6c58]/20">
                                   <SelectValue placeholder="Select breed" />
@@ -417,9 +430,12 @@ export default function EditRoosterPage() {
                                       Loading breeds...
                                     </SelectItem>
                                   ) : (
-                                    breeds.map((breed: string) => (
-                                      <SelectItem key={breed} value={breed}>
-                                        {breed}
+                                    breeds.map((breed) => (
+                                      <SelectItem
+                                        key={breed.breedId}
+                                        value={breed.breedId}
+                                      >
+                                        {breed.name}
                                       </SelectItem>
                                     ))
                                   )}

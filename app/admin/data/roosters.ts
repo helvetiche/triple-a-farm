@@ -5,6 +5,11 @@ export interface Vaccination {
   date: string;
 }
 
+export interface BreedOption {
+  breedId: string;
+  name: string;
+}
+
 export interface Rooster {
   id: string;
   breedId: string;
@@ -42,6 +47,36 @@ export const getRoosterBreeds = async (): Promise<string[]> => {
   } catch (error) {
     console.error("Error fetching breeds:", error);
     return fallbackBreeds;
+  }
+};
+
+export const getRoosterBreedsWithIds = async (): Promise<BreedOption[]> => {
+  try {
+    const response = await fetch("/api/public/breeds");
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      return result.data
+        .map(
+          (breed: { breedId?: string; id?: string; name: string }) =>
+            ({
+              breedId: breed.breedId || breed.id || "",
+              name: breed.name,
+            }) satisfies BreedOption
+        )
+        .filter((breed: BreedOption) => breed.breedId && breed.name);
+    }
+
+    return fallbackBreeds.map((name) => ({
+      breedId: name.toLowerCase().replace(/\s+/g, "-"),
+      name,
+    }));
+  } catch (error) {
+    console.error("Error fetching breeds:", error);
+    return fallbackBreeds.map((name) => ({
+      breedId: name.toLowerCase().replace(/\s+/g, "-"),
+      name,
+    }));
   }
 };
 

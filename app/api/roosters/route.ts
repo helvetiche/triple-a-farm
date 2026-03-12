@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // If pagination is requested
     if (searchParams.has("page") || searchParams.has("limit")) {
-      const cacheKey = `roosters:paginated:${page}:${limit}:${search || ''}:${status || ''}:${breedId || ''}`;
+      const cacheKey = `roosters:paginated:v3:${page}:${limit}:${search || ''}:${status || ''}:${breedId || ''}`;
       
       const result = await withCache(
         cacheKey,
