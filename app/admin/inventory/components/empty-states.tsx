@@ -4,7 +4,7 @@ import { Package, Plus, Search, AlertTriangle, Users } from "lucide-react";
 import Link from "next/link";
 
 // Empty inventory state
-export function EmptyInventoryState() {
+export function EmptyInventoryState({ onAddItem }: { onAddItem?: () => void }) {
   return (
     <Card className="border-[#3d6c58]/20">
       <CardContent className="flex flex-col items-center justify-center py-16">
@@ -16,11 +16,12 @@ export function EmptyInventoryState() {
           Start by adding your first inventory item to track stock levels,
           suppliers, and manage your farm supplies efficiently.
         </p>
-        <Button asChild className="bg-[#3d6c58] hover:bg-[#4e816b]">
-          <Link href="/admin/inventory/add">
-            <Plus className="w-4 h-4 " />
-            Add Your First Item
-          </Link>
+        <Button 
+          onClick={onAddItem}
+          className="bg-[#3d6c58] hover:bg-[#4e816b]"
+        >
+          <Plus className="w-4 h-4 " />
+          Add Your First Item
         </Button>
       </CardContent>
     </Card>
@@ -28,7 +29,15 @@ export function EmptyInventoryState() {
 }
 
 // No search results state
-export function NoSearchResultsState({ searchValue }: { searchValue: string }) {
+export function NoSearchResultsState({ 
+  searchValue, 
+  onClearSearch,
+  onAddItem 
+}: { 
+  searchValue: string;
+  onClearSearch?: () => void;
+  onAddItem?: () => void;
+}) {
   return (
     <Card className="border-[#3d6c58]/20">
       <CardContent className="flex flex-col items-center justify-center py-16">
@@ -41,14 +50,19 @@ export function NoSearchResultsState({ searchValue }: { searchValue: string }) {
           &quot;. Try adjusting your search terms or browse all items.
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" className="border-[#3d6c58]/20">
+          <Button 
+            variant="outline" 
+            className="border-[#3d6c58]/20"
+            onClick={onClearSearch}
+          >
             Clear Search
           </Button>
-          <Button asChild className="bg-[#3d6c58] hover:bg-[#4e816b]">
-            <Link href="/admin/inventory/add">
-              <Plus className="w-4 h-4 " />
-              Add New Item
-            </Link>
+          <Button 
+            onClick={onAddItem}
+            className="bg-[#3d6c58] hover:bg-[#4e816b]"
+          >
+            <Plus className="w-4 h-4 " />
+            Add New Item
           </Button>
         </div>
       </CardContent>
@@ -100,7 +114,13 @@ export function NoSuppliersState() {
 }
 
 // Empty category state
-export function EmptyCategoryState({ category }: { category: string }) {
+export function EmptyCategoryState({ 
+  category,
+  onAddItem 
+}: { 
+  category: string;
+  onAddItem?: () => void;
+}) {
   return (
     <Card className="border-[#3d6c58]/20">
       <CardContent className="flex flex-col items-center justify-center py-16">
@@ -112,11 +132,12 @@ export function EmptyCategoryState({ category }: { category: string }) {
           There are currently no items in the {category.toLowerCase()} category.
           Add your first {category.toLowerCase()} item to get started.
         </p>
-        <Button asChild className="bg-[#3d6c58] hover:bg-[#4e816b]">
-          <Link href="/admin/inventory/add">
-            <Plus className="w-4 h-4 " />
-            Add {category} Item
-          </Link>
+        <Button 
+          onClick={onAddItem}
+          className="bg-[#3d6c58] hover:bg-[#4e816b]"
+        >
+          <Plus className="w-4 h-4 " />
+          Add {category} Item
         </Button>
       </CardContent>
     </Card>

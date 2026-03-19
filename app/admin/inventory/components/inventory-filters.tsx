@@ -100,9 +100,9 @@ export function InventoryFilters({
                           <SelectItem value="all">All Categories</SelectItem>
                           <SelectItem value="Feed">Feed</SelectItem>
                           <SelectItem value="Medicine">Medicine</SelectItem>
-                          <SelectItem value="Vitamins">Vitamins</SelectItem>
-                          <SelectItem value="Equipment">Equipment</SelectItem>
                           <SelectItem value="Supplements">Supplements</SelectItem>
+                          <SelectItem value="Supplies">Supplies</SelectItem>
+                          <SelectItem value="Cleaning">Cleaning</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

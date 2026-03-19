@@ -665,9 +665,13 @@ export default function InventoryPage() {
                     <TableSkeleton />
                   ) : !paginatedItems || paginatedItems.length === 0 ? (
                     searchValue ? (
-                      <NoSearchResultsState searchValue={searchValue} />
+                      <NoSearchResultsState 
+                        searchValue={searchValue}
+                        onClearSearch={() => setSearchValue("")}
+                        onAddItem={() => setIsAddDialogOpen(true)}
+                      />
                     ) : (
-                      <EmptyInventoryState />
+                      <EmptyInventoryState onAddItem={() => setIsAddDialogOpen(true)} />
                     )
                   ) : (
                     <InventoryTablePaginated
